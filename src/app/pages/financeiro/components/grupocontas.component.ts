@@ -149,6 +149,7 @@ interface ExportColumn {
                             optionValue="value"
                             placeholder="Selecione um status" 
                             fluid 
+                            [appendTo]="'body'"
                         />
                          <small class="text-red-500" *ngIf="submitted && grupoConta.ativo">Status é obrigatório.</small>
                     </div>

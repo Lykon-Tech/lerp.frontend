@@ -7,6 +7,7 @@ import { Bolsas } from './financeiro/components/bolsa.component';
 import { GrupoContas } from './financeiro/components/grupocontas.component';
 import { Contas } from './financeiro/components/conta.component';
 import { subcontas } from './financeiro/components/subconta.component';
+import { TipoDocumentos } from './financeiro/components/tipodocumento.component';
 
 export default [
     { path: 'documentation', component: Documentation },
@@ -15,6 +16,7 @@ export default [
     { path: 'grupos_contas', component: GrupoContas },
     { path: 'contas', component: Contas },
     { path: 'subcontas', component: subcontas },
+    { path: 'tipos_documentos', component: TipoDocumentos },
     { path: 'crud', component: Crud },
     { path: 'empty', component: Empty },
     { path: '**', redirectTo: '/notfound' }

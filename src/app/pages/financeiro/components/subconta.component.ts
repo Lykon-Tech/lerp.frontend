@@ -78,7 +78,7 @@ interface ExportColumn {
             [tableStyle]="{ 'min-width': '75rem' }"
             [rowHover]="true"
             dataKey="id"
-            currentPageReportTemplate="Mostrando de {first} até {last} de {totalRecords} subcontas"
+            currentPageReportTemplate="Mostrando de {first} até {last} de {totalRecords} Subcontas"
             [showCurrentPageReport]="true"
             [rowsPerPageOptions]="[10, 20, 30]"
         >

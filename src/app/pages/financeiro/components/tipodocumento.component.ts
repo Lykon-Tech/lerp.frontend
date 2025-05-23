@@ -18,8 +18,8 @@ import { TagModule } from 'primeng/tag';
 import { InputIconModule } from 'primeng/inputicon';
 import { IconFieldModule } from 'primeng/iconfield';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { Bolsa } from '../models/bolsa.model';
-import { BolsaService } from '../services/bolsa.service';
+import { TipoDocumento } from '../models/tipodocumento.model';
+import { TipoDocumentoService } from '../services/tipodocumento.service';
 import { CheckboxModule } from 'primeng/checkbox';
 
 interface Column {
@@ -67,21 +67,21 @@ interface ExportColumn {
 
         <p-table
             #dt
-            [value]="bolsas()"
+            [value]="tipoDocumentos()"
             [rows]="10"
             [columns]="cols"
             [paginator]="true"
-            [globalFilterFields]="['nome', 'percentualDesconto', 'necessitaAutSuperior', 'ativo']"
+            [globalFilterFields]="['nome', 'ativo']"
             [tableStyle]="{ 'min-width': '75rem' }"
             [rowHover]="true"
             dataKey="id"
-            currentPageReportTemplate="Mostrando de {first} até {last} de {totalRecords} Bolsas"
+            currentPageReportTemplate="Mostrando de {first} até {last} de {totalRecords} Tipo de documentos"
             [showCurrentPageReport]="true"
             [rowsPerPageOptions]="[10, 20, 30]"
         >
             <ng-template #caption>
                 <div class="flex items-center justify-between">
-                    <h5 class="m-0">Gerenciar Bolsas</h5>
+                    <h5 class="m-0">Gerenciar Tipo de Documentos</h5>
                     <p-iconfield>
                         <p-inputicon styleClass="pi pi-search" />
                         <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Pesquisar..." />
@@ -94,14 +94,6 @@ interface ExportColumn {
                         Nome
                         <p-sortIcon field="nome" />
                     </th>
-                    <th pSortableColumn="percentualDesconto" style="min-width:10rem">
-                        Percentual de desconto
-                        <p-sortIcon field="percentualDesconto" />
-                    </th>
-                    <th pSortableColumn="necessitaAutSuperior" style="min-width: 12rem">
-                        Necessita autorização sup.
-                        <p-sortIcon field="necessitaAutSuperior" />
-                    </th>
                     <th pSortableColumn="ativo" style="min-width: 12rem">
                         Ativo
                         <p-sortIcon field="ativo" />
@@ -109,50 +101,33 @@ interface ExportColumn {
                     <th style="min-width: 12rem"></th>
                 </tr>
             </ng-template>
-            <ng-template #body let-bolsa>
+            <ng-template #body let-TipoDocumento>
                 <tr>
-                    <td style="min-width: 16rem">{{ bolsa.nome }}</td>
-                    <td>{{ bolsa.percentualDesconto + '%'}}</td>
+                    <td style="min-width: 16rem">{{ TipoDocumento.nome }}</td>
                     <td>
-                        <i
-                            class="pi"
-                            [ngClass]="{
-                            'pi-check text-green-600': bolsa.necessitaAutSuperior,
-                            'pi-times text-red-600': !bolsa.necessitaAutSuperior
-                            }"
-                            aria-label="aut_sup">
-                        </i>
+                        <p-tag [value]="TipoDocumento.ativo ? 'ATIVO' : 'INATIVO' " [severity]="getSeverity(TipoDocumento.ativo)" />
                     </td>
                     <td>
-                        <p-tag [value]="bolsa.ativo ? 'ATIVO' : 'INATIVO' " [severity]="getSeverity(bolsa.ativo)" />
-                    </td>
-                    <td>
-                        <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="editBolsa(bolsa)" />
-                        <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (click)="deleteBolsa(bolsa)" />
+                        <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="editTipoDocumento(TipoDocumento)" />
+                        <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (click)="deleteTipoDocumento(TipoDocumento)" />
                     </td>
                 </tr>
             </ng-template>
         </p-table>
 
-        <p-dialog [(visible)]="BolsaDialog" [style]="{ width: '450px' }" header="Detalhes do Bolsa" [modal]="true">
+        <p-dialog [(visible)]="tipoDocumentoDialog" [style]="{ width: '450px' }" header="Detalhes do Tipo de Documento" [modal]="true">
             <ng-template #content>
                 <div class="flex flex-col gap-6">
                     <div>
                         <label for="name" class="block font-bold mb-3">Nome</label>
-                        <input name="name" type="text" pInputText id="nome" [(ngModel)]="bolsa.nome" required autofocus fluid />
-                        <small class="text-red-500" *ngIf="submitted && !bolsa.nome">Nome é obrigatório.</small>
+                        <input name="name" type="text" pInputText id="nome" [(ngModel)]="tipoDocumento.nome" required autofocus fluid />
+                        <small class="text-red-500" *ngIf="submitted && !tipoDocumento.nome">Nome é obrigatório.</small>
                     </div>
-                    <div>
-                        <label for="perc_desconto" class="block font-bold mb-3">Percentual de desconto</label>
-                        <input name="perc_desconto" id="perc_desconto" type="number" pInputText [(ngModel)]="bolsa.percentualDesconto" required fluid/>
-                        <small class="text-red-500" *ngIf="submitted && !bolsa.percentualDesconto">Percentual de desconto é obrigatório.</small>
-                    </div>
-
                     <div>
                         <label for="status" class="block font-bold mb-3">Status</label>
                         <p-select 
                             name="status" 
-                            [(ngModel)]="bolsa.ativo" 
+                            [(ngModel)]="tipoDocumento.ativo" 
                             inputId="ativo" 
                             [options]="statuses" 
                             optionLabel="label" 
@@ -161,39 +136,29 @@ interface ExportColumn {
                             fluid 
                             [appendTo]="'body'"
                         />
-                        <small class="text-red-500" *ngIf="submitted && bolsa.ativo == undefined">Status é obrigatório.</small>
-                    </div>
-
-                    <div>
-                        <span class="block font-bold mb-4">Opções</span>
-                        <div class="grid grid-cols-2 gap-2">
-                            <div class="flex items-center gap-2 col-span-6">
-                                <p-checkbox id="aut_sup" name="aut_sup" binary="true" [(ngModel)]="bolsa.necessitaAutSuperior"></p-checkbox>
-                                <label for="aut_sup">Necessita autorização de superior</label>
-                            </div>
-                        </div>
+                        <small class="text-red-500" *ngIf="submitted && tipoDocumento.ativo == undefined">Status é obrigatório.</small>
                     </div>
                 </div>
             </ng-template>
 
             <ng-template #footer>
                 <p-button label="Cancel" icon="pi pi-times" text (click)="hideDialog()" />
-                <p-button label="Save" icon="pi pi-check" (click)="saveBolsa()" />
+                <p-button label="Save" icon="pi pi-check" (click)="saveTipoDocumento()" />
             </ng-template>
         </p-dialog>
 
         <p-confirmdialog [style]="{ width: '450px' }" />
     `,
-    providers: [MessageService, BolsaService, ConfirmationService]
+    providers: [MessageService, TipoDocumentoService, ConfirmationService]
 })
-export class Bolsas implements OnInit {
-    BolsaDialog: boolean = false;
+export class TipoDocumentos implements OnInit {
+    tipoDocumentoDialog: boolean = false;
 
-    bolsas = signal<Bolsa[]>([]);
+    tipoDocumentos = signal<TipoDocumento[]>([]);
 
     exportColumns!: ExportColumn[];
 
-    bolsa!: Bolsa;
+    tipoDocumento!: TipoDocumento;
 
     submitted: boolean = false;
 
@@ -204,7 +169,7 @@ export class Bolsas implements OnInit {
     cols!: Column[];
 
     constructor(
-        private bolsaService: BolsaService,
+        private tipoDocumentoService: TipoDocumentoService,
         private messageService: MessageService,
         private confirmationService: ConfirmationService
         
@@ -216,8 +181,8 @@ export class Bolsas implements OnInit {
     }
 
     loadDemoData() {
-        this.bolsaService.getBolsas().then((data) => {
-            this.bolsas.set(data);
+        this.tipoDocumentoService.getTipoDocumentos().then((data) => {
+            this.tipoDocumentos.set(data);
         });
 
         this.statuses = [
@@ -227,8 +192,6 @@ export class Bolsas implements OnInit {
 
         this.cols = [
             { field: 'nome', header: 'Nome', customExportHeader: 'Nome' },
-            { field: 'perc_desconto', header: '% Desconto' },
-            { field: 'aut_sup', header: 'Necessita autorização sup.' },
             { field: 'ativo', header: 'Status' }
         ];
 
@@ -240,44 +203,44 @@ export class Bolsas implements OnInit {
     }
 
     openNew() {
-        this.bolsa = {};
+        this.tipoDocumento = {};
         this.submitted = false;
-        this.BolsaDialog = true;
+        this.tipoDocumentoDialog = true;
     }
 
-    editBolsa(Bolsa: Bolsa) {
-        this.bolsa = { ...Bolsa };
-        this.BolsaDialog = true;
+    editTipoDocumento(TipoDocumento: TipoDocumento) {
+        this.tipoDocumento = { ...TipoDocumento };
+        this.tipoDocumentoDialog = true;
     }
 
     hideDialog() {
-        this.BolsaDialog = false;
+        this.tipoDocumentoDialog = false;
         this.submitted = false;
     }
 
-    async deleteBolsa(bolsa: Bolsa) {
+    async deleteTipoDocumento(tipoDocumento: TipoDocumento) {
         this.confirmationService.confirm({
-            message: 'Você tem certeza que deseja deletar ' + bolsa.nome + '?',
+            message: 'Você tem certeza que deseja deletar ' + tipoDocumento.nome + '?',
             header: 'Confirmar',
             icon: 'pi pi-exclamation-triangle',
             accept: async () => {
-                if (bolsa.id != null) {
+                if (tipoDocumento.id != null) {
                     try {
-                        await this.bolsaService.deleteBolsa(bolsa.id);
+                        await this.tipoDocumentoService.deleteTipoDocumento(tipoDocumento.id);
 
-                        const novaLista = this.bolsas().filter(b => b.id !== bolsa.id);
-                        this.bolsas.set([...novaLista]);
+                        const novaLista = this.tipoDocumentos().filter(b => b.id !== tipoDocumento.id);
+                        this.tipoDocumentos.set([...novaLista]);
                         this.messageService.add({
                             severity: 'success',
                             summary: 'Sucesso',
-                            detail: 'Bolsa deletado',
+                            detail: 'Tipo de documento deletado',
                             life: 3000
                         });
                     } catch (err) {
                         this.messageService.add({
                             severity: 'error',
                             summary: 'Erro',
-                            detail: 'Falha ao deletar o Bolsa: ' + err,
+                            detail: 'Falha ao deletar o Tipo de documento: ' + err,
                             life: 3000
                         });
                     }
@@ -288,8 +251,8 @@ export class Bolsas implements OnInit {
 
     findIndexById(id: string): number {
         let index = -1;
-        for (let i = 0; i < this.bolsas().length; i++) {
-            if (this.bolsas()[i].id === id) {
+        for (let i = 0; i < this.tipoDocumentos().length; i++) {
+            if (this.tipoDocumentos()[i].id === id) {
                 index = i;
                 break;
             }
@@ -302,49 +265,49 @@ export class Bolsas implements OnInit {
         return ativo ? 'success' : 'danger';
     }
 
-    async saveBolsa() {
+    async saveTipoDocumento() {
         this.submitted = true;
-        let _bolsas = this.bolsas();
+        let _TipoDocumentos = this.tipoDocumentos();
 
-        if (this.bolsa.nome?.trim() && this.bolsa.percentualDesconto != 0 && this.bolsa.percentualDesconto != null && this.bolsa.ativo != undefined) {
+        if (this.tipoDocumento.nome?.trim() && this.tipoDocumento.ativo != undefined) {
             try {
-            if (this.bolsa.id) {
-                const updatedBolsa = await this.bolsaService.updateBolsa(this.bolsa);
-                const index = this.findIndexById(updatedBolsa.id!);
-                const updatedBolsas = [..._bolsas];
-                updatedBolsas[index] = updatedBolsa;
-                this.bolsas.set(updatedBolsas);
+            if (this.tipoDocumento.id) {
+                const updatedTipoDocumento = await this.tipoDocumentoService.updateTipoDocumento(this.tipoDocumento);
+                const index = this.findIndexById(updatedTipoDocumento.id!);
+                const updatedTipoDocumentos = [..._TipoDocumentos];
+                updatedTipoDocumentos[index] = updatedTipoDocumento;
+                this.tipoDocumentos.set(updatedTipoDocumentos);
 
                 this.messageService.add({
                 severity: 'success',
                 summary: 'Sucesso',
-                detail: 'Bolsa atualizada',
+                detail: 'Tipo de documento atualizado',
                 life: 3000
                 });
             } else {
-                const createdBolsa = await this.bolsaService.createBolsa(this.bolsa);
-                this.bolsas.set([..._bolsas, createdBolsa]);
+                const createdTipoDocumento = await this.tipoDocumentoService.createTipoDocumento(this.tipoDocumento);
+                this.tipoDocumentos.set([..._TipoDocumentos, createdTipoDocumento]);
                 
 
                 this.messageService.add({
                     severity: 'success',
                     summary: 'Sucesso',
-                    detail: 'Bolsa criada',
+                    detail: 'Tipo de documento criado',
                 life: 3000
                 });
             }
 
-            this.BolsaDialog = false;
-            this.bolsa = {};
+            this.tipoDocumentoDialog = false;
+            this.tipoDocumento = {};
             } catch (error) {
                 this.messageService.add({
                     severity: 'error',
                     summary: 'Erro',
-                    detail: 'Falha ao salvar bolsa: ' + error,
+                    detail: 'Falha ao salvar tipo de documento: ' + error,
                     life: 3000
                 });
             }
         }
     }
-    
+
 }

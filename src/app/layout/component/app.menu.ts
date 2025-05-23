@@ -29,23 +29,33 @@ export class AppMenu {
             {
                 label: 'Educacional',
                 items: [
-                    { label: 'Cursos', icon: 'pi pi-book', routerLink: ['/pages/cursos'] },
                     { label: 'Alunos', icon: 'pi pi-users', routerLink: ['/pages/alunos'] },
-                    { label: 'Contratos', icon: 'pi pi-file', routerLink: ['/pages/contratos'] },
-                    { label: 'Turmas', icon: 'pi pi-users', routerLink: ['/pages/turmas'] },
                     {
-                        label: 'Cadastros',
+                        label: 'Turmas',
                         items: [
-                            { label: 'Salas', icon: 'pi pi-building', routerLink: ['/pages/salas'] },
-                            { label: 'Matrizes curriculares', icon: 'pi pi-th-large', routerLink: ['/pages/matrizes_curriculares'] },
-                            { label: 'Modalidades', icon: 'pi pi-sliders-h', routerLink: ['/pages/modalidades'] },
+                            { label: 'Turmas', icon: 'pi pi-users', routerLink: ['/pages/turmas'] },
                             { label: 'Turnos', icon: 'pi pi-clock', routerLink: ['/pages/turnos'] },
                             { label: 'Situação de turma', icon: 'pi pi-info-circle', routerLink: ['/pages/situacoes_turmas'] },
-                            { label: 'Situação de contrato', icon: 'pi pi-file-excel', routerLink: ['/pages/situacoes_contratos'] },
+                        ]
+                    },
+                    {
+                        label: 'Cursos',
+                        items: [
+                            { label: 'Cursos', icon: 'pi pi-book', routerLink: ['/pages/cursos'] },
+                            { label: 'Matrizes curriculares', icon: 'pi pi-th-large', routerLink: ['/pages/matrizes_curriculares'] },
+                            { label: 'Modalidades', icon: 'pi pi-sliders-h', routerLink: ['/pages/modalidades'] },
                             { label: 'Tipo de curso', icon: 'pi pi-tags', routerLink: ['/pages/tipos_cursos'] },
+                        ]
+                    },
+                    {
+                        label: 'Contratos',
+                        items: [
+                            { label: 'Contratos', icon: 'pi pi-file', routerLink: ['/pages/contratos'] },
+                            { label: 'Situação de contrato', icon: 'pi pi-file-excel', routerLink: ['/pages/situacoes_contratos'] },
                             { label: 'Tipo de contrato', icon: 'pi pi-briefcase', routerLink: ['/pages/tipos_contratos'] }
                         ]
-                    }
+                    },
+                    { label: 'Salas', icon: 'pi pi-building', routerLink: ['/pages/salas'] }
                 ]
             },
             {
@@ -56,7 +66,8 @@ export class AppMenu {
                     { label: 'Contas', icon: 'pi pi-credit-card', routerLink: ['/pages/contas'] },
                     { label: 'Subcontas', icon: 'pi pi-credit-card', routerLink: ['/pages/subcontas'] },
                     { label: 'Grupo de Contas', icon: 'pi pi-th-large', routerLink: ['/pages/grupos_contas'] },
-                    { label: 'Bolsas', icon: 'pi pi-percentage', routerLink: ['/pages/bolsas'] }
+                    { label: 'Bolsas', icon: 'pi pi-percentage', routerLink: ['/pages/bolsas'] },
+                    { label: 'Tipos de Documentos', icon: 'pi pi-percentage', routerLink: ['/pages/tipos_documentos'] }
                 ]
             },
             {

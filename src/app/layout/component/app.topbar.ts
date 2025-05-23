@@ -64,8 +64,8 @@ import { MenuModule } from 'primeng/menu';
                         <p-menu #menu [popup]="true" [model]="overlayMenuItems"></p-menu>
                         <button type="button" class="layout-topbar-action" (click)="menu.toggle($event)" style="width:auto" pButton icon="pi pi-chevron-down" >
                             <i class="pi pi-user"></i>
-                        <span>Profile</span>
-                    </button>
+                            <span>Profile</span>
+                        </button>
                     </div>
                 </div>
             </div>

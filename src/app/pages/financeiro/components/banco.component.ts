@@ -75,7 +75,7 @@ interface ExportColumn {
             [tableStyle]="{ 'min-width': '75rem' }"
             [rowHover]="true"
             dataKey="id"
-            currentPageReportTemplate="Mostrando de {first} até {last} de {totalRecords} bancos"
+            currentPageReportTemplate="Mostrando de {first} até {last} de {totalRecords} Bancos"
             [showCurrentPageReport]="true"
             [rowsPerPageOptions]="[10, 20, 30]"
         >
@@ -173,6 +173,7 @@ interface ExportColumn {
                             optionValue="value"
                             placeholder="Selecione um status" 
                             fluid 
+                            [appendTo]="'body'"
                         />
                         <small class="text-red-500" *ngIf="submitted && banco.ativo == undefined">Status é obrigatório.</small>
                     </div>
