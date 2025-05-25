@@ -19,7 +19,7 @@ import { InputIconModule } from 'primeng/inputicon';
 import { IconFieldModule } from 'primeng/iconfield';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TagSaida } from '../models/tag.saida.model';
-import { Tag } from '../models/tag.model';
+import { TagModel } from '../models/tag.model';
 import { TagService } from '../services/tag.service';
 import { CheckboxModule } from 'primeng/checkbox';
 import { Subconta } from '../models/subconta.model';
@@ -66,13 +66,13 @@ interface ExportColumn {
 export class Tags implements OnInit {
     tagDialog: boolean = false;
 
-    tags = signal<Tag[]>([]);
+    tags = signal<TagModel[]>([]);
 
     subcontas = signal<Subconta[]>([]);
 
     exportColumns!: ExportColumn[];
 
-    tag!: Tag;
+    tag!: TagModel;
 
     submitted: boolean = false;
 
@@ -135,7 +135,7 @@ export class Tags implements OnInit {
         this.tagDialog = true;
     }
 
-    edittag(tag: Tag) {
+    edittag(tag: TagModel) {
         this.tag = {
             id: tag.id,
             nome: tag.nome,
@@ -150,7 +150,7 @@ export class Tags implements OnInit {
         this.submitted = false;
     }
 
-    async deletetag(tag: Tag) {
+    async deletetag(tag: TagModel) {
         this.confirmationService.confirm({
             message: 'Você tem certeza que deseja deletar a tag ' + tag.nome + '?',
             header: 'Confirmar',
@@ -242,7 +242,7 @@ export class Tags implements OnInit {
         }
     }
 
-    convertertagParatagSaida(tag: Tag): TagSaida {
+    convertertagParatagSaida(tag: TagModel): TagSaida {
         return {
             id: tag.id,
             nome: tag.nome,

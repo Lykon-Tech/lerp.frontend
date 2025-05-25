@@ -261,8 +261,7 @@ export class subcontas implements OnInit {
             this.subconta.tipo = 'ENTRADA';
             this.tipoTravado = true;
         } else {
-            this.tipoTravado = false;
-            this.subconta.tipo = ''; 
+            this.tipoTravado = false; 
         }
     }
 

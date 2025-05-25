@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Tag } from '../models/tag.model';
+import { TagModel } from '../models/tag.model';
 import { firstValueFrom } from 'rxjs';
 import { HttpParams } from '@angular/common/http';
 
@@ -13,7 +13,7 @@ export class TagService {
 
     constructor(private http: HttpClient) {}
 
-    gettags(ativo?: boolean): Promise<Tag[]> {
+    gettags(ativo?: boolean): Promise<TagModel[]> {
             let params = new HttpParams();
             
             if (ativo !== undefined) {
@@ -21,14 +21,14 @@ export class TagService {
             }
 
             return firstValueFrom(
-                this.http.get<Tag[]>(`${this.baseUrl}/find_all_by_empresa`, { params })
+                this.http.get<TagModel[]>(`${this.baseUrl}/find_all_by_empresa`, { params })
             ).then(tags => tags ?? [])
             .catch(error => Promise.reject(this.extractErrorMessage(error)));
         }
 
-    gettag(id: string): Promise<Tag> {
+    gettag(id: string): Promise<TagModel> {
         return firstValueFrom(
-            this.http.get<Tag>(`${this.baseUrl}/find_by_id`, {
+            this.http.get<TagModel>(`${this.baseUrl}/find_by_id`, {
                 params: { id }
             })
         ).catch(error => {
@@ -36,15 +36,25 @@ export class TagService {
         });
     }
 
-    createtag(tag: Tag): Promise<Tag> {
-        return firstValueFrom(this.http.post<Tag>(this.baseUrl, tag))
+    findByName(nome: string): Promise<TagModel> {
+        return firstValueFrom(
+            this.http.get<TagModel>(`${this.baseUrl}/find_by_name`, {
+                params: { nome }
+            })
+        ).catch(error => {
+            return Promise.reject(this.extractErrorMessage(error));
+        });
+    }
+
+    createtag(tag: TagModel): Promise<TagModel> {
+        return firstValueFrom(this.http.post<TagModel>(this.baseUrl, tag))
             .catch(error => {
                 return Promise.reject(this.extractErrorMessage(error));
             });
     }
 
-    updatetag(tag: Tag): Promise<Tag> {
-        return firstValueFrom(this.http.put<Tag>(`${this.baseUrl}/${tag.id}`, tag))
+    updatetag(tag: TagModel): Promise<TagModel> {
+        return firstValueFrom(this.http.put<TagModel>(`${this.baseUrl}/${tag.id}`, tag))
             .catch(error => {
                 return Promise.reject(this.extractErrorMessage(error));
             });

@@ -14,17 +14,17 @@ export class ContaService {
     constructor(private http: HttpClient) {}
 
     getContas(ativo?: boolean): Promise<Conta[]> {
-            let params = new HttpParams();
-            
-            if (ativo !== undefined) {
-                params = params.set('ativo', ativo.toString());
-            }
-
-            return firstValueFrom(
-                this.http.get<Conta[]>(`${this.baseUrl}/find_all_by_empresa`, { params })
-            ).then(contas => contas ?? [])
-            .catch(error => Promise.reject(this.extractErrorMessage(error)));
+        let params = new HttpParams();
+        
+        if (ativo !== undefined) {
+            params = params.set('ativo', ativo.toString());
         }
+
+        return firstValueFrom(
+            this.http.get<Conta[]>(`${this.baseUrl}/find_all_by_empresa`, { params })
+        ).then(contas => contas ?? [])
+        .catch(error => Promise.reject(this.extractErrorMessage(error)));
+    }
 
     getConta(id: string): Promise<Conta> {
         return firstValueFrom(
@@ -35,6 +35,17 @@ export class ContaService {
             return Promise.reject(this.extractErrorMessage(error));
         });
     }
+
+    findByAgenciaNumeroConta(agencia: string, numeroConta :string): Promise<Conta> {
+        return firstValueFrom(
+            this.http.get<Conta>(`${this.baseUrl}/find_by_agencia_numero`, {
+                params: {agencia, numeroConta }
+            })
+        ).catch(error => {
+            return Promise.reject(this.extractErrorMessage(error));
+        });
+    }
+
 
     createConta(conta: Conta): Promise<Conta> {
         return firstValueFrom(this.http.post<Conta>(this.baseUrl, conta))

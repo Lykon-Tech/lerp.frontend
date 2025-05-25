@@ -85,13 +85,13 @@
             </div>
             <div>
                 <label for="agencia" class="block font-bold mb-3">Agência</label>
-                <input name="agencia" id="agencia" type="number" pInputText [(ngModel)]="conta.agencia" required fluid/>
+                <input name="agencia" id="agencia" type="text" pInputText [(ngModel)]="conta.agencia" required fluid/>
                 <small class="text-red-500" *ngIf="submitted && conta.agencia == undefined">Agência é obrigatória.</small>
             </div>
 
             <div>
                 <label for="numero_conta" class="block font-bold mb-3">Número da conta</label>
-                <input name="numero_conta" id="numero_conta" type="number" pInputText [(ngModel)]="conta.numeroConta" required fluid/>
+                <input name="numero_conta" id="numero_conta" type="text" pInputText [(ngModel)]="conta.numeroConta" required fluid/>
                 <small class="text-red-500" *ngIf="submitted && conta.numeroConta == undefined">Número da conta é obrigatório.</small>
             </div>
 

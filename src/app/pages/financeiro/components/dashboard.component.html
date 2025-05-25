@@ -1,0 +1,64 @@
+<p-fluid class="grid grid-cols-12 gap-4">
+
+  <!-- Título do Dashboard -->
+  <div class="col-span-12 mb-4">
+    <h1 class="text-3xl font-bold text-gray-800">Dashboard Financeiro</h1>
+  </div>
+
+  <div class="col-span-12 md:col-span-3">
+    <label for="dataInicio" class="block mb-1 font-medium text-gray-700">Data Início</label>
+    <p-date-picker
+      [(ngModel)]="filtro.dataInicio"
+      inputId="dataInicio"
+      placeholder="Data Início"
+      fluid>
+    </p-date-picker>
+  </div>
+  
+  <div class="col-span-12 md:col-span-3">
+    <label for="dataFim" class="block mb-1 font-medium text-gray-700">Data Fim</label>
+    <p-date-picker
+      [(ngModel)]="filtro.dataFim"
+      inputId="dataFim"
+      placeholder="Data Fim"
+      fluid>
+    </p-date-picker>
+  </div>
+  
+  <div class="col-span-12 md:col-span-3">
+    <label for="subconta" class="block mb-1 font-medium text-gray-700">Subconta</label>
+    <p-dropdown
+      name="subcontas"
+      [(ngModel)]="subcontas"
+      inputId="subconta"
+      [options]="subcontas_select"
+      optionLabel="label"
+      optionValue="value"
+      placeholder="Selecione uma subconta"
+      fluid>
+    </p-dropdown>
+  </div>
+  
+  <div class="col-span-12 md:col-span-3 flex items-center">
+    <button
+      pButton
+      type="button"
+      label="Buscar"
+      (click)="buscarMovimentos()"
+      class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md shadow-md py-3 uppercase"
+    ></button>
+  </div>
+
+  <div class="col-span-12 md:col-span-3 flex space-x-3 mt-2 md:mt-0">
+    <button pButton type="button" label="Semana" (click)="definirPeriodoSemanal()" class="flex-1"></button>
+    <button pButton type="button" label="Mês" (click)="definirPeriodoMensal()" class="flex-1"></button>
+  </div>
+
+  <div class="col-span-12 md:col-span-9"></div>
+
+  <div class="col-span-12 mt-6">
+    <p-card header="Resumo Financeiro">
+      <p-chart type="doughnut" [data]="chartData" [options]="chartOptions"></p-chart>
+    </p-card>
+  </div>
+</p-fluid>

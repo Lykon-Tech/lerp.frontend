@@ -4,6 +4,7 @@ import { Movimento } from '../models/movimento.model';
 import { firstValueFrom } from 'rxjs';
 import { HttpParams } from '@angular/common/http';
 import { MovimentoSaida } from '../models/movimento.saida.model';
+import { FiltroMovimento } from '../models/filtromovimento.model';
 
 interface Page<T> {
   content: T[];
@@ -43,6 +44,12 @@ export class MovimentoService {
         ).catch(error => Promise.reject(this.extractErrorMessage(error)));
     }
 
+    getMovimentosFiltro(filtro : FiltroMovimento): Promise<Movimento[]> {
+        return firstValueFrom(
+           this.http.post<Movimento[]>(`${this.baseUrl}/find_all_by_filtro`, filtro)
+        ).catch(error => Promise.reject(this.extractErrorMessage(error)));
+    }
+
 
     getMovimento(id: string): Promise<Movimento> {
         return firstValueFrom(
@@ -52,6 +59,13 @@ export class MovimentoService {
         ).catch(error => {
             return Promise.reject(this.extractErrorMessage(error));
         });
+    }
+
+    createmovimentos(movimentos :MovimentoSaida[]){
+        return firstValueFrom(this.http.post<Movimento>(this.baseUrl+"/cadastrar_lista", movimentos))
+            .catch(error => {
+                return Promise.reject(this.extractErrorMessage(error));
+            });
     }
 
 

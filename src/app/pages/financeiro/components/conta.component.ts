@@ -203,7 +203,7 @@ export class Contas implements OnInit {
         this.submitted = true;
         let _bancos = this.contas();
 
-        if (this.conta.agencia != 0 && this.conta.numeroConta != 0 && this.conta.banco != undefined && this.conta.ativo != undefined) {
+        if (this.conta.agencia != undefined && this.conta.numeroConta != undefined && this.conta.banco != undefined && this.conta.ativo != undefined) {
             try {
             if (this.conta.id) {
                 const updatedBanco = await this.contaService.updateConta(this.converterContaParaContaSaida(this.conta));

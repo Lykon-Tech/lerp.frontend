@@ -36,6 +36,14 @@ export class TipoDocumentoService {
         });
     }
 
+    findOfx(): Promise<TipoDocumento> {
+        return firstValueFrom(
+            this.http.get<TipoDocumento>(`${this.baseUrl}/find_ofx`)
+        ).catch(error => {
+            return Promise.reject(this.extractErrorMessage(error));
+        });
+    }
+
 
     createTipoDocumento(tipoDocumento: TipoDocumento): Promise<TipoDocumento> {
         return firstValueFrom(this.http.post<TipoDocumento>(this.baseUrl, tipoDocumento))

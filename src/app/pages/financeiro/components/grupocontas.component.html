@@ -91,7 +91,7 @@
                     fluid 
                     [appendTo]="'body'"
                 />
-                    <small class="text-red-500" *ngIf="submitted && grupoConta.ativo">Status é obrigatório.</small>
+                    <small class="text-red-500" *ngIf="submitted && grupoConta.ativo == undefined">Status é obrigatório.</small>
             </div>
 
             <div>

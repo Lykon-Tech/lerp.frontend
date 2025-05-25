@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, signal, ViewChild } from '@angular/core';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Table, TableModule } from 'primeng/table';
 import { CommonModule } from '@angular/common';
@@ -27,7 +27,11 @@ import { DatePicker } from 'primeng/datepicker';
 import { TipoDocumentoService } from '../services/tipodocumento.service';
 import { TipoDocumento } from '../models/tipodocumento.model';
 import { DropdownModule } from 'primeng/dropdown';
-
+import { OfxImportService } from '../services/ofximport.service';
+import { TagService } from '../services/tag.service';
+import { Conta } from '../models/conta.model';
+import { ContaService } from '../services/conta.service';
+import { TagModel } from '../models/tag.model';
 @Component({
     selector: 'app-movimentos',
     templateUrl: './movimento.component.html',
@@ -67,17 +71,24 @@ export class Movimentos implements OnInit {
     submitted: boolean = false;
     subcontas_select!: any[];
     subcontas = signal<Subconta[]>([]);
+    contas_select!: any[];
+    contas = signal<Conta[]>([]);
     tipo_documentos_select!: any[];
     tiposDocumentos = signal<TipoDocumento[]>([]);
     totalRecords : number = 0;
     @ViewChild('dt') dt!: Table;
+    @ViewChild('fileInput') fileInput!: ElementRef;
+    private resolverMovimentoManual?: () => void;
 
     constructor(
     private movimentoService: MovimentoService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
     private subcontaService : SubcontaService,
-    private tipoDocumentoService : TipoDocumentoService
+    private tipoDocumentoService : TipoDocumentoService,
+    private ofxService : OfxImportService,
+    private tagService : TagService,
+    private contaService : ContaService
     ) {}
 
     ngOnInit() {
@@ -117,6 +128,15 @@ export class Movimentos implements OnInit {
             });
         });
 
+        this.contaService.getContas(true).then((data)=>{
+            this.contas.set(data);
+            this.contas_select = this.contas().map(conta => ({
+                label: conta.numeroConta,
+                value: conta
+            }));
+        });
+
+
         this.subcontaService.getSubcontas(true).then((data)=>{
             this.subcontas.set(data);
             this.subcontas_select = this.subcontas().map(subconta => ({
@@ -132,6 +152,181 @@ export class Movimentos implements OnInit {
                 value: tipoDocumento
             }));
         });
+    }
+    async importOfx(event: Event) {
+        const input = event.target as HTMLInputElement;
+        
+        if (input.files && input.files.length > 0) {
+            try {
+                const file = input.files[0];
+                this.loading = true;
+
+           
+                const ofxData = await this.ofxService.importarOfx(file);
+                
+                const conta = await this.contaService.findByAgenciaNumeroConta(ofxData[0].agencia, ofxData[0].numeroConta);
+
+                if(!conta){
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Erro',
+                        detail: 'Conta não cadastrada ou inativa, não foi possível importar OFX. \n Agência: ' + ofxData[0].agencia + ' Número da conta: ' + ofxData[0].numeroConta,
+                        life: 5000
+                    });
+                    return;
+                }
+                
+                const tipoDocumento = await this.tipoDocumentoService.findOfx();
+
+                const { movimentosValidos, historicosSemTag } = await this.identificarTagsFaltantes(ofxData, conta, tipoDocumento);
+
+                if (historicosSemTag.length > 0) {
+                    this.confirmationService.confirm({
+                        message: `
+                            <div>
+                                <p>Os seguintes históricos não possuem tags correspondentes:</p>
+                                <ul style="max-height: 200px; overflow-y: auto; margin: 10px 0; padding-left: 20px;">
+                                    ${historicosSemTag.map(h => `<li>${h}</li>`).join('')}
+                                </ul>
+                                <p>Deseja importar esses ${historicosSemTag.length} movimentos manualmente?</p>
+                            </div>
+                        `,
+                        header: 'Tags não encontradas',
+                        icon: 'pi pi-exclamation-triangle',
+                        acceptLabel: 'Sim, importar manualmente',
+                        rejectLabel: 'Não, pular estes',
+                        acceptButtonStyleClass: 'p-button-primary',
+                        rejectButtonStyleClass: 'p-button-secondary',
+                        accept: async () => {
+                            await this.importarMovimentosManualmente(
+                                ofxData.filter(item => historicosSemTag.includes(item.historico)),
+                                tipoDocumento
+                            );
+                        },
+                        reject: () => {
+                            this.messageService.add({
+                                severity: 'info',
+                                summary: 'Importação parcial',
+                                detail: `${historicosSemTag.length} movimentos sem tags foram ignorados`,
+                                life: 5000
+                            });
+                        }
+                    });
+                }
+
+                if (movimentosValidos.length > 0) {
+                    const movimentosSaida = movimentosValidos
+                        .map(mov => this.converterMovimentoComObjetosParaIds(mov));
+
+                    await this.movimentoService.createmovimentos(movimentosSaida);
+                    await this.loadMovimentos();
+                    
+                    this.messageService.add({
+                        severity: 'success',
+                        summary: 'Sucesso',
+                        detail: `${movimentosValidos.length} movimentos importados automaticamente!`,
+                        life: 5000
+                    });
+                }
+
+            } catch (error) {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Erro',
+                    detail: 'Falha ao importar arquivo OFX: ' + error,
+                    life: 5000
+                });
+            } finally {
+                this.loading = false;
+                input.value = '';
+            }
+        }
+    }
+
+    private async identificarTagsFaltantes(ofxData: any[], conta :Conta, tipoDocumento : TipoDocumento): Promise<{ 
+        movimentosValidos: Movimento[], 
+        historicosSemTag: string[]
+    }> {
+        const movimentosValidos: Movimento[] = [];
+        const historicosSemTag = new Set<string>();
+        let tag : TagModel = {};
+
+        for (const item of ofxData) {
+            try {
+                tag = await this.tagService.findByName(item.historico);
+                
+                if (!tag) {
+                    historicosSemTag.add(item.historico);
+                    continue;
+                }
+               
+
+            } catch (error) {
+                historicosSemTag.add(item.historico);
+                continue;
+            }
+            
+            movimentosValidos.push({
+                dataLancamento: item.dataLancamento,
+                valor: item.valor,
+                historico: item.historico,
+                numeroDocumento: item.numeroDocumento,
+                subconta: tag.subconta || {},
+                conta : conta || {},
+                tipoDocumento: tipoDocumento || {},
+                importadoOfx: true
+            });
+           
+        }
+
+        return { 
+            movimentosValidos, 
+            historicosSemTag: Array.from(historicosSemTag) 
+        };
+    }
+
+    private async importarMovimentosManualmente(movimentos: any[], tipodocumento :TipoDocumento): Promise<void> {
+        for (const mov of movimentos) {
+            try {
+               
+                this.movimento = {
+                    dataLancamento: mov.dataLancamento,
+                    valor: mov.valor,
+                    historico: mov.historico,
+                    numeroDocumento: mov.numeroDocumento,
+                    importadoOfx: true,
+                    subconta: {}, 
+                    tipoDocumento: tipodocumento || {}
+                };
+
+
+                this.movimentoDialog = true;
+                
+                await new Promise<void>((resolve) => {
+                    const subscription = this.messageService.messageObserver.subscribe((msg) => {
+                        const mensagens = Array.isArray(msg) ? msg : [msg];
+
+                        for (const m of mensagens) {
+                            if ((m.summary === 'Sucesso' && m.detail?.includes('Movimento'))) {
+                                subscription.unsubscribe();
+                                resolve();
+                                break;
+                            }
+                        }
+                    });
+                });
+
+
+            } catch (error) {
+                console.error(`Erro ao importar: ${mov.historico}`, error);
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Erro',
+                    detail: `Falha ao importar: ${mov.historico}`,
+                    life: 3000
+                });
+            }
+        }
     }
 
     onGlobalFilter(event: Event) {
@@ -170,8 +365,10 @@ export class Movimentos implements OnInit {
 
     async deleteMovimento(movimento: Movimento) {
         this.confirmationService.confirm({
-            message: 'Você tem certeza que deseja deletar ' + movimento.id + '?',
+            message: 'Você tem certeza que deseja deletar ' + movimento.historico + '?',
             header: 'Confirmar',
+            acceptLabel: 'Sim',
+            rejectLabel: 'Não',
             icon: 'pi pi-exclamation-triangle',
             accept: async () => {
                 if (movimento.id != null) {
@@ -183,7 +380,7 @@ export class Movimentos implements OnInit {
                         this.messageService.add({
                             severity: 'success',
                             summary: 'Sucesso',
-                            detail: 'Movimento deletada',
+                            detail: 'Movimento deletado',
                             life: 3000
                         });
                     } catch (err) {
@@ -219,7 +416,13 @@ export class Movimentos implements OnInit {
         this.submitted = true;
         let _movimentos = this.movimentos();
 
-        if (this.movimento.valor != undefined && this.movimento.subconta != undefined && this.movimento.tipoDocumento != undefined) {
+        if (this.movimento.valor != undefined && 
+            this.movimento.conta && 
+            Object.keys(this.movimento.conta).length > 0 && 
+            this.movimento.subconta && 
+            Object.keys(this.movimento.subconta).length > 0 && 
+            this.movimento?.historico?.trim != undefined
+        ) {
             try {
             if (this.movimento.id) {
                 const updatedmovimento = await this.movimentoService.updateMovimento(this.converterMovimentoComObjetosParaIds(this.movimento));
@@ -264,6 +467,7 @@ export class Movimentos implements OnInit {
         return {
             id: movimento.id,
             subcontaId: movimento.subconta?.id ?? '',
+            contaId: movimento.conta?.id ?? '',
             tipoDocumentoId: movimento.tipoDocumento?.id ?? '',
             valor: movimento?.valor ?? 0,
             dataLancamento: movimento?.dataLancamento ?? new Date,

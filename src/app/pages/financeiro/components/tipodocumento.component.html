@@ -34,6 +34,10 @@
                 Nome
                 <p-sortIcon field="nome" />
             </th>
+            <th pSortableColumn="ofx" style="min-width: 12rem">
+                OFX
+                <p-sortIcon field="ofx" />
+            </th>
             <th pSortableColumn="ativo" style="min-width: 12rem">
                 Ativo
                 <p-sortIcon field="ativo" />
@@ -44,6 +48,16 @@
     <ng-template #body let-tipoDocumento>
         <tr>
             <td style="min-width: 16rem">{{ tipoDocumento.nome }}</td>
+            <td>
+                <i
+                    class="pi"
+                    [ngClass]="{
+                    'pi-check text-green-600': tipoDocumento.ofx,
+                    'pi-times text-red-600': !tipoDocumento.ofx
+                    }"
+                    aria-label="ofx">
+                </i>
+            </td>
             <td>
                 <p-tag [value]="tipoDocumento.ativo ? 'ATIVO' : 'INATIVO' " [severity]="getSeverity(tipoDocumento.ativo)" />
             </td>
@@ -62,6 +76,15 @@
                 <label for="name" class="block font-bold mb-3">Nome</label>
                 <input name="name" type="text" pInputText id="nome" [(ngModel)]="tipoDocumento.nome" required autofocus fluid />
                 <small class="text-red-500" *ngIf="submitted && !tipoDocumento.nome">Nome é obrigatório.</small>
+            </div>
+            <div>
+                <span class="block font-bold mb-4">Opções</span>
+                <div class="grid grid-cols-2 gap-2">
+                    <div class="flex items-center gap-2 col-span-6">
+                        <p-checkbox id="ofx" name="ofx" binary="true" [(ngModel)]="tipoDocumento.ofx"></p-checkbox>
+                        <label for="ofx">OFX</label>
+                    </div>
+                </div>
             </div>
             <div>
                 <label for="status" class="block font-bold mb-3">Status</label>

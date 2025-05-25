@@ -4,6 +4,6 @@ export interface Conta {
   id?: string;          
   banco?: Banco;
   ativo?: boolean;
-  agencia?: number;
-  numeroConta?: number;
+  agencia?: string;
+  numeroConta?: string;
 }

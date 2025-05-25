@@ -53,7 +53,9 @@
         <tr>
             <td style="min-width: 16rem">{{ subconta.nome}}</td>
             <td>{{ subconta.grupoConta.nome}}</td>
-            <td>{{ subconta.tipo}}</td>
+            <td>
+                <p-tag [value]="subconta.tipo" [severity]="getSeverity(subconta.tipo == 'ENTRADA')" />
+            </td>
             <td>
                 <p-tag [value]="subconta.ativo ? 'ATIVO' : 'INATIVO' " [severity]="getSeverity(subconta.ativo)" />
             </td>

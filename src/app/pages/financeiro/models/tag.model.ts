@@ -1,6 +1,6 @@
 import { Subconta } from "./subconta.model";
 
-export interface Tag {
+export interface TagModel {
   id?: string;          
   nome?: string;
   ativo?: boolean;
