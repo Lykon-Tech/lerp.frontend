@@ -60,130 +60,7 @@ interface ExportColumn {
         CheckboxModule,
         ConfirmDialogModule
     ],
-    template: `
-        <p-toast></p-toast>
-        <p-toolbar>
-            <ng-template #end>
-                <p-button label="Novo" icon="pi pi-plus" severity="secondary"(onClick)="openNew()" />
-            </ng-template>
-        </p-toolbar>
-
-        <p-table
-            #dt
-            [value]="contas()"
-            [rows]="10"
-            [columns]="cols"
-            [paginator]="true"
-            [globalFilterFields]="['agencia', 'numeroConta', 'ativo']"
-            [tableStyle]="{ 'min-width': '75rem' }"
-            [rowHover]="true"
-            dataKey="id"
-            currentPageReportTemplate="Mostrando de {first} até {last} de {totalRecords} Contas"
-            [showCurrentPageReport]="true"
-            [rowsPerPageOptions]="[10, 20, 30]"
-        >
-            <ng-template #caption>
-                <div class="flex items-center justify-between">
-                    <h5 class="m-0">Gerenciar Contas</h5>
-                    <p-iconfield>
-                        <p-inputicon styleClass="pi pi-search" />
-                        <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Pesquisar..." />
-                    </p-iconfield>
-                </div>
-            </ng-template>
-            <ng-template #header>
-                <tr>
-                    <th pSortableColumn="banco" style="min-width:16rem">
-                        Banco
-                        <p-sortIcon field="banco" />
-                    </th>
-                    <th pSortableColumn="agencia" style="min-width:10rem">
-                        Agência
-                        <p-sortIcon field="agencia" />
-                    </th>
-                    <th pSortableColumn="numero_conta" style="min-width: 12rem">
-                        Número da conta
-                        <p-sortIcon field="numero_conta" />
-                    </th>
-                    <th pSortableColumn="ativo" style="min-width: 12rem">
-                        Ativo
-                        <p-sortIcon field="ativo" />
-                    </th>
-                    <th style="min-width: 12rem"></th>
-                </tr>
-            </ng-template>
-            <ng-template #body let-conta>
-                <tr>
-                    <td style="min-width: 16rem">{{ conta.banco.nome + " - " + conta.banco.numeroBanco }}</td>
-                    <td>{{ conta.agencia}}</td>
-                    <td>{{ conta.numeroConta}}</td>
-                    <td>
-                        <p-tag [value]="conta.ativo ? 'ATIVO' : 'INATIVO' " [severity]="getSeverity(conta.ativo)" />
-                    </td>
-                    <td>
-                        <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="editConta(conta)" />
-                        <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (click)="deleteConta(conta)" />
-                    </td>
-                </tr>
-            </ng-template>
-        </p-table>
-
-        <p-dialog [(visible)]="contaDialog" [style]="{ width: '450px' }" header="Detalhes da Conta" [modal]="true">
-            <ng-template #content>
-                <div class="flex flex-col gap-6">
-                    <div>
-                        <label for="bancos" class="block font-bold mb-3">Banco</label>
-                        <p-select 
-                            name="bancos" 
-                            [(ngModel)]="conta.banco" 
-                            inputId="banco" 
-                            [options]="bancos_select" 
-                            optionLabel="label" 
-                            optionValue="value"
-                            placeholder="Selecione um banco"
-                            fluid 
-                            [appendTo]="'body'"
-                        />
-                        <small class="text-red-500" *ngIf="submitted && conta.banco == undefined">Banco é obrigatório.</small>
-                    </div>
-                    <div>
-                        <label for="agencia" class="block font-bold mb-3">Agência</label>
-                        <input name="agencia" id="agencia" type="number" pInputText [(ngModel)]="conta.agencia" required fluid/>
-                        <small class="text-red-500" *ngIf="submitted && conta.agencia == undefined">Agência é obrigatória.</small>
-                    </div>
-
-                    <div>
-                        <label for="numero_conta" class="block font-bold mb-3">Número da conta</label>
-                        <input name="numero_conta" id="numero_conta" type="number" pInputText [(ngModel)]="conta.numeroConta" required fluid/>
-                        <small class="text-red-500" *ngIf="submitted && conta.numeroConta == undefined">Número da conta é obrigatório.</small>
-                    </div>
-
-                    <div>
-                        <label for="status" class="block font-bold mb-3">Status</label>
-                        <p-select 
-                            name="status" 
-                            [(ngModel)]="conta.ativo" 
-                            inputId="ativo" 
-                            [options]="statuses" 
-                            optionLabel="label" 
-                            optionValue="value"
-                            placeholder="Selecione um status" 
-                            fluid 
-                            [appendTo]="'body'"
-                        />
-                        <small class="text-red-500" *ngIf="submitted && conta.ativo == undefined">Status é obrigatório.</small>
-                    </div>
-                </div>
-            </ng-template>
-
-            <ng-template #footer>
-                <p-button label="Cancel" icon="pi pi-times" text (click)="hideDialog()" />
-                <p-button label="Save" icon="pi pi-check" (click)="saveConta()" />
-            </ng-template>
-        </p-dialog>
-
-        <p-confirmdialog [style]="{ width: '450px' }" />
-    `,
+    templateUrl: './conta.component.html',
     providers: [MessageService, ContaService, ConfirmationService]
 })
 export class Contas implements OnInit {
@@ -254,7 +131,7 @@ export class Contas implements OnInit {
     }
 
     openNew() {
-        this.conta = {};
+        this.conta = {ativo:true};
         this.submitted = false;
         this.contaDialog = true;
     }

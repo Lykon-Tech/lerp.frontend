@@ -1,0 +1,241 @@
+<p-toast></p-toast>
+<p-toolbar>
+    <ng-template #end>
+        <p-button label="Novo" icon="pi pi-plus" severity="secondary"(onClick)="openNew()" />
+    </ng-template>
+</p-toolbar>
+<div class="card">
+    <div class="font-semibold text-xl mb-4">Movimentos Financeiros</div>
+
+    <p-table
+        #dt
+        [value]="movimentos()"
+        dataKey="id"
+        [rows]="10"
+        [loading]="loading"
+        [paginator]="true"
+        [showGridlines]="true"
+        [rowHover]="true"
+        responsiveLayout="scroll"
+        currentPageReportTemplate="Mostrando de {first} até {last} de {totalRecords} Movimentos"
+        [showCurrentPageReport]="true"
+        [rowsPerPageOptions]="[10, 20, 30]"
+        [globalFilterFields]="['subconta.nome', 'tipoDocumento.nome', 'valor', 'numeroDocumento', 'historico']"
+    >
+        <ng-template #caption>
+            <div class="flex justify-between items-center">
+                <button pButton label="Limpar" icon="pi pi-filter-slash" class="p-button-outlined" (click)="dt.clear()"></button>
+                <p-iconfield iconPosition="left" class="ml-auto">
+                    <p-inputicon>
+                        <i class="pi pi-search"></i>
+                    </p-inputicon>
+                    <input
+                        pInputText
+                        type="text"
+                        (input)="onGlobalFilter($event)"
+                        placeholder="Buscar..." />
+                </p-iconfield>
+            </div>
+        </ng-template>
+
+        <ng-template #header>
+            <tr>
+                <th style="min-width: 10rem">
+                    Data
+                    <p-columnFilter type="date" field="dataLancamento" display="menu" placeholder="dd/mm/aaaa" />
+                </th>
+                <th style="min-width: 10rem">
+                    Subconta
+                    <p-columnFilter type="text" field="subconta.nome" display="menu" placeholder="Buscar por subconta" />
+                </th>
+                <th style="min-width: 10rem">
+                    Tipo Documento
+                    <p-columnFilter type="text" field="tipoDocumento.nome" display="menu" placeholder="Buscar por tipo" />
+                </th>
+                <th style="min-width: 8rem">
+                    Valor
+                    <p-columnFilter type="numeric" field="valor" display="menu" />
+                </th>
+                <th style="min-width: 10rem">
+                    Nº Documento
+                    <p-columnFilter type="text" field="numeroDocumento" display="menu" />
+                </th>
+                <th style="min-width: 12rem">
+                    Histórico
+                    <p-columnFilter type="text" field="historico" display="menu" />
+                </th>
+                <th style="min-width: 8rem">
+                    Saldo
+                </th>
+                <th style="min-width: 12rem">Ações</th>
+            </tr>
+        </ng-template>
+
+        <ng-template #body let-mov>
+            <tr>
+                <td>{{ mov?.dataLancamento | date:'dd/MM/yyyy' }}</td>
+                <td>
+                    <p-tag [value]="mov.subconta.nome" severity="info" styleClass="rounded-full" />
+                </td>
+                <td>
+                    <p-tag [value]="mov.tipoDocumento.nome" severity="primary" styleClass="rounded-full" />
+                </td>
+                <td>{{ mov?.valor | currency:'BRL' }}</td>
+                <td>{{ mov?.numeroDocumento }}</td>
+                <td>{{ mov?.historico }}</td>
+                <td>
+                    <p-tag [value]="formatarValor(mov?.valor)" [severity]="getSeverity(mov?.subconta.tipo == 'ENTRADA')" />
+                <td>
+                    <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="editMovimento(mov)" />
+                    <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (click)="deleteMovimento(mov)" />
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template #footer>
+            <tr>
+                <td colspan="6" class="text-right font-bold">Total do Saldo:</td>
+                <td colspan="2">
+                    <p-tag [value]="totalSaldoFormatado()" severity="success" styleClass="rounded-full" />
+                </td>
+            </tr>
+        </ng-template>
+
+        <ng-template #emptymessage>
+            <tr><td colspan="7">Nenhum movimento encontrado.</td></tr>
+        </ng-template>
+
+        <ng-template #loadingbody>
+            <tr><td colspan="7">Carregando dados...</td></tr>
+        </ng-template>
+    </p-table>
+
+    <p-dialog [(visible)]="movimentoDialog" [style]="{ width: '450px' }" header="Detalhes do Movimento" [modal]="true">
+        <ng-template #content>
+            <div class="flex flex-col gap-6">
+
+                <div>
+                    <label for="dataLancamento" class="block font-bold mb-3">Data Lançamento</label>
+                    <p-datepicker
+                    id="dataLancamento"
+                    [(ngModel)]="movimento.dataLancamento"
+                    dateFormat="dd/mm/yy"
+                    inputId="dataLancamento"
+                    placeholder="Selecione a data"
+                    [showIcon]="true"
+                    [showButtonBar]="true"
+                    fluid
+                    />
+                    <small class="text-red-500" *ngIf="submitted && !movimento.dataLancamento">Data de lançamento é obrigatória.</small>
+                </div>
+            
+                <div>
+                    <label for="valor" class="block font-bold mb-3">Valor</label>
+                    <input
+                    name="valor"
+                    type="number"
+                    pInputText
+                    id="valor"
+                    [(ngModel)]="movimento.valor"
+                    required
+                    autofocus
+                    fluid
+                    />
+                    <small class="text-red-500" *ngIf="submitted && movimento.valor == undefined">Valor é obrigatório.</small>
+                </div>
+
+                <div>
+                    <label for="subcontas" class="block font-bold mb-3">Subconta</label>
+                    <p-select
+                    name="subcontas"
+                    [(ngModel)]="movimento.subconta"
+                    inputId="subconta"
+                    [options]="subcontas_select"
+                    optionLabel="label"
+                    optionValue="value"
+                    placeholder="Selecione uma subconta"
+                    fluid
+                    [appendTo]="'body'"
+                    ></p-select>
+                    <small class="text-red-500" *ngIf="submitted && movimento.subconta == undefined">Subconta é obrigatório.</small>
+                </div>
+
+                <div>
+                    <label for="tipo_documentos" class="block font-bold mb-3">Tipo de Documento</label>
+                    <p-select
+                    name="tipo_documentos"
+                    [(ngModel)]="movimento.tipoDocumento"
+                    inputId="tipo_documento"
+                    [options]="tipo_documentos_select"
+                    optionLabel="label"
+                    optionValue="value"
+                    placeholder="Selecione um tipo de documento"
+                    fluid
+                    [appendTo]="'body'"
+                    ></p-select>
+                </div>
+
+                <div>
+                    <label for="historico" class="block font-bold mb-3">Histórico</label>
+                    <input
+                    type="text"
+                    pInputText
+                    id="historico"
+                    [(ngModel)]="movimento.historico"
+                    maxlength="255"
+                    placeholder="Descreva o histórico"
+                    fluid
+                    />
+                </div>
+
+                
+                <div>
+                    <label for="numeroDocumento" class="block font-bold mb-3">Número do Documento</label>
+                    <input
+                    type="text"
+                    pInputText
+                    id="numeroDocumento"
+                    [(ngModel)]="movimento.numeroDocumento"
+                    maxlength="50"
+                    placeholder="Número do documento"
+                    fluid
+                    />
+                </div>
+
+                <div>
+                    <label for="numeroMovimento" class="block font-bold mb-3">Número do Movimento</label>
+                    <input
+                    type="text"
+                    pInputText
+                    id="numeroMovimento"
+                    [(ngModel)]="movimento.numeroMovimento"
+                    maxlength="50"
+                    placeholder="Número do movimento"
+                    fluid
+                    />
+                </div>
+
+                <div>
+                    <label for="observacao" class="block font-bold mb-3">Observação</label>
+                    <textarea
+                    pInputTextarea
+                    id="observacao"
+                    [(ngModel)]="movimento.observacao"
+                    rows="3"
+                    placeholder="Observações adicionais"
+                    fluid
+                    ></textarea>
+                </div>
+
+            </div>
+        </ng-template>
+
+        <ng-template #footer>
+            <p-button label="Cancel" icon="pi pi-times" text (click)="hideDialog()" />
+            <p-button label="Save" icon="pi pi-check" (click)="savemovimento()" />
+        </ng-template>
+        </p-dialog>
+
+        <p-confirmdialog [style]="{ width: '450px' }" />
+
+
+</div>

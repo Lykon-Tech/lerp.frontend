@@ -1,19 +1,19 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Subconta } from '../models/subconta.model';
+import { Tag } from '../models/tag.model';
 import { firstValueFrom } from 'rxjs';
 import { HttpParams } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
 })
-export class SubcontaService {
+export class TagService {
 
-    private baseUrl = 'http://localhost:8080/financeiro/subconta';
+    private baseUrl = 'http://localhost:8080/financeiro/tag';
 
     constructor(private http: HttpClient) {}
 
-    getSubcontas(ativo?: boolean): Promise<Subconta[]> {
+    gettags(ativo?: boolean): Promise<Tag[]> {
             let params = new HttpParams();
             
             if (ativo !== undefined) {
@@ -21,14 +21,14 @@ export class SubcontaService {
             }
 
             return firstValueFrom(
-                this.http.get<Subconta[]>(`${this.baseUrl}/find_all_by_empresa`, { params })
-            ).then(subcontas => subcontas ?? [])
+                this.http.get<Tag[]>(`${this.baseUrl}/find_all_by_empresa`, { params })
+            ).then(tags => tags ?? [])
             .catch(error => Promise.reject(this.extractErrorMessage(error)));
         }
 
-    getSubconta(id: string): Promise<Subconta> {
+    gettag(id: string): Promise<Tag> {
         return firstValueFrom(
-            this.http.get<Subconta>(`${this.baseUrl}/find_by_id`, {
+            this.http.get<Tag>(`${this.baseUrl}/find_by_id`, {
                 params: { id }
             })
         ).catch(error => {
@@ -36,21 +36,21 @@ export class SubcontaService {
         });
     }
 
-    createSubconta(subconta: Subconta): Promise<Subconta> {
-        return firstValueFrom(this.http.post<Subconta>(this.baseUrl, subconta))
+    createtag(tag: Tag): Promise<Tag> {
+        return firstValueFrom(this.http.post<Tag>(this.baseUrl, tag))
             .catch(error => {
                 return Promise.reject(this.extractErrorMessage(error));
             });
     }
 
-    updateSubconta(subconta: Subconta): Promise<Subconta> {
-        return firstValueFrom(this.http.put<Subconta>(`${this.baseUrl}/${subconta.id}`, subconta))
+    updatetag(tag: Tag): Promise<Tag> {
+        return firstValueFrom(this.http.put<Tag>(`${this.baseUrl}/${tag.id}`, tag))
             .catch(error => {
                 return Promise.reject(this.extractErrorMessage(error));
             });
     }
 
-    deleteSubconta(id: string): Promise<string> {
+    deletetag(id: string): Promise<string> {
         return firstValueFrom(
             this.http.delete(`${this.baseUrl}/${id}`, { responseType: 'text' })
         ).catch(error => {

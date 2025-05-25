@@ -18,8 +18,8 @@ import { TagModule } from 'primeng/tag';
 import { InputIconModule } from 'primeng/inputicon';
 import { IconFieldModule } from 'primeng/iconfield';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { Bolsa } from '../models/bolsa.model';
-import { BolsaService } from '../services/bolsa.service';
+import { Modalidade } from '../models/modalidade.model';
+import { ModalidadeService } from '../services/modalidade.service';
 import { CheckboxModule } from 'primeng/checkbox';
 
 interface Column {
@@ -57,17 +57,17 @@ interface ExportColumn {
         CheckboxModule,
         ConfirmDialogModule
     ],
-    templateUrl: `./bolsa.component.html`,
-    providers: [MessageService, BolsaService, ConfirmationService]
+    templateUrl: `./modalidade.component.html`,
+    providers: [MessageService, ModalidadeService, ConfirmationService]
 })
-export class Bolsas implements OnInit {
-    BolsaDialog: boolean = false;
+export class Modalidades implements OnInit {
+    modalidadeDialog: boolean = false;
 
-    bolsas = signal<Bolsa[]>([]);
+    modalidades = signal<Modalidade[]>([]);
 
     exportColumns!: ExportColumn[];
 
-    bolsa!: Bolsa;
+    modalidade!: Modalidade;
 
     submitted: boolean = false;
 
@@ -78,7 +78,7 @@ export class Bolsas implements OnInit {
     cols!: Column[];
 
     constructor(
-        private bolsaService: BolsaService,
+        private modalidadeService: ModalidadeService,
         private messageService: MessageService,
         private confirmationService: ConfirmationService
         
@@ -90,8 +90,8 @@ export class Bolsas implements OnInit {
     }
 
     loadDemoData() {
-        this.bolsaService.getBolsas().then((data) => {
-            this.bolsas.set(data);
+        this.modalidadeService.getModalidades().then((data) => {
+            this.modalidades.set(data);
         });
 
         this.statuses = [
@@ -101,8 +101,6 @@ export class Bolsas implements OnInit {
 
         this.cols = [
             { field: 'nome', header: 'Nome', customExportHeader: 'Nome' },
-            { field: 'perc_desconto', header: '% Desconto' },
-            { field: 'aut_sup', header: 'Necessita autorização sup.' },
             { field: 'ativo', header: 'Status' }
         ];
 
@@ -114,44 +112,44 @@ export class Bolsas implements OnInit {
     }
 
     openNew() {
-        this.bolsa = {ativo:true};
+        this.modalidade = {ativo:true};
         this.submitted = false;
-        this.BolsaDialog = true;
+        this.modalidadeDialog = true;
     }
 
-    editBolsa(Bolsa: Bolsa) {
-        this.bolsa = { ...Bolsa };
-        this.BolsaDialog = true;
+    editModalidade(modalidade: Modalidade) {
+        this.modalidade = { ...modalidade };
+        this.modalidadeDialog = true;
     }
 
     hideDialog() {
-        this.BolsaDialog = false;
+        this.modalidadeDialog = false;
         this.submitted = false;
     }
 
-    async deleteBolsa(bolsa: Bolsa) {
+    async deleteModalidade(modalidade: Modalidade) {
         this.confirmationService.confirm({
-            message: 'Você tem certeza que deseja deletar ' + bolsa.nome + '?',
+            message: 'Você tem certeza que deseja deletar ' + modalidade.nome + '?',
             header: 'Confirmar',
             icon: 'pi pi-exclamation-triangle',
             accept: async () => {
-                if (bolsa.id != null) {
+                if (modalidade.id != null) {
                     try {
-                        await this.bolsaService.deleteBolsa(bolsa.id);
+                        await this.modalidadeService.deleteModalidade(modalidade.id);
 
-                        const novaLista = this.bolsas().filter(b => b.id !== bolsa.id);
-                        this.bolsas.set([...novaLista]);
+                        const novaLista = this.modalidades().filter(b => b.id !== modalidade.id);
+                        this.modalidades.set([...novaLista]);
                         this.messageService.add({
                             severity: 'success',
                             summary: 'Sucesso',
-                            detail: 'Bolsa deletado',
+                            detail: 'Modalidade deletada',
                             life: 3000
                         });
                     } catch (err) {
                         this.messageService.add({
                             severity: 'error',
                             summary: 'Erro',
-                            detail: 'Falha ao deletar o Bolsa: ' + err,
+                            detail: 'Falha ao deletar a Modalidade: ' + err,
                             life: 3000
                         });
                     }
@@ -162,8 +160,8 @@ export class Bolsas implements OnInit {
 
     findIndexById(id: string): number {
         let index = -1;
-        for (let i = 0; i < this.bolsas().length; i++) {
-            if (this.bolsas()[i].id === id) {
+        for (let i = 0; i < this.modalidades().length; i++) {
+            if (this.modalidades()[i].id === id) {
                 index = i;
                 break;
             }
@@ -176,49 +174,49 @@ export class Bolsas implements OnInit {
         return ativo ? 'success' : 'danger';
     }
 
-    async saveBolsa() {
+    async savemodalidade() {
         this.submitted = true;
-        let _bolsas = this.bolsas();
+        let _modalidades = this.modalidades();
 
-        if (this.bolsa.nome?.trim() && this.bolsa.percentualDesconto != 0 && this.bolsa.percentualDesconto != null && this.bolsa.ativo != undefined) {
+        if (this.modalidade.nome?.trim() && this.modalidade.ativo != undefined) {
             try {
-            if (this.bolsa.id) {
-                const updatedBolsa = await this.bolsaService.updateBolsa(this.bolsa);
-                const index = this.findIndexById(updatedBolsa.id!);
-                const updatedBolsas = [..._bolsas];
-                updatedBolsas[index] = updatedBolsa;
-                this.bolsas.set(updatedBolsas);
+            if (this.modalidade.id) {
+                const updatedmodalidade = await this.modalidadeService.updateModalidade(this.modalidade);
+                const index = this.findIndexById(updatedmodalidade.id!);
+                const updatedmodalidades = [..._modalidades];
+                updatedmodalidades[index] = updatedmodalidade;
+                this.modalidades.set(updatedmodalidades);
 
                 this.messageService.add({
                 severity: 'success',
                 summary: 'Sucesso',
-                detail: 'Bolsa atualizada',
+                detail: 'Modalidade atualizada',
                 life: 3000
                 });
             } else {
-                const createdBolsa = await this.bolsaService.createBolsa(this.bolsa);
-                this.bolsas.set([..._bolsas, createdBolsa]);
+                const createdmodalidade = await this.modalidadeService.createModalidade(this.modalidade);
+                this.modalidades.set([..._modalidades, createdmodalidade]);
                 
 
                 this.messageService.add({
                     severity: 'success',
                     summary: 'Sucesso',
-                    detail: 'Bolsa criada',
+                    detail: 'Modalidade criada',
                 life: 3000
                 });
             }
 
-            this.BolsaDialog = false;
-            this.bolsa = {};
+            this.modalidadeDialog = false;
+            this.modalidade = {};
             } catch (error) {
                 this.messageService.add({
                     severity: 'error',
                     summary: 'Erro',
-                    detail: 'Falha ao salvar bolsa: ' + error,
+                    detail: 'Falha ao salvar modalidade: ' + error,
                     life: 3000
                 });
             }
         }
     }
-    
+
 }

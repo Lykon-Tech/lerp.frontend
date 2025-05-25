@@ -1,34 +1,34 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Subconta } from '../models/subconta.model';
+import { Disciplina } from '../models/disciplina.model';
 import { firstValueFrom } from 'rxjs';
 import { HttpParams } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
 })
-export class SubcontaService {
+export class DisciplinaService {
 
-    private baseUrl = 'http://localhost:8080/financeiro/subconta';
+    private baseUrl = 'http://localhost:8080/curso/disciplina';
 
     constructor(private http: HttpClient) {}
 
-    getSubcontas(ativo?: boolean): Promise<Subconta[]> {
-            let params = new HttpParams();
-            
-            if (ativo !== undefined) {
-                params = params.set('ativo', ativo.toString());
-            }
-
-            return firstValueFrom(
-                this.http.get<Subconta[]>(`${this.baseUrl}/find_all_by_empresa`, { params })
-            ).then(subcontas => subcontas ?? [])
-            .catch(error => Promise.reject(this.extractErrorMessage(error)));
+    getdisciplinas(ativo?: boolean): Promise<Disciplina[]> {
+        let params = new HttpParams();
+        
+        if (ativo !== undefined) {
+            params = params.set('ativo', ativo.toString());
         }
 
-    getSubconta(id: string): Promise<Subconta> {
         return firstValueFrom(
-            this.http.get<Subconta>(`${this.baseUrl}/find_by_id`, {
+            this.http.get<Disciplina[]>(`${this.baseUrl}/find_all_by_empresa`, { params })
+        ).then(disciplinas => disciplinas ?? [])
+        .catch(error => Promise.reject(this.extractErrorMessage(error)));
+    }
+
+    getdisciplina(id: string): Promise<Disciplina> {
+        return firstValueFrom(
+            this.http.get<Disciplina>(`${this.baseUrl}/find_by_id`, {
                 params: { id }
             })
         ).catch(error => {
@@ -36,27 +36,29 @@ export class SubcontaService {
         });
     }
 
-    createSubconta(subconta: Subconta): Promise<Subconta> {
-        return firstValueFrom(this.http.post<Subconta>(this.baseUrl, subconta))
+
+    createdisciplina(disciplina: Disciplina): Promise<Disciplina> {
+        return firstValueFrom(this.http.post<Disciplina>(this.baseUrl, disciplina))
             .catch(error => {
                 return Promise.reject(this.extractErrorMessage(error));
             });
     }
 
-    updateSubconta(subconta: Subconta): Promise<Subconta> {
-        return firstValueFrom(this.http.put<Subconta>(`${this.baseUrl}/${subconta.id}`, subconta))
+    updatedisciplina(disciplina: Disciplina): Promise<Disciplina> {
+        return firstValueFrom(this.http.put<Disciplina>(`${this.baseUrl}/${disciplina.id}`, disciplina))
             .catch(error => {
                 return Promise.reject(this.extractErrorMessage(error));
             });
     }
 
-    deleteSubconta(id: string): Promise<string> {
+    deletedisciplina(id: string): Promise<string> {
         return firstValueFrom(
             this.http.delete(`${this.baseUrl}/${id}`, { responseType: 'text' })
         ).catch(error => {
             return Promise.reject(this.extractErrorMessage(error));
         });
     }
+
 
     private extractErrorMessage(error: any): string {
         if (typeof error === 'string') {

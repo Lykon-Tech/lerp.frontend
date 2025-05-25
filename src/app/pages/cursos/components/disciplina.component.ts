@@ -18,8 +18,8 @@ import { TagModule } from 'primeng/tag';
 import { InputIconModule } from 'primeng/inputicon';
 import { IconFieldModule } from 'primeng/iconfield';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { Bolsa } from '../models/bolsa.model';
-import { BolsaService } from '../services/bolsa.service';
+import { Disciplina } from '../models/disciplina.model';
+import { DisciplinaService } from '../services/disciplina.service';
 import { CheckboxModule } from 'primeng/checkbox';
 
 interface Column {
@@ -57,17 +57,17 @@ interface ExportColumn {
         CheckboxModule,
         ConfirmDialogModule
     ],
-    templateUrl: `./bolsa.component.html`,
-    providers: [MessageService, BolsaService, ConfirmationService]
+    templateUrl: `./disciplina.component.html`,
+    providers: [MessageService, DisciplinaService, ConfirmationService]
 })
-export class Bolsas implements OnInit {
-    BolsaDialog: boolean = false;
+export class Disciplinas implements OnInit {
+    disciplinaDialog: boolean = false;
 
-    bolsas = signal<Bolsa[]>([]);
+    disciplinas = signal<Disciplina[]>([]);
 
     exportColumns!: ExportColumn[];
 
-    bolsa!: Bolsa;
+    disciplina!: Disciplina;
 
     submitted: boolean = false;
 
@@ -78,7 +78,7 @@ export class Bolsas implements OnInit {
     cols!: Column[];
 
     constructor(
-        private bolsaService: BolsaService,
+        private disciplinaService: DisciplinaService,
         private messageService: MessageService,
         private confirmationService: ConfirmationService
         
@@ -90,8 +90,8 @@ export class Bolsas implements OnInit {
     }
 
     loadDemoData() {
-        this.bolsaService.getBolsas().then((data) => {
-            this.bolsas.set(data);
+        this.disciplinaService.getdisciplinas().then((data) => {
+            this.disciplinas.set(data);
         });
 
         this.statuses = [
@@ -101,8 +101,6 @@ export class Bolsas implements OnInit {
 
         this.cols = [
             { field: 'nome', header: 'Nome', customExportHeader: 'Nome' },
-            { field: 'perc_desconto', header: '% Desconto' },
-            { field: 'aut_sup', header: 'Necessita autorização sup.' },
             { field: 'ativo', header: 'Status' }
         ];
 
@@ -114,44 +112,44 @@ export class Bolsas implements OnInit {
     }
 
     openNew() {
-        this.bolsa = {ativo:true};
+        this.disciplina = {ativo:true};
         this.submitted = false;
-        this.BolsaDialog = true;
+        this.disciplinaDialog = true;
     }
 
-    editBolsa(Bolsa: Bolsa) {
-        this.bolsa = { ...Bolsa };
-        this.BolsaDialog = true;
+    editdisciplina(disciplina: Disciplina) {
+        this.disciplina = { ...disciplina };
+        this.disciplinaDialog = true;
     }
 
     hideDialog() {
-        this.BolsaDialog = false;
+        this.disciplinaDialog = false;
         this.submitted = false;
     }
 
-    async deleteBolsa(bolsa: Bolsa) {
+    async deletedisciplina(disciplina: Disciplina) {
         this.confirmationService.confirm({
-            message: 'Você tem certeza que deseja deletar ' + bolsa.nome + '?',
+            message: 'Você tem certeza que deseja deletar ' + disciplina.nome + '?',
             header: 'Confirmar',
             icon: 'pi pi-exclamation-triangle',
             accept: async () => {
-                if (bolsa.id != null) {
+                if (disciplina.id != null) {
                     try {
-                        await this.bolsaService.deleteBolsa(bolsa.id);
+                        await this.disciplinaService.deletedisciplina(disciplina.id);
 
-                        const novaLista = this.bolsas().filter(b => b.id !== bolsa.id);
-                        this.bolsas.set([...novaLista]);
+                        const novaLista = this.disciplinas().filter(b => b.id !== disciplina.id);
+                        this.disciplinas.set([...novaLista]);
                         this.messageService.add({
                             severity: 'success',
                             summary: 'Sucesso',
-                            detail: 'Bolsa deletado',
+                            detail: 'Disciplina deletada',
                             life: 3000
                         });
                     } catch (err) {
                         this.messageService.add({
                             severity: 'error',
                             summary: 'Erro',
-                            detail: 'Falha ao deletar o Bolsa: ' + err,
+                            detail: 'Falha ao deletar a disciplina: ' + err,
                             life: 3000
                         });
                     }
@@ -162,8 +160,8 @@ export class Bolsas implements OnInit {
 
     findIndexById(id: string): number {
         let index = -1;
-        for (let i = 0; i < this.bolsas().length; i++) {
-            if (this.bolsas()[i].id === id) {
+        for (let i = 0; i < this.disciplinas().length; i++) {
+            if (this.disciplinas()[i].id === id) {
                 index = i;
                 break;
             }
@@ -176,49 +174,49 @@ export class Bolsas implements OnInit {
         return ativo ? 'success' : 'danger';
     }
 
-    async saveBolsa() {
+    async savedisciplina() {
         this.submitted = true;
-        let _bolsas = this.bolsas();
+        let _disciplinas = this.disciplinas();
 
-        if (this.bolsa.nome?.trim() && this.bolsa.percentualDesconto != 0 && this.bolsa.percentualDesconto != null && this.bolsa.ativo != undefined) {
+        if (this.disciplina.nome?.trim() && this.disciplina.ativo != undefined) {
             try {
-            if (this.bolsa.id) {
-                const updatedBolsa = await this.bolsaService.updateBolsa(this.bolsa);
-                const index = this.findIndexById(updatedBolsa.id!);
-                const updatedBolsas = [..._bolsas];
-                updatedBolsas[index] = updatedBolsa;
-                this.bolsas.set(updatedBolsas);
+            if (this.disciplina.id) {
+                const updateddisciplina = await this.disciplinaService.updatedisciplina(this.disciplina);
+                const index = this.findIndexById(updateddisciplina.id!);
+                const updateddisciplinas = [..._disciplinas];
+                updateddisciplinas[index] = updateddisciplina;
+                this.disciplinas.set(updateddisciplinas);
 
                 this.messageService.add({
                 severity: 'success',
                 summary: 'Sucesso',
-                detail: 'Bolsa atualizada',
+                detail: 'Disciplina atualizada',
                 life: 3000
                 });
             } else {
-                const createdBolsa = await this.bolsaService.createBolsa(this.bolsa);
-                this.bolsas.set([..._bolsas, createdBolsa]);
+                const createddisciplina = await this.disciplinaService.createdisciplina(this.disciplina);
+                this.disciplinas.set([..._disciplinas, createddisciplina]);
                 
 
                 this.messageService.add({
                     severity: 'success',
                     summary: 'Sucesso',
-                    detail: 'Bolsa criada',
+                    detail: 'Disciplina criada',
                 life: 3000
                 });
             }
 
-            this.BolsaDialog = false;
-            this.bolsa = {};
+            this.disciplinaDialog = false;
+            this.disciplina = {};
             } catch (error) {
                 this.messageService.add({
                     severity: 'error',
                     summary: 'Erro',
-                    detail: 'Falha ao salvar bolsa: ' + error,
+                    detail: 'Falha ao salvar disciplina: ' + error,
                     life: 3000
                 });
             }
         }
     }
-    
+
 }

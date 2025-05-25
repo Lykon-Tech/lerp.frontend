@@ -1,0 +1,143 @@
+<p-toast></p-toast>
+<p-toolbar>
+    <ng-template #end>
+        <p-button label="Novo" icon="pi pi-plus" severity="secondary"(onClick)="openNew()" />
+    </ng-template>
+</p-toolbar>
+
+<p-table
+    #dt
+    [value]="bancos()"
+    [rows]="10"
+    [columns]="cols"
+    [paginator]="true"
+    [globalFilterFields]="['nome', 'numeroBanco', 'exigeOfx', 'caixa', 'ativo']"
+    [tableStyle]="{ 'min-width': '75rem' }"
+    [rowHover]="true"
+    dataKey="id"
+    currentPageReportTemplate="Mostrando de {first} até {last} de {totalRecords} Bancos"
+    [showCurrentPageReport]="true"
+    [rowsPerPageOptions]="[10, 20, 30]"
+>
+    <ng-template #caption>
+        <div class="flex items-center justify-between">
+            <h5 class="m-0">Gerenciar Bancos</h5>
+            <p-iconfield>
+                <p-inputicon styleClass="pi pi-search" />
+                <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Pesquisar..." />
+            </p-iconfield>
+        </div>
+    </ng-template>
+    <ng-template #header>
+        <tr>
+            <th pSortableColumn="nome" style="min-width:16rem">
+                Nome
+                <p-sortIcon field="nome" />
+            </th>
+            <th pSortableColumn="numeroBanco" style="min-width:10rem">
+                Número
+                <p-sortIcon field="numeroBanco" />
+            </th>
+            <th pSortableColumn="exigeOfx" style="min-width: 12rem">
+                Exige OFX
+                <p-sortIcon field="exigeOfx" />
+            </th>
+            <th pSortableColumn="caixa" style="min-width: 12rem">
+                Caixa
+                <p-sortIcon field="caixa" />
+            </th>
+            <th pSortableColumn="ativo" style="min-width: 12rem">
+                Ativo
+                <p-sortIcon field="ativo" />
+            </th>
+            <th style="min-width: 12rem"></th>
+        </tr>
+    </ng-template>
+    <ng-template #body let-banco>
+        <tr>
+            <td style="min-width: 16rem">{{ banco.nome }}</td>
+            <td>{{ banco.numeroBanco }}</td>
+            <td>
+                <i
+                    class="pi"
+                    [ngClass]="{
+                    'pi-check text-green-600': banco.exigeOfx,
+                    'pi-times text-red-600': !banco.exigeOfx
+                    }"
+                    aria-label="exige OFX">
+                </i>
+            </td>
+            <td>
+                <i
+                    class="pi"
+                    [ngClass]="{
+                    'pi-check text-green-600': banco.caixa,
+                    'pi-times text-red-600': !banco.caixa
+                    }"
+                    aria-label="caixa">
+                </i>
+            </td>
+            <td>
+                <p-tag [value]="banco.ativo ? 'ATIVO' : 'INATIVO' " [severity]="getSeverity(banco.ativo)" />
+            </td>
+            <td>
+                <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="editBanco(banco)" />
+                <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (click)="deleteBanco(banco)" />
+            </td>
+        </tr>
+    </ng-template>
+</p-table>
+
+<p-dialog [(visible)]="bancoDialog" [style]="{ width: '450px' }" header="Detalhes do Banco" [modal]="true">
+    <ng-template #content>
+        <div class="flex flex-col gap-6">
+            <div>
+                <label for="name" class="block font-bold mb-3">Nome</label>
+                <input name="name" type="text" pInputText id="nome" [(ngModel)]="banco.nome" required autofocus fluid />
+                <small class="text-red-500" *ngIf="submitted && !banco.nome">Nome é obrigatório.</small>
+            </div>
+            <div>
+                <label for="nr_banco" class="block font-bold mb-3">Número do banco</label>
+                <input name="nr_banco" id="numero_banco" type="number" pInputText [(ngModel)]="banco.numeroBanco" required fluid/>
+                <small class="text-red-500" *ngIf="submitted && (banco.numeroBanco == null)">Número é obrigatório.</small>
+            </div>
+
+            <div>
+                <label for="status" class="block font-bold mb-3">Status</label>
+                <p-select 
+                    name="status" 
+                    [(ngModel)]="banco.ativo" 
+                    inputId="ativo" 
+                    [options]="statuses" 
+                    optionLabel="label" 
+                    optionValue="value"
+                    placeholder="Selecione um status" 
+                    fluid 
+                    [appendTo]="'body'"
+                />
+                <small class="text-red-500" *ngIf="submitted && banco.ativo == undefined">Status é obrigatório.</small>
+            </div>
+
+            <div>
+                <span class="block font-bold mb-4">Opções</span>
+                <div class="grid grid-cols-2 gap-2">
+                    <div class="flex items-center gap-2 col-span-6">
+                        <p-checkbox id="exige_ofx" name="exige_ofx" binary="true" [(ngModel)]="banco.exigeOfx"></p-checkbox>
+                        <label for="exige_ofx">Exige OFX</label>
+                    </div>
+                    <div class="flex items-center gap-2 col-span-6">
+                        <p-checkbox id="caixa" name="caixa" binary="true" [(ngModel)]="banco.caixa"></p-checkbox>
+                        <label for="caixa">Caixa</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template #footer>
+        <p-button label="Cancel" icon="pi pi-times" text (click)="hideDialog()" />
+        <p-button label="Save" icon="pi pi-check" (click)="saveBanco()" />
+    </ng-template>
+</p-dialog>
+
+<p-confirmdialog [style]="{ width: '450px' }" />

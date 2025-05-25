@@ -43,6 +43,7 @@ export class AppMenu {
                         items: [
                             { label: 'Cursos', icon: 'pi pi-book', routerLink: ['/pages/cursos'] },
                             { label: 'Matrizes curriculares', icon: 'pi pi-th-large', routerLink: ['/pages/matrizes_curriculares'] },
+                            { label: 'Disciplinas', icon: 'pi pi-th-large', routerLink: ['/pages/disciplinas'] },
                             { label: 'Modalidades', icon: 'pi pi-sliders-h', routerLink: ['/pages/modalidades'] },
                             { label: 'Tipo de curso', icon: 'pi pi-tags', routerLink: ['/pages/tipos_cursos'] },
                         ]
@@ -66,6 +67,7 @@ export class AppMenu {
                     { label: 'Contas', icon: 'pi pi-credit-card', routerLink: ['/pages/contas'] },
                     { label: 'Subcontas', icon: 'pi pi-credit-card', routerLink: ['/pages/subcontas'] },
                     { label: 'Grupo de Contas', icon: 'pi pi-th-large', routerLink: ['/pages/grupos_contas'] },
+                    { label: 'Tags', icon: 'pi pi-percentage', routerLink: ['/pages/tags'] },
                     { label: 'Bolsas', icon: 'pi pi-percentage', routerLink: ['/pages/bolsas'] },
                     { label: 'Tipos de Documentos', icon: 'pi pi-percentage', routerLink: ['/pages/tipos_documentos'] }
                 ]

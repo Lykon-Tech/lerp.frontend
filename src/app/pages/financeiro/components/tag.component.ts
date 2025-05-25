@@ -18,9 +18,12 @@ import { TagModule } from 'primeng/tag';
 import { InputIconModule } from 'primeng/inputicon';
 import { IconFieldModule } from 'primeng/iconfield';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { Bolsa } from '../models/bolsa.model';
-import { BolsaService } from '../services/bolsa.service';
+import { TagSaida } from '../models/tag.saida.model';
+import { Tag } from '../models/tag.model';
+import { TagService } from '../services/tag.service';
 import { CheckboxModule } from 'primeng/checkbox';
+import { Subconta } from '../models/subconta.model';
+import { SubcontaService } from '../services/subconta.service';
 
 interface Column {
     field: string;
@@ -57,30 +60,35 @@ interface ExportColumn {
         CheckboxModule,
         ConfirmDialogModule
     ],
-    templateUrl: `./bolsa.component.html`,
-    providers: [MessageService, BolsaService, ConfirmationService]
+    templateUrl : './tag.component.html',
+    providers: [MessageService, TagService, ConfirmationService]
 })
-export class Bolsas implements OnInit {
-    BolsaDialog: boolean = false;
+export class Tags implements OnInit {
+    tagDialog: boolean = false;
 
-    bolsas = signal<Bolsa[]>([]);
+    tags = signal<Tag[]>([]);
+
+    subcontas = signal<Subconta[]>([]);
 
     exportColumns!: ExportColumn[];
 
-    bolsa!: Bolsa;
+    tag!: Tag;
 
     submitted: boolean = false;
 
     statuses!: any[];
+
+    subcontas_select!: any[];
 
     @ViewChild('dt') dt!: Table;
 
     cols!: Column[];
 
     constructor(
-        private bolsaService: BolsaService,
+        private tagService: TagService,
         private messageService: MessageService,
-        private confirmationService: ConfirmationService
+        private confirmationService: ConfirmationService,
+        private subcontaService : SubcontaService
         
     ) {}
 
@@ -90,19 +98,27 @@ export class Bolsas implements OnInit {
     }
 
     loadDemoData() {
-        this.bolsaService.getBolsas().then((data) => {
-            this.bolsas.set(data);
+        this.tagService.gettags().then((data) => {
+            this.tags.set(data);
+        });
+
+        this.subcontaService.getSubcontas(true).then((data)=>{
+            this.subcontas.set(data);
+            this.subcontas_select = this.subcontas().map(subconta => ({
+                label: subconta.nome,
+                value: subconta
+            }));
         });
 
         this.statuses = [
             { label: 'ATIVO', value: true },
             { label: 'INATIVO', value: false }
+            
         ];
 
         this.cols = [
-            { field: 'nome', header: 'Nome', customExportHeader: 'Nome' },
-            { field: 'perc_desconto', header: '% Desconto' },
-            { field: 'aut_sup', header: 'Necessita autorização sup.' },
+            { field: 'nome', header: 'nome', customExportHeader: 'nome' },
+            { field: 'subconta', header: 'subconta' },
             { field: 'ativo', header: 'Status' }
         ];
 
@@ -110,48 +126,53 @@ export class Bolsas implements OnInit {
     }
 
     onGlobalFilter(table: Table, event: Event) {
-        table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
+        table.filterGlobal((event.target as HTMLInputElement).value, 'tagins');
     }
 
     openNew() {
-        this.bolsa = {ativo:true};
+        this.tag = {ativo:true};
         this.submitted = false;
-        this.BolsaDialog = true;
+        this.tagDialog = true;
     }
 
-    editBolsa(Bolsa: Bolsa) {
-        this.bolsa = { ...Bolsa };
-        this.BolsaDialog = true;
+    edittag(tag: Tag) {
+        this.tag = {
+            id: tag.id,
+            nome: tag.nome,
+            ativo: tag.ativo,
+            subconta: this.subcontas().find(b => b.id === tag.subconta?.id)
+        };
+        this.tagDialog = true;
     }
 
     hideDialog() {
-        this.BolsaDialog = false;
+        this.tagDialog = false;
         this.submitted = false;
     }
 
-    async deleteBolsa(bolsa: Bolsa) {
+    async deletetag(tag: Tag) {
         this.confirmationService.confirm({
-            message: 'Você tem certeza que deseja deletar ' + bolsa.nome + '?',
+            message: 'Você tem certeza que deseja deletar a tag ' + tag.nome + '?',
             header: 'Confirmar',
             icon: 'pi pi-exclamation-triangle',
             accept: async () => {
-                if (bolsa.id != null) {
+                if (tag.id != null) {
                     try {
-                        await this.bolsaService.deleteBolsa(bolsa.id);
+                        await this.tagService.deletetag(tag.id);
 
-                        const novaLista = this.bolsas().filter(b => b.id !== bolsa.id);
-                        this.bolsas.set([...novaLista]);
+                        const novaLista = this.tags().filter(b => b.id !== tag.id);
+                        this.tags.set([...novaLista]);
                         this.messageService.add({
                             severity: 'success',
                             summary: 'Sucesso',
-                            detail: 'Bolsa deletado',
+                            detail: 'Tag deletada',
                             life: 3000
                         });
                     } catch (err) {
                         this.messageService.add({
                             severity: 'error',
                             summary: 'Erro',
-                            detail: 'Falha ao deletar o Bolsa: ' + err,
+                            detail: 'Falha ao deletar a tag: ' + err,
                             life: 3000
                         });
                     }
@@ -162,8 +183,8 @@ export class Bolsas implements OnInit {
 
     findIndexById(id: string): number {
         let index = -1;
-        for (let i = 0; i < this.bolsas().length; i++) {
-            if (this.bolsas()[i].id === id) {
+        for (let i = 0; i < this.tags().length; i++) {
+            if (this.tags()[i].id === id) {
                 index = i;
                 break;
             }
@@ -176,49 +197,58 @@ export class Bolsas implements OnInit {
         return ativo ? 'success' : 'danger';
     }
 
-    async saveBolsa() {
+    async savetag() {
         this.submitted = true;
-        let _bolsas = this.bolsas();
+        let _subcontas = this.tags();
 
-        if (this.bolsa.nome?.trim() && this.bolsa.percentualDesconto != 0 && this.bolsa.percentualDesconto != null && this.bolsa.ativo != undefined) {
+        if (this.tag.nome?.trim() && this.tag.subconta != undefined && this.tag.ativo != undefined) {
             try {
-            if (this.bolsa.id) {
-                const updatedBolsa = await this.bolsaService.updateBolsa(this.bolsa);
-                const index = this.findIndexById(updatedBolsa.id!);
-                const updatedBolsas = [..._bolsas];
-                updatedBolsas[index] = updatedBolsa;
-                this.bolsas.set(updatedBolsas);
+            if (this.tag.id) {
+                const updatedsubconta = await this.tagService.updatetag(this.convertertagParatagSaida(this.tag));
+                const index = this.findIndexById(updatedsubconta.id!);
+                const updatedsubcontas = [..._subcontas];
+                updatedsubcontas[index] = updatedsubconta;
+                this.tags.set(updatedsubcontas);
 
                 this.messageService.add({
                 severity: 'success',
                 summary: 'Sucesso',
-                detail: 'Bolsa atualizada',
+                detail: 'Tag atualizada',
                 life: 3000
                 });
             } else {
-                const createdBolsa = await this.bolsaService.createBolsa(this.bolsa);
-                this.bolsas.set([..._bolsas, createdBolsa]);
+                const createdsubconta = await this.tagService.createtag(this.convertertagParatagSaida(this.tag));
+                this.tags.set([..._subcontas, createdsubconta]);
                 
 
                 this.messageService.add({
                     severity: 'success',
                     summary: 'Sucesso',
-                    detail: 'Bolsa criada',
+                    detail: 'Tag criada',
                 life: 3000
                 });
             }
 
-            this.BolsaDialog = false;
-            this.bolsa = {};
+            this.tagDialog = false;
+            this.tag = {};
             } catch (error) {
                 this.messageService.add({
                     severity: 'error',
                     summary: 'Erro',
-                    detail: 'Falha ao salvar bolsa: ' + error,
+                    detail: 'Falha ao salvar tag: ' + error,
                     life: 3000
                 });
             }
         }
     }
-    
+
+    convertertagParatagSaida(tag: Tag): TagSaida {
+        return {
+            id: tag.id,
+            nome: tag.nome,
+            subcontaId: tag.subconta?.id, 
+            ativo: tag.ativo,
+        };
+    }
+
 }
