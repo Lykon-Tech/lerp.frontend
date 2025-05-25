@@ -5,27 +5,44 @@ import { firstValueFrom } from 'rxjs';
 import { HttpParams } from '@angular/common/http';
 import { MovimentoSaida } from '../models/movimento.saida.model';
 
+interface Page<T> {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  number: number;
+  size: number;
+  numberOfElements: number;
+  first: boolean;
+  last: boolean;
+  empty: boolean;
+}
+
 @Injectable({
   providedIn: 'root'
 })
+
+
 export class MovimentoService {
+    
 
     private baseUrl = 'http://localhost:8080/financeiro/movimento';
 
     constructor(private http: HttpClient) {}
 
-    getMovimentos(ativo?: boolean): Promise<Movimento[]> {
-        let params = new HttpParams();
-        
+   getMovimentos(page: number, size: number, ativo?: boolean): Promise<Page<Movimento>> {
+        let params = new HttpParams()
+            .set('page', page)
+            .set('size', size);
+
         if (ativo !== undefined) {
             params = params.set('ativo', ativo.toString());
         }
 
         return firstValueFrom(
-            this.http.get<Movimento[]>(`${this.baseUrl}/find_all_by_empresa`, { params })
-        ).then(movimentos => movimentos ?? [])
-        .catch(error => Promise.reject(this.extractErrorMessage(error)));
+            this.http.get<Page<Movimento>>(`${this.baseUrl}/find_all_by_empresa`, { params })
+        ).catch(error => Promise.reject(this.extractErrorMessage(error)));
     }
+
 
     getMovimento(id: string): Promise<Movimento> {
         return firstValueFrom(

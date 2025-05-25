@@ -6,6 +6,8 @@ import Aura from '@primeng/themes/aura';
 import { providePrimeNG } from 'primeng/config';
 import { appRoutes } from './app.routes';
 import { tokenInterceptor } from './app/pages/auth/interceptors/auth.interceptor';
+import ptBR from 'primelocale/pt-BR.json';
+
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -15,6 +17,9 @@ export const appConfig: ApplicationConfig = {
       withInterceptors([tokenInterceptor])
     ),
     provideAnimationsAsync(),
-    providePrimeNG({ theme: { preset: Aura, options: { darkModeSelector: '.app-dark' } } }),
+    providePrimeNG({
+      theme: { preset: Aura, options: { darkModeSelector: '.app-dark' } },
+      translation: ptBR['pt-BR']
+    })
   ]
 };

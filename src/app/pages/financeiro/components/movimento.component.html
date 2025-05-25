@@ -13,6 +13,7 @@
         dataKey="id"
         [rows]="10"
         [loading]="loading"
+        (onLazyLoad)="loadMovimentosLazy($event)"
         [paginator]="true"
         [showGridlines]="true"
         [rowHover]="true"
@@ -20,7 +21,7 @@
         currentPageReportTemplate="Mostrando de {first} até {last} de {totalRecords} Movimentos"
         [showCurrentPageReport]="true"
         [rowsPerPageOptions]="[10, 20, 30]"
-        [globalFilterFields]="['subconta.nome', 'tipoDocumento.nome', 'valor', 'numeroDocumento', 'historico']"
+        [globalFilterFields]="['subconta.nome', 'dataLancamento', 'tipoDocumento.nome', 'valor', 'numeroDocumento', 'historico']"
     >
         <ng-template #caption>
             <div class="flex justify-between items-center">
@@ -42,27 +43,27 @@
             <tr>
                 <th style="min-width: 10rem">
                     Data
-                    <p-columnFilter type="date" field="dataLancamento" display="menu" placeholder="dd/mm/aaaa" />
+                    <p-columnFilter  dataType="date" dateFormat="dd/mm/yy" type="date" field="dataLancamento" display="menu" placeholder="dd/mm/aaaa" />
                 </th>
                 <th style="min-width: 10rem">
                     Subconta
-                    <p-columnFilter type="text" field="subconta.nome" display="menu" placeholder="Buscar por subconta" />
+                    <p-columnFilter type="text" field="subconta.nome" display="menu" placeholder="Buscar por subconta" matchMode="contains"/>
                 </th>
                 <th style="min-width: 10rem">
                     Tipo Documento
-                    <p-columnFilter type="text" field="tipoDocumento.nome" display="menu" placeholder="Buscar por tipo" />
+                    <p-columnFilter type="text" field="tipoDocumento.nome" display="menu" placeholder="Buscar por tipo" matchMode="contains"/>
                 </th>
                 <th style="min-width: 8rem">
                     Valor
-                    <p-columnFilter type="numeric" field="valor" display="menu" />
+                    <p-columnFilter type="numeric" field="valor" display="menu" matchMode="contains"/>
                 </th>
                 <th style="min-width: 10rem">
                     Nº Documento
-                    <p-columnFilter type="text" field="numeroDocumento" display="menu" />
+                    <p-columnFilter type="text" field="numeroDocumento" display="menu" matchMode="contains"/>
                 </th>
                 <th style="min-width: 12rem">
                     Histórico
-                    <p-columnFilter type="text" field="historico" display="menu" />
+                    <p-columnFilter type="text" field="historico" display="menu" matchMode="contains"/>
                 </th>
                 <th style="min-width: 8rem">
                     Saldo

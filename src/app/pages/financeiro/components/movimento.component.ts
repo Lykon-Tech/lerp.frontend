@@ -69,6 +69,7 @@ export class Movimentos implements OnInit {
     subcontas = signal<Subconta[]>([]);
     tipo_documentos_select!: any[];
     tiposDocumentos = signal<TipoDocumento[]>([]);
+    totalRecords : number = 0;
     @ViewChild('dt') dt!: Table;
 
     constructor(
@@ -99,8 +100,12 @@ export class Movimentos implements OnInit {
 
     loadMovimentos() {
         this.loading = true;
-        this.movimentoService.getMovimentos().then(data => {
-            this.movimentos.set(data);
+        this.movimentoService.getMovimentos(0,10).then(data => {
+            const movimentosComDataConvertida = data.content.map(mov => ({
+                ...mov,
+                dataLancamento: mov.dataLancamento ? new Date(mov.dataLancamento) : undefined
+            }));
+            this.movimentos.set(movimentosComDataConvertida);
             this.loading = false;
         }).catch(error => {
             this.loading = false;
@@ -286,6 +291,26 @@ export class Movimentos implements OnInit {
 
     formatarValor(valor: number): string{
         return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    loadMovimentosLazy(event: any) {
+        this.loading = true;
+
+        const page = event.first / event.rows;
+        const size = event.rows;
+
+        this.movimentoService.getMovimentos(page, size).then((response) => {
+            this.movimentos.set(response.content);
+            this.totalRecords = response.totalElements;
+            this.loading = false;
+        }).catch(error => {
+            this.loading = false;
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Erro',
+                detail: 'Erro ao carregar movimentos: ' + error
+            });
+        });
     }
 
 
