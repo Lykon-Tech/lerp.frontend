@@ -9,7 +9,7 @@ import { HttpParams } from '@angular/common/http';
 })
 export class SubcontaService {
 
-    private baseUrl = 'http://localhost:8080/financeiro/subconta';
+    private baseUrl = 'http://52.91.21.188:8080/financeiro/subconta';
 
     constructor(private http: HttpClient) {}
 

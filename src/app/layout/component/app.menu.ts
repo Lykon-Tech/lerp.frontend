@@ -26,7 +26,7 @@ export class AppMenu {
                     { label: 'Dashboard', icon: 'pi pi-home', routerLink: ['/'] }
                 ]
             },
-            {
+            /*{
                 label: 'Educacional',
                 items: [
                     { label: 'Alunos', icon: 'pi pi-users', routerLink: ['/pages/alunos'] },
@@ -58,7 +58,7 @@ export class AppMenu {
                     },
                     { label: 'Salas', icon: 'pi pi-building', routerLink: ['/pages/salas'] }
                 ]
-            },
+            },*/
             {
                 label: 'Financeiro',
                 items: [

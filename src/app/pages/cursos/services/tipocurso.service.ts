@@ -9,7 +9,7 @@ import { HttpParams } from '@angular/common/http';
 })
 export class TipoCursoService {
 
-    private baseUrl = 'http://localhost:8080/curso/tipo_curso';
+    private baseUrl = 'http://52.91.21.188:8080/curso/tipo_curso';
 
     constructor(private http: HttpClient) {}
 
