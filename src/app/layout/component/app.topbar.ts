@@ -51,15 +51,6 @@ import { MenuModule } from 'primeng/menu';
 
             <div class="layout-topbar-menu hidden lg:block">
                 <div class="layout-topbar-menu-content">
-                    <button type="button" class="layout-topbar-action">
-                        <i class="pi pi-calendar"></i>
-                        <span>Calendar</span>
-                    </button>
-                    <button type="button" class="layout-topbar-action">
-                        <i class="pi pi-inbox"></i>
-                        <span>Messages</span>
-                    </button>
-
                     <div> 
                         <p-menu #menu [popup]="true" [model]="overlayMenuItems"></p-menu>
                         <button type="button" class="layout-topbar-action" (click)="menu.toggle($event)" style="width:auto" pButton icon="pi pi-chevron-down" >
@@ -86,18 +77,6 @@ export class AppTopbar {
     }
 
     overlayMenuItems = [
-        {
-            label: 'Save',
-            icon: 'pi pi-save'
-        },
-        {
-            label: 'Update',
-            icon: 'pi pi-refresh'
-        },
-        {
-            label: 'Delete',
-            icon: 'pi pi-trash'
-        },
         {
             separator: true
         },

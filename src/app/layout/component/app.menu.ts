@@ -71,14 +71,14 @@ export class AppMenu {
                     { label: 'Bolsas', icon: 'pi pi-percentage', routerLink: ['/pages/bolsas'] },
                     { label: 'Tipos de Documentos', icon: 'pi pi-percentage', routerLink: ['/pages/tipos_documentos'] }
                 ]
-            },
+            },/*
             {
                 label: 'Usuários',
                 items: [
                     { label: 'Funcionários', icon: 'pi pi-id-card', routerLink: ['/pages/movimentos'] },
                     { label: 'Cargos', icon: 'pi pi-sitemap', routerLink: ['/pages/movimentos'] }
                 ]
-            }
+            }*/
         ]
     }
 }
