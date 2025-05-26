@@ -9,7 +9,7 @@ import { HttpParams } from '@angular/common/http';
 })
 export class ContaService {
 
-    private baseUrl = 'http://52.91.21.188:8080/financeiro/conta';
+    private baseUrl = 'https://52.91.21.188:8080/financeiro/conta';
 
     constructor(private http: HttpClient) {}
 

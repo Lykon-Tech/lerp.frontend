@@ -9,7 +9,7 @@ import { HttpParams } from '@angular/common/http';
 })
 export class TipoDocumentoService {
 
-    private baseUrl = 'http://52.91.21.188:8080/financeiro/tipo_documento';
+    private baseUrl = 'https://52.91.21.188:8080/financeiro/tipo_documento';
 
     constructor(private http: HttpClient) {}
 

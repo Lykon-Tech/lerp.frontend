@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly TOKEN_KEY = 'auth-token';
-  private readonly API_LOGIN = 'http://52.91.21.188:8080/auth/login';
+  private readonly API_LOGIN = 'https://52.91.21.188:8080/auth/login';
   private lembrar : boolean = false;
 
   constructor(private http: HttpClient, private router: Router) {}
@@ -44,7 +44,7 @@ export class AuthService {
   validateToken() {
     const token = this.getToken();
     return this.http.get<{ valid: boolean }>(
-      'http://52.91.21.188:8080/auth/validate',
+      'https://52.91.21.188:8080/auth/validate',
       {
         headers: {
           Authorization: `Bearer ${token}`

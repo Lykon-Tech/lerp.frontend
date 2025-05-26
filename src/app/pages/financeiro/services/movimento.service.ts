@@ -26,7 +26,7 @@ interface Page<T> {
 export class MovimentoService {
     
 
-    private baseUrl = 'http://52.91.21.188:8080/financeiro/movimento';
+    private baseUrl = 'https://52.91.21.188:8080/financeiro/movimento';
 
     constructor(private http: HttpClient) {}
 

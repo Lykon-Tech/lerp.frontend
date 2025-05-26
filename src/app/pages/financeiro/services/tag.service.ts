@@ -9,7 +9,7 @@ import { HttpParams } from '@angular/common/http';
 })
 export class TagService {
 
-    private baseUrl = 'http://52.91.21.188:8080/financeiro/tag';
+    private baseUrl = 'https://52.91.21.188:8080/financeiro/tag';
 
     constructor(private http: HttpClient) {}
 
