@@ -9,7 +9,7 @@ import { HttpParams } from '@angular/common/http';
 })
 export class BancoService {
 
-    private baseUrl = 'https://52.91.21.188:8080/financeiro/banco';
+    private baseUrl = 'https://api.lykon.com.br/financeiro/banco';
 
     constructor(private http: HttpClient) {}
 

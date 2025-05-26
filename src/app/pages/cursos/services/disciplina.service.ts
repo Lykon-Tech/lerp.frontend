@@ -9,7 +9,7 @@ import { HttpParams } from '@angular/common/http';
 })
 export class DisciplinaService {
 
-    private baseUrl = 'https://52.91.21.188:8080/curso/disciplina';
+    private baseUrl = 'https://api.lykon.com.br/curso/disciplina';
 
     constructor(private http: HttpClient) {}
 

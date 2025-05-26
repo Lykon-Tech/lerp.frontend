@@ -26,7 +26,7 @@ interface Page<T> {
 export class MovimentoService {
     
 
-    private baseUrl = 'https://52.91.21.188:8080/financeiro/movimento';
+    private baseUrl = 'https://api.lykon.com.br/financeiro/movimento';
 
     constructor(private http: HttpClient) {}
 

@@ -9,7 +9,7 @@ import { HttpParams } from '@angular/common/http';
 })
 export class GrupoContaService {
 
-    private baseUrl = 'https://52.91.21.188:8080/financeiro/grupo_conta';
+    private baseUrl = 'https://api.lykon.com.br/financeiro/grupo_conta';
 
     constructor(private http: HttpClient) {}
 

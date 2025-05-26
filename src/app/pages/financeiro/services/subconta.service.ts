@@ -9,7 +9,7 @@ import { HttpParams } from '@angular/common/http';
 })
 export class SubcontaService {
 
-    private baseUrl = 'https://52.91.21.188:8080/financeiro/subconta';
+    private baseUrl = 'https://api.lykon.com.br/financeiro/subconta';
 
     constructor(private http: HttpClient) {}
 
