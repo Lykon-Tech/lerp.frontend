@@ -9,7 +9,7 @@ import { HttpParams } from '@angular/common/http';
 })
 export class TagService {
 
-    private baseUrl = 'http://localhost:8080/financeiro/tag';
+    private baseUrl = 'https://api.lykon.com.br/financeiro/tag';
 
     constructor(private http: HttpClient) {}
 

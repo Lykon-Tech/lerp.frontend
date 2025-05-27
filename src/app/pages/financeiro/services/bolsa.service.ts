@@ -9,7 +9,7 @@ import { HttpParams } from '@angular/common/http';
 })
 export class BolsaService {
 
-    private baseUrl = 'http://localhost:8080/financeiro/bolsa';
+    private baseUrl = 'https://api.lykon.com.br/financeiro/bolsa';
 
     constructor(private http: HttpClient) {}
 
