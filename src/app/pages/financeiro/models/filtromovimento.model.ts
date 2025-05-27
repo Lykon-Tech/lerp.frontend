@@ -4,5 +4,5 @@ export interface FiltroMovimento {
   numeroMovimento?: string;
   numeroDocumento?: string;
   importadoOfx?: boolean;
-  subcontaId?: string;
+  grupoContaId?: string;
 }

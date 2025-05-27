@@ -16,6 +16,10 @@ import { ConfirmationService, MessageService } from "primeng/api";
 import { Subconta } from "../models/subconta.model";
 import { SubcontaService } from "../services/subconta.service";
 import { SelectModule } from "primeng/select";
+import { GrupoConta } from "../models/grupoconta.model";
+import { GrupoContaService } from "../services/grupoconta.service";
+import { ReceitaDespesa } from "../models/receitadespesas.model";
+import { ReceitasDespesasRelatorios } from "../models/receitasdespesasrelatorios.model";
 
 @Component({
     selector: 'app-dashboard-financeiro',
@@ -38,91 +42,134 @@ import { SelectModule } from "primeng/select";
 })
 export class DashboardFinanceiroComponent implements OnInit {
   filtro: FiltroMovimento = {};
-  movimentos: Movimento[] = [];
+  receitasDespesasRelatorio: ReceitasDespesasRelatorios = {};
   chartData: any;
   chartOptions: any;
   loading: boolean = false;
-  subcontas = signal<Subconta[]>([]);
-  subcontas_select!: any[];
+  grupoContas = signal<GrupoConta[]>([]);
+  grupo_contas_select!: any[];
+  barData : any;
+  barOptions: any;
+  
+  receitas : number[] = [];
+  despesas : number[] = [];
 
-  constructor(private movimentoService: MovimentoService,private messageService: MessageService, private subcontaService : SubcontaService) {}
+  totalReceitaSemana : number = 0;
+  totalReceitaMes : number = 0;
+  totalReceitaSemestre : number = 0;
+  totalReceitaAno : number = 0;
+  totalDespesaSemana : number = 0;
+  totalDespesaMes : number = 0;
+  totalDespesaSemestre : number = 0;
+  totalDespesaAno : number = 0;
+
+  constructor(private movimentoService: MovimentoService,private messageService: MessageService, private grupoContasService : GrupoContaService) {}
 
   ngOnInit() {
-    this.definirPeriodoMensal();
+
+    this.filtro = {dataInicio:new Date(new Date().getFullYear(), 0, 1), dataFim:new Date(new Date().getFullYear(), 11, 31)}
     this.buscarMovimentos();
 
-    this.subcontaService.getSubcontas(true).then((data)=>{
-        this.subcontas.set(data);
-        this.subcontas_select = this.subcontas().map(subconta => ({
-            label: subconta.nome,
-            value: subconta
+    this.grupoContasService.getGrupoContas(true).then((data)=>{
+        this.grupoContas.set(data);
+        this.grupo_contas_select = this.grupoContas().map(grupoConta => ({
+            label: grupoConta.nome,
+            value: grupoConta
         }));
     });
   }
+
+  limparFiltros(){
+    this.filtro = {};
+  }
   
-
-  definirPeriodoSemanal() {
-    const hoje = new Date();
-    const inicioSemana = new Date(hoje);
-    inicioSemana.setDate(hoje.getDate() - hoje.getDay());
-    const fimSemana = new Date(inicioSemana);
-    fimSemana.setDate(inicioSemana.getDate() + 6);
-
-    this.filtro.dataInicio = inicioSemana;
-    this.filtro.dataFim = fimSemana;
-    this.buscarMovimentos();
-  }
-
-  definirPeriodoMensal() {
-    const hoje = new Date();
-    const inicioMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
-    const fimMes = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0);
-
-    this.filtro.dataInicio = inicioMes;
-    this.filtro.dataFim = fimMes;
-    this.buscarMovimentos();
-  }
-
   buscarMovimentos() {
     this.loading = true;
 
-    this.movimentoService.getMovimentosFiltro(this.filtro).then((response) => {
-            this.movimentos = response;
-            this.atualizarGraficos();
-            this.loading = false;
-        }).catch(error => {
-            this.loading = false;
-            this.messageService.add({
-                severity: 'error',
-                summary: 'Erro',
-                detail: 'Erro ao carregar movimentos: ' + error
-            });
+    this.movimentoService.getReceitasDespesas(this.filtro).then((response) => {
+        this.receitasDespesasRelatorio = response;
+        this.receitas = (this.receitasDespesasRelatorio.receitasDespesasMensal?? []).filter(t => t.tipo == 'ENTRADA').map(t => t.valor);
+        this.despesas = (this.receitasDespesasRelatorio.receitasDespesasMensal?? []).filter(t => t.tipo == 'ENTRADA').map(t => t.valor);
+
+        this.totalDespesaAno = this.receitasDespesasRelatorio.despesas?.valorTotalAnual ?? 0;
+        this.totalDespesaSemestre = this.receitasDespesasRelatorio.despesas?.valorTotalSemestral ?? 0;
+        this.totalDespesaMes = this.receitasDespesasRelatorio.despesas?.valorTotalMensal ?? 0;
+        this.totalDespesaSemana = this.receitasDespesasRelatorio.despesas?.valorTotalSemanal ?? 0;
+
+        this.totalReceitaAno = this.receitasDespesasRelatorio.receitas?.valorTotalAnual ?? 0;
+        this.totalReceitaSemestre = this.receitasDespesasRelatorio.receitas?.valorTotalSemestral ?? 0;
+        this.totalReceitaMes = this.receitasDespesasRelatorio.receitas?.valorTotalMensal ?? 0;
+        this.totalReceitaSemana = this.receitasDespesasRelatorio.receitas?.valorTotalSemanal ?? 0;
+        
+        this.initCharts();
+        this.loading = false;
+    }).catch(error => {
+        this.loading = false;
+        this.messageService.add({
+            severity: 'error',
+            summary: 'Erro',
+            detail: 'Erro ao carregar receitas x despesas: ' + error
         });
+    });
   }
 
-  atualizarGraficos() {
-    const entradas = this.movimentos.filter(m => (m?.valor || 0) > 0).reduce((sum, m) => sum + (m?.valor || 0), 0);
-    const saidas = this.movimentos.filter(m => (m?.valor || 0) < 0).reduce((sum, m) => sum + Math.abs((m?.valor || 0)), 0);
+  initCharts() {
+    const documentStyle = getComputedStyle(document.documentElement);
+    const textColor = documentStyle.getPropertyValue('--text-color');
+    const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
+    const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
 
-    this.chartData = {
-      labels: ['Entradas', 'Saídas'],
-      datasets: [
-        {
-          data: [entradas, saidas],
-          backgroundColor: ['#42A5F5', '#FF6384'],
-          hoverBackgroundColor: ['#64B5F6', '#FF6384']
-        }
-      ]
+    this.barData = {
+        labels: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro' ,'Dezembro'],
+        datasets: [
+            {
+                label: 'Receita',
+                backgroundColor: documentStyle.getPropertyValue('--p-primary-500'),
+                borderColor: documentStyle.getPropertyValue('--p-primary-500'),
+                data: this.receitas
+            },
+            {
+                label: 'Despesa',
+                backgroundColor: documentStyle.getPropertyValue('--p-primary-200'),
+                borderColor: documentStyle.getPropertyValue('--p-primary-200'),
+                data: this.despesas
+            }
+        ]
     };
 
-    this.chartOptions = {
-      plugins: {
-        legend: {
-          labels: {
-            color: '#495057'
-          }
+    this.barOptions = {
+        maintainAspectRatio: false,
+        aspectRatio: 0.8,
+        plugins: {
+            legend: {
+                labels: {
+                    color: textColor
+                }
+            }
+        },
+        scales: {
+            x: {
+                ticks: {
+                    color: textColorSecondary,
+                    font: {
+                        weight: 500
+                    }
+                },
+                grid: {
+                    display: false,
+                    drawBorder: false
+                }
+            },
+            y: {
+                ticks: {
+                    color: textColorSecondary
+                },
+                grid: {
+                    color: surfaceBorder,
+                    drawBorder: false
+                }
+            }
         }
-      }
     };
   }
 }

@@ -5,6 +5,8 @@ import { firstValueFrom } from 'rxjs';
 import { HttpParams } from '@angular/common/http';
 import { MovimentoSaida } from '../models/movimento.saida.model';
 import { FiltroMovimento } from '../models/filtromovimento.model';
+import { ReceitaDespesa } from '../models/receitadespesas.model';
+import { ReceitasDespesasRelatorios } from '../models/receitasdespesasrelatorios.model';
 
 interface Page<T> {
   content: T[];
@@ -50,6 +52,11 @@ export class MovimentoService {
         ).catch(error => Promise.reject(this.extractErrorMessage(error)));
     }
 
+    getReceitasDespesas(filtro : FiltroMovimento): Promise<ReceitasDespesasRelatorios> {
+        return firstValueFrom(
+           this.http.post<ReceitasDespesasRelatorios>(`${this.baseUrl}/receitas_despesas/find_all_by_filtro`, filtro)
+        ).catch(error => Promise.reject(this.extractErrorMessage(error)));
+    }
 
     getMovimento(id: string): Promise<Movimento> {
         return firstValueFrom(

@@ -1,64 +1,140 @@
-<p-fluid class="grid grid-cols-12 gap-4">
-
-  <!-- Título do Dashboard -->
-  <div class="col-span-12 mb-4">
-    <h1 class="text-3xl font-bold text-gray-800">Dashboard Financeiro</h1>
+<div class="grid grid-cols-12 gap-4 p-4">
+  <div class="col-span-12">
+    <h1 class="text-4xl font-bold text-gray-800 text-center mb-6">
+      Dashboard Financeiro
+    </h1>
   </div>
 
-  <div class="col-span-12 md:col-span-3">
-    <label for="dataInicio" class="block mb-1 font-medium text-gray-700">Data Início</label>
-    <p-date-picker
-      [(ngModel)]="filtro.dataInicio"
-      inputId="dataInicio"
-      placeholder="Data Início"
-      fluid>
-    </p-date-picker>
-  </div>
-  
-  <div class="col-span-12 md:col-span-3">
-    <label for="dataFim" class="block mb-1 font-medium text-gray-700">Data Fim</label>
-    <p-date-picker
-      [(ngModel)]="filtro.dataFim"
-      inputId="dataFim"
-      placeholder="Data Fim"
-      fluid>
-    </p-date-picker>
-  </div>
-  
-  <div class="col-span-12 md:col-span-3">
-    <label for="subconta" class="block mb-1 font-medium text-gray-700">Subconta</label>
-    <p-dropdown
-      name="subcontas"
-      [(ngModel)]="subcontas"
-      inputId="subconta"
-      [options]="subcontas_select"
-      optionLabel="label"
-      optionValue="value"
-      placeholder="Selecione uma subconta"
-      fluid>
-    </p-dropdown>
-  </div>
-  
-  <div class="col-span-12 md:col-span-3 flex items-center">
-    <button
-      pButton
-      type="button"
-      label="Buscar"
-      (click)="buscarMovimentos()"
-      class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md shadow-md py-3 uppercase"
-    ></button>
+  <div class="col-span-12 grid grid-cols-12 gap-4 mb-4">
+    <div class="col-span-12 md:col-span-6 lg:col-span-4">
+      <label for="dataInicio" class="block mb-2 font-semibold text-gray-700"
+        >Data Início</label
+      >
+      <p-date-picker
+        [(ngModel)]="filtro.dataInicio"
+        inputId="dataInicio"
+        placeholder="Selecione a Data de Início"
+        fluid
+        [showClear]="true"
+        dateFormat="dd/mm/yy"
+      ></p-date-picker>
+    </div>
+
+    <div class="col-span-12 md:col-span-6 lg:col-span-4">
+      <label for="dataFim" class="block mb-2 font-semibold text-gray-700"
+        >Data Fim</label
+      >
+      <p-date-picker
+        [(ngModel)]="filtro.dataFim"
+        inputId="dataFim"
+        placeholder="Selecione a Data Final"
+        fluid
+        [showClear]="true"
+        dateFormat="dd/mm/yy"
+      ></p-date-picker>
+    </div>
+
+    <div class="col-span-12 md:col-span-6 lg:col-span-2 flex items-end">
+      <button
+        pButton
+        type="button"
+        label="Buscar"
+        (click)="buscarMovimentos()"
+        icon="pi pi-search"
+        class="w-full p-button-primary p-button-md"
+      ></button>
+    </div>
+
+    <div class="col-span-12 md:col-span-6 lg:col-span-2 flex items-end">
+      <button
+        pButton
+        type="button"
+        label="Limpar"
+        (click)="limparFiltros()"
+        icon="pi pi-times"
+        class="w-full p-button-outlined p-button-secondary p-button-md"
+      ></button>
+    </div>
   </div>
 
-  <div class="col-span-12 md:col-span-3 flex space-x-3 mt-2 md:mt-0">
-    <button pButton type="button" label="Semana" (click)="definirPeriodoSemanal()" class="flex-1"></button>
-    <button pButton type="button" label="Mês" (click)="definirPeriodoMensal()" class="flex-1"></button>
+  <div class="col-span-12 grid grid-cols-12 gap-4 mb-4">
+    <div class="col-span-12 sm:col-span-6 lg:col-span-3">
+      <p-card class="bg-green-500 text-white shadow-md rounded-lg">
+        <div class="p-d-flex p-flex-column p-jc-between p-ai-center h-full">
+          <div class="text-xl font-semibold mb-2">Receita Semana</div>
+          <div class="text-4xl font-bold">R$ {{ totalReceitaSemana | number:'1.2-2' }}</div>
+        </div>
+      </p-card>
+    </div>
+    <div class="col-span-12 sm:col-span-6 lg:col-span-3">
+      <p-card class="bg-green-500 text-white shadow-md rounded-lg">
+        <div class="p-d-flex p-flex-column p-jc-between p-ai-center h-full">
+          <div class="text-xl font-semibold mb-2">Receita Mês</div>
+          <div class="text-4xl font-bold">R$ {{ totalReceitaMes | number:'1.2-2' }}</div>
+        </div>
+      </p-card>
+    </div>
+    <div class="col-span-12 sm:col-span-6 lg:col-span-3">
+      <p-card class="bg-green-500 text-white shadow-md rounded-lg">
+        <div class="p-d-flex p-flex-column p-jc-between p-ai-center h-full">
+          <div class="text-xl font-semibold mb-2">Receita Semestre</div>
+          <div class="text-4xl font-bold">R$ {{ totalReceitaSemestre | number:'1.2-2' }}</div>
+        </div>
+      </p-card>
+    </div>
+    <div class="col-span-12 sm:col-span-6 lg:col-span-3">
+      <p-card class="bg-green-500 text-white shadow-md rounded-lg">
+        <div class="p-d-flex p-flex-column p-jc-between p-ai-center h-full">
+          <div class="text-xl font-semibold mb-2">Receita Ano</div>
+          <div class="text-4xl font-bold">R$ {{ totalReceitaAno | number:'1.2-2' }}</div>
+        </div>
+      </p-card>
+    </div>
   </div>
 
-  <div class="col-span-12 md:col-span-9"></div>
-
-  <div class="col-span-12 mt-6">
-    <p-card header="Resumo Financeiro">
-      <p-chart type="doughnut" [data]="chartData" [options]="chartOptions"></p-chart>
+  <div class="col-span-12">
+    <p-card header="Receita por Mês (Ano 2025)" class="h-full shadow-md rounded-lg">
+      <p-chart
+        type="bar"
+        [data]="barData"
+        [options]="barOptions"
+        class="w-full h-full"
+      ></p-chart>
     </p-card>
   </div>
-</p-fluid>
+
+  <div class="col-span-12 grid grid-cols-12 gap-4 mt-4">
+    <div class="col-span-12 sm:col-span-6 lg:col-span-3">
+      <p-card class="bg-red-500 text-white shadow-md rounded-lg">
+        <div class="p-d-flex p-flex-column p-jc-between p-ai-center h-full">
+          <div class="text-xl font-semibold mb-2">Despesa Semana</div>
+          <div class="text-4xl font-bold">R$ {{ totalDespesaSemana | number:'1.2-2' }}</div>
+        </div>
+      </p-card>
+    </div>
+    <div class="col-span-12 sm:col-span-6 lg:col-span-3">
+      <p-card class="bg-red-500 text-white shadow-md rounded-lg">
+        <div class="p-d-flex p-flex-column p-jc-between p-ai-center h-full">
+          <div class="text-xl font-semibold mb-2">Despesa Mês</div>
+          <div class="text-4xl font-bold">R$ {{ totalDespesaMes | number:'1.2-2' }}</div>
+        </div>
+      </p-card>
+    </div>
+    <div class="col-span-12 sm:col-span-6 lg:col-span-3">
+      <p-card class="bg-red-500 text-white shadow-md rounded-lg">
+        <div class="p-d-flex p-flex-column p-jc-between p-ai-center h-full">
+          <div class="text-xl font-semibold mb-2">Despesa Semestre</div>
+          <div class="text-4xl font-bold">R$ {{ totalDespesaSemestre | number:'1.2-2' }}</div>
+        </div>
+      </p-card>
+    </div>
+    <div class="col-span-12 sm:col-span-6 lg:col-span-3">
+      <p-card class="bg-red-500 text-white shadow-md rounded-lg">
+        <div class="p-d-flex p-flex-column p-jc-between p-ai-center h-full">
+          <div class="text-xl font-semibold mb-2">Despesa Ano</div>
+          <div class="text-4xl font-bold">R$ {{ totalDespesaAno | number:'1.2-2' }}</div>
+        </div>
+      </p-card>
+    </div>
+  </div>
+</div>
