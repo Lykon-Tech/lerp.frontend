@@ -1,183 +1,179 @@
 import { CommonModule } from "@angular/common";
-import { Component, OnInit, signal } from "@angular/core";
-import { FormsModule } from "@angular/forms";
-
 import { Movimento } from "../models/movimento.model";
-import { FiltroMovimento } from "../models/filtromovimento.model";
-import { Subconta } from "../models/subconta.model";
-
 import { MovimentoService } from "../services/movimento.service";
-import { SubcontaService } from "../services/subconta.service";
-
 import { ChartModule } from "primeng/chart";
+import { Component, OnInit, signal } from "@angular/core";
 import { FluidModule } from "primeng/fluid";
 import { DatePicker } from "primeng/datepicker";
 import { DropdownModule } from "primeng/dropdown";
 import { InputTextModule } from "primeng/inputtext";
 import { CheckboxModule } from "primeng/checkbox";
 import { ButtonModule } from "primeng/button";
+import { FiltroMovimento } from "../models/filtromovimento.model";
+import { FormsModule } from "@angular/forms";
 import { CardModule } from "primeng/card";
 import { ConfirmationService, MessageService } from "primeng/api";
 import { SelectModule } from "primeng/select";
-import { PanelModule } from "primeng/panel";
+import { GrupoConta } from "../models/grupoconta.model";
+import { GrupoContaService } from "../services/grupoconta.service";
+import { ReceitasDespesasRelatorios } from "../models/receitasdespesasrelatorios.model";
 
 @Component({
-  selector: 'app-dashboard-financeiro',
-  standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    ChartModule,
-    FluidModule,
-    DatePicker,
-    DropdownModule,
-    InputTextModule,
-    CheckboxModule,
-    ButtonModule,
-    CardModule,
-    SelectModule,
-    PanelModule
-  ],
-  templateUrl: './dashboard.component.html',
-  providers: [MessageService, ConfirmationService]
+    selector: 'app-dashboard-financeiro',
+    standalone: true,
+    imports: [
+        CommonModule,
+        FormsModule, 
+        ChartModule,
+        FluidModule,
+        DropdownModule,
+        InputTextModule,
+        CheckboxModule,
+        ButtonModule,
+        CardModule,
+        SelectModule
+    ],
+    templateUrl: './dashboard.component.html',
+    providers: [MessageService,ConfirmationService]
 })
 export class DashboardFinanceiroComponent implements OnInit {
   filtro: FiltroMovimento = {};
-  movimentos: Movimento[] = [];
-  subcontas = signal<Subconta[]>([]);
-  subcontas_select!: any[];
-
-  chartPizzaData: any;
-  chartBarData: any;
-  chartLineData: any;
-
+  receitasDespesasRelatorio: ReceitasDespesasRelatorios = {};
+  chartData: any;
   chartOptions: any;
-  loading = false;
+  loading: boolean = false;
+  grupoContas = signal<GrupoConta[]>([]);
+  grupo_contas_select!: any[];
+  barData : any;
+  barOptions: any;
+  
+  receitas : number[] = [];
+  despesas : number[] = [];
 
-  constructor(
-    private movimentoService: MovimentoService,
-    private messageService: MessageService,
-    private subcontaService: SubcontaService
-  ) {}
+  totalReceitaSemana : number = 0;
+  totalReceitaMes : number = 0;
+  totalReceitaSemestre : number = 0;
+  totalReceitaAno : number = 0;
+  totalDespesaSemana : number = 0;
+  totalDespesaMes : number = 0;
+  totalDespesaSemestre : number = 0;
+  totalDespesaAno : number = 0;
+
+  constructor(private movimentoService: MovimentoService,private messageService: MessageService, private grupoContasService : GrupoContaService) {}
 
   ngOnInit() {
-    this.definirPeriodoMensal();
+
+    this.filtro = {dataInicio:new Date(new Date().getFullYear(), 0, 1), dataFim:new Date(new Date().getFullYear(), 11, 31)}
     this.buscarMovimentos();
 
-    this.subcontaService.getSubcontas(true).then((data) => {
-      this.subcontas.set(data);
-      this.subcontas_select = this.subcontas().map(sub => ({
-        label: sub.nome,
-        value: sub
-      }));
+    this.grupoContasService.getGrupoContas(true).then((data)=>{
+        this.grupoContas.set(data);
+        this.grupo_contas_select = this.grupoContas().map(grupoConta => ({
+            label: grupoConta.nome,
+            value: grupoConta
+        }));
     });
-
-    this.chartOptions = {
-      responsive: true,
-      plugins: {
-        legend: {
-          labels: {
-            color: '#495057'
-          }
-        }
-      },
-      scales: {
-        x: { ticks: { color: '#495057' }, grid: { color: '#ebedef' } },
-        y: { ticks: { color: '#495057' }, grid: { color: '#ebedef' } }
-      }
-    };
   }
 
-  definirPeriodoSemanal() {
-    const hoje = new Date();
-    const inicioSemana = new Date(hoje);
-    inicioSemana.setDate(hoje.getDate() - hoje.getDay());
-    const fimSemana = new Date(inicioSemana);
-    fimSemana.setDate(inicioSemana.getDate() + 6);
-
-    this.filtro.dataInicio = inicioSemana;
-    this.filtro.dataFim = fimSemana;
-    this.buscarMovimentos();
-  }
-
-  definirPeriodoMensal() {
-    const hoje = new Date();
-    const inicioMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
-    const fimMes = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0);
-
-    this.filtro.dataInicio = inicioMes;
-    this.filtro.dataFim = fimMes;
-    this.buscarMovimentos();
-  }
-
+  
   buscarMovimentos() {
     this.loading = true;
-    this.movimentoService.getMovimentosFiltro(this.filtro).then((response) => {
-      this.movimentos = response;
-      this.atualizarGraficos();
-      this.loading = false;
+
+    this.movimentoService.getReceitasDespesas(this.filtro).then((response) => {
+        this.receitasDespesasRelatorio = response;
+        this.receitas = Array(12).fill(0);
+        this.despesas = Array(12).fill(0);
+
+        (this.receitasDespesasRelatorio.receitasDespesasMensal ?? []).forEach(t => {
+            const mesIndex = (t.mes ?? 0);
+            if (mesIndex >= 0 && mesIndex < 12) {
+                if (t.tipo === 'ENTRADA') {
+                this.receitas[mesIndex] = t.valor;
+                } else if (t.tipo === 'SAIDA') {
+                this.despesas[mesIndex] = t.valor;
+                }
+            }
+        });
+
+        this.totalDespesaAno = this.receitasDespesasRelatorio.despesa?.valorTotalAnual ?? 0;
+        this.totalDespesaSemestre = this.receitasDespesasRelatorio.despesa?.valorTotalSemestral ?? 0;
+        this.totalDespesaMes = this.receitasDespesasRelatorio.despesa?.valorTotalMensal ?? 0;
+        this.totalDespesaSemana = this.receitasDespesasRelatorio.despesa?.valorTotalSemanal ?? 0;
+
+        this.totalReceitaAno = this.receitasDespesasRelatorio.receita?.valorTotalAnual ?? 0;
+        this.totalReceitaSemestre = this.receitasDespesasRelatorio.receita?.valorTotalSemestral ?? 0;
+        this.totalReceitaMes = this.receitasDespesasRelatorio.receita?.valorTotalMensal ?? 0;
+        this.totalReceitaSemana = this.receitasDespesasRelatorio.receita?.valorTotalSemanal ?? 0;
+        
+        this.initCharts();
+        this.loading = false;
     }).catch(error => {
-      this.loading = false;
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Erro',
-        detail: 'Erro ao carregar movimentos: ' + error
-      });
+        this.loading = false;
+        this.messageService.add({
+            severity: 'error',
+            summary: 'Erro',
+            detail: 'Erro ao carregar receitas x despesas: ' + error
+        });
     });
   }
 
-  atualizarGraficos() {
-    const entradas = this.movimentos.filter(m => (m?.valor || 0) > 0).reduce((sum, m) => sum + (m?.valor || 0), 0);
-    const saidas = this.movimentos.filter(m => (m?.valor || 0) < 0).reduce((sum, m) => sum + Math.abs((m?.valor || 0)), 0);
+  initCharts() {
+    const documentStyle = getComputedStyle(document.documentElement);
+    const textColor = documentStyle.getPropertyValue('--text-color');
+    const textColorSecondary = documentStyle.getPropertyValue('--text-color-secondary');
+    const surfaceBorder = documentStyle.getPropertyValue('--surface-border');
 
-    this.chartPizzaData = {
-      labels: ['Entradas', 'Saídas'],
-      datasets: [
-        {
-          data: [entradas, saidas],
-          backgroundColor: ['#42A5F5', '#FF6384'],
-          hoverBackgroundColor: ['#64B5F6', '#FF6384']
-        }
-      ]
+    this.barData = {
+        labels: ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro' ,'Dezembro'],
+        datasets: [
+            {
+                label: 'Receita',
+                backgroundColor: documentStyle.getPropertyValue('--p-primary-500'),
+                borderColor: documentStyle.getPropertyValue('--p-primary-500'),
+                data: this.receitas
+            },
+            {
+                label: 'Despesa',
+                backgroundColor: documentStyle.getPropertyValue('--p-primary-200'),
+                borderColor: documentStyle.getPropertyValue('--p-primary-200'),
+                data: this.despesas
+            }
+        ]
     };
 
-    const movimentacaoPorDia: { [data: string]: number } = {};
-    this.movimentos.forEach(mov => {
-      const data = new Date(mov.dataLancamento || '').toLocaleDateString();
-      movimentacaoPorDia[data] = (movimentacaoPorDia[data] || 0) + (mov.valor || 0);
-    });
-
-    const dias = Object.keys(movimentacaoPorDia).sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
-    const valores = dias.map(dia => movimentacaoPorDia[dia]);
-
-    this.chartBarData = {
-      labels: dias,
-      datasets: [
-        {
-          label: 'Movimentação Diária',
-          backgroundColor: '#42A5F5',
-          data: valores
+    this.barOptions = {
+        maintainAspectRatio: false,
+        aspectRatio: 0.8,
+        plugins: {
+            legend: {
+                labels: {
+                    color: textColor
+                }
+            }
+        },
+        scales: {
+            x: {
+                ticks: {
+                    color: textColorSecondary,
+                    font: {
+                        weight: 500
+                    }
+                },
+                grid: {
+                    display: false,
+                    drawBorder: false
+                }
+            },
+            y: {
+                ticks: {
+                    color: textColorSecondary
+                },
+                grid: {
+                    color: surfaceBorder,
+                    drawBorder: false
+                }
+            }
         }
-      ]
-    };
-
-    let saldoAcumulado = 0;
-    const saldoPorDia = valores.map(valor => {
-      saldoAcumulado += valor;
-      return saldoAcumulado;
-    });
-
-    this.chartLineData = {
-      labels: dias,
-      datasets: [
-        {
-          label: 'Saldo Acumulado',
-          data: saldoPorDia,
-          fill: false,
-          borderColor: '#66BB6A',
-          tension: 0.4
-        }
-      ]
     };
   }
 }

@@ -9,7 +9,7 @@ import { HttpParams } from '@angular/common/http';
 })
 export class TipoDocumentoService {
 
-    private baseUrl = 'https://api.lykon.com.br/financeiro/tipo_documento';
+    private baseUrl = 'http://localhost:8080/financeiro/tipo_documento';
 
     constructor(private http: HttpClient) {}
 

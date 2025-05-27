@@ -9,7 +9,7 @@ import { HttpParams } from '@angular/common/http';
 })
 export class ContaService {
 
-    private baseUrl = 'https://api.lykon.com.br/financeiro/conta';
+    private baseUrl = 'http://localhost:8080/financeiro/conta';
 
     constructor(private http: HttpClient) {}
 

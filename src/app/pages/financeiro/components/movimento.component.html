@@ -2,14 +2,73 @@
 <p-dialog [(visible)]="movimentoDialog" [style]="{ width: '450px' }" header="Detalhes do Movimento" [modal]="true">
 </p-dialog>
 <p-toolbar>
-    <ng-template #start>
-        <p-button label="Novo" icon="pi pi-plus" severity="secondary"(onClick)="openNew()" />
-    </ng-template>
-    <ng-template #end>
-        <p-button label="Importar OFX" icon="pi pi-file-import" severity="secondary" (click)="fileInput.click()" class="ml-2" />
-        <input #fileInput type="file" accept=".ofx,.qfx" (change)="importOfx($event)" style="display: none;" />
-    </ng-template>
+  <ng-template #start>
+    <div class="flex gap-2 flex-wrap items-center">
+      <p-button
+        label="Novo"
+        icon="pi pi-plus"
+        severity="secondary"
+        (click)="openNew()"
+      ></p-button>
+
+      <p-button
+        label="Importar OFX"
+        icon="pi pi-file-import"
+        severity="secondary"
+        (click)="fileInput.click()"
+      ></p-button>
+      
+      <input
+        #fileInput
+        type="file"
+        accept=".ofx,.qfx"
+        (change)="importOfx($event)"
+        style="display: none"
+      />
+    </div>
+  </ng-template>
+
+  <ng-template #center>
+    <div class="flex flex-wrap gap-4 items-center">
+      <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+        <label for="startDate" class="font-bold">Data de Início:</label>
+        <p-date-picker
+          [(ngModel)]="filtro.dataInicio"
+          inputId="startDate"
+          [showIcon]="true"
+          dateFormat="dd/mm/yy"
+          placeholder="Selecione a data de início"
+          [maxDate]="filtro.dataFim || null"
+          appendTo="body"
+          styleClass="w-full sm:w-auto"
+        ></p-date-picker>
+      </div>
+
+      <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+        <label for="endDate" class="font-bold">Data de Fim:</label>
+        <p-date-picker
+          [(ngModel)]="filtro.dataFim"
+          inputId="endDate"
+          [showIcon]="true"
+          dateFormat="dd/mm/yy"
+          placeholder="Selecione a data de fim"
+          [minDate]="filtro.dataInicio || null"
+          appendTo="body"
+          styleClass="w-full sm:w-auto"
+        ></p-date-picker>
+      </div>
+
+      <p-button
+        label="Aplicar Filtro"
+        icon="pi pi-filter"
+        (click)="loadMovimentos()"
+        [disabled]="!filtro.dataInicio || !filtro.dataFim"
+        styleClass="p-button-primary ml-auto sm:ml-0"
+      ></p-button>
+    </div>
+  </ng-template>
 </p-toolbar>
+
 <div class="card">
     <div class="font-semibold text-xl mb-4">Movimentos Financeiros</div>
 
@@ -18,8 +77,9 @@
         [value]="movimentos()"
         dataKey="id"
         [rows]="10"
+        (input)="onGlobalFilter($event)"
         [loading]="loading"
-        (onLazyLoad)="loadMovimentosLazy($event)"
+        [totalRecords]="totalRecords"
         [paginator]="true"
         [showGridlines]="true"
         [rowHover]="true"
