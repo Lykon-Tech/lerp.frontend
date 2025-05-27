@@ -32,6 +32,7 @@ import { TagService } from '../services/tag.service';
 import { Conta } from '../models/conta.model';
 import { ContaService } from '../services/conta.service';
 import { TagModel } from '../models/tag.model';
+import { FiltroMovimento } from '../models/filtromovimento.model';
 @Component({
     selector: 'app-movimentos',
     templateUrl: './movimento.component.html',
@@ -78,8 +79,7 @@ export class Movimentos implements OnInit {
     totalRecords : number = 0;
     @ViewChild('dt') dt!: Table;
     @ViewChild('fileInput') fileInput!: ElementRef;
-    private resolverMovimentoManual?: () => void;
-
+    filtro : FiltroMovimento = {};
     constructor(
     private movimentoService: MovimentoService,
     private messageService: MessageService,
@@ -92,27 +92,34 @@ export class Movimentos implements OnInit {
     ) {}
 
     ngOnInit() {
-    this.loadMovimentos();
+        const hoje = new Date();
 
-    this.cols = [
-        { field: 'subconta.nome', header: 'Subconta', customExportHeader: 'Subconta' },
-        { field: 'tipoDocumento.nome', header: 'Tipo Documento' },
-        { field: 'valor', header: 'Valor' },
-        { field: 'dataLancamento', header: 'Data' },
-        { field: 'numeroDocumento', header: 'Nº Documento' },
-        { field: 'historico', header: 'Histórico' }
-    ];
+        this.filtro = {
+            dataInicio: new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate()),
+            dataFim: new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate())     
+        };
 
-    this.exportColumns = this.cols.map(col => ({
-        title: col.header,
-        dataKey: col.field
-    }));
+        this.loadMovimentos();
+
+        this.cols = [
+            { field: 'subconta.nome', header: 'Subconta', customExportHeader: 'Subconta' },
+            { field: 'tipoDocumento.nome', header: 'Tipo Documento' },
+            { field: 'valor', header: 'Valor' },
+            { field: 'dataLancamento', header: 'Data' },
+            { field: 'numeroDocumento', header: 'Nº Documento' },
+            { field: 'historico', header: 'Histórico' }
+        ];
+
+        this.exportColumns = this.cols.map(col => ({
+            title: col.header,
+            dataKey: col.field
+        }));
     }
 
     loadMovimentos() {
         this.loading = true;
-        this.movimentoService.getMovimentos(0,10).then(data => {
-            const movimentosComDataConvertida = data.content.map(mov => ({
+        this.movimentoService.getMovimentosFiltro(this.filtro).then(data => {
+            const movimentosComDataConvertida = data.map(mov => ({
                 ...mov,
                 dataLancamento: mov.dataLancamento ? new Date(mov.dataLancamento) : undefined
             }));
@@ -496,26 +503,5 @@ export class Movimentos implements OnInit {
     formatarValor(valor: number): string{
         return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     }
-
-    loadMovimentosLazy(event: any) {
-        this.loading = true;
-
-        const page = event.first / event.rows;
-        const size = event.rows;
-
-        this.movimentoService.getMovimentos(page, size).then((response) => {
-            this.movimentos.set(response.content);
-            this.totalRecords = response.totalElements;
-            this.loading = false;
-        }).catch(error => {
-            this.loading = false;
-            this.messageService.add({
-                severity: 'error',
-                summary: 'Erro',
-                detail: 'Erro ao carregar movimentos: ' + error
-            });
-        });
-    }
-
 
 }

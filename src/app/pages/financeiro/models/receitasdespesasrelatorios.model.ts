@@ -2,7 +2,7 @@ import { ReceitaDespesa } from "./receitadespesas.model";
 import { ReceitasDespesasBase } from "./receitasdespesasbase.model";
 
 export interface ReceitasDespesasRelatorios{
-    receitas? : ReceitasDespesasBase;
-    despesas? : ReceitasDespesasBase;
+    receita? : ReceitasDespesasBase;
+    despesa? : ReceitasDespesasBase;
     receitasDespesasMensal? : ReceitaDespesa[];
 }

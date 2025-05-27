@@ -13,12 +13,9 @@ import { FiltroMovimento } from "../models/filtromovimento.model";
 import { FormsModule } from "@angular/forms";
 import { CardModule } from "primeng/card";
 import { ConfirmationService, MessageService } from "primeng/api";
-import { Subconta } from "../models/subconta.model";
-import { SubcontaService } from "../services/subconta.service";
 import { SelectModule } from "primeng/select";
 import { GrupoConta } from "../models/grupoconta.model";
 import { GrupoContaService } from "../services/grupoconta.service";
-import { ReceitaDespesa } from "../models/receitadespesas.model";
 import { ReceitasDespesasRelatorios } from "../models/receitasdespesasrelatorios.model";
 
 @Component({
@@ -29,7 +26,6 @@ import { ReceitasDespesasRelatorios } from "../models/receitasdespesasrelatorios
         FormsModule, 
         ChartModule,
         FluidModule,
-        DatePicker,
         DropdownModule,
         InputTextModule,
         CheckboxModule,
@@ -85,18 +81,29 @@ export class DashboardFinanceiroComponent implements OnInit {
 
     this.movimentoService.getReceitasDespesas(this.filtro).then((response) => {
         this.receitasDespesasRelatorio = response;
-        this.receitas = (this.receitasDespesasRelatorio.receitasDespesasMensal?? []).filter(t => t.tipo == 'ENTRADA').map(t => t.valor);
-        this.despesas = (this.receitasDespesasRelatorio.receitasDespesasMensal?? []).filter(t => t.tipo == 'ENTRADA').map(t => t.valor);
+        this.receitas = Array(12).fill(0);
+        this.despesas = Array(12).fill(0);
 
-        this.totalDespesaAno = this.receitasDespesasRelatorio.despesas?.valorTotalAnual ?? 0;
-        this.totalDespesaSemestre = this.receitasDespesasRelatorio.despesas?.valorTotalSemestral ?? 0;
-        this.totalDespesaMes = this.receitasDespesasRelatorio.despesas?.valorTotalMensal ?? 0;
-        this.totalDespesaSemana = this.receitasDespesasRelatorio.despesas?.valorTotalSemanal ?? 0;
+        (this.receitasDespesasRelatorio.receitasDespesasMensal ?? []).forEach(t => {
+            const mesIndex = (t.mes ?? 0);
+            if (mesIndex >= 0 && mesIndex < 12) {
+                if (t.tipo === 'ENTRADA') {
+                this.receitas[mesIndex] = t.valor;
+                } else if (t.tipo === 'SAIDA') {
+                this.despesas[mesIndex] = t.valor;
+                }
+            }
+        });
 
-        this.totalReceitaAno = this.receitasDespesasRelatorio.receitas?.valorTotalAnual ?? 0;
-        this.totalReceitaSemestre = this.receitasDespesasRelatorio.receitas?.valorTotalSemestral ?? 0;
-        this.totalReceitaMes = this.receitasDespesasRelatorio.receitas?.valorTotalMensal ?? 0;
-        this.totalReceitaSemana = this.receitasDespesasRelatorio.receitas?.valorTotalSemanal ?? 0;
+        this.totalDespesaAno = this.receitasDespesasRelatorio.despesa?.valorTotalAnual ?? 0;
+        this.totalDespesaSemestre = this.receitasDespesasRelatorio.despesa?.valorTotalSemestral ?? 0;
+        this.totalDespesaMes = this.receitasDespesasRelatorio.despesa?.valorTotalMensal ?? 0;
+        this.totalDespesaSemana = this.receitasDespesasRelatorio.despesa?.valorTotalSemanal ?? 0;
+
+        this.totalReceitaAno = this.receitasDespesasRelatorio.receita?.valorTotalAnual ?? 0;
+        this.totalReceitaSemestre = this.receitasDespesasRelatorio.receita?.valorTotalSemestral ?? 0;
+        this.totalReceitaMes = this.receitasDespesasRelatorio.receita?.valorTotalMensal ?? 0;
+        this.totalReceitaSemana = this.receitasDespesasRelatorio.receita?.valorTotalSemanal ?? 0;
         
         this.initCharts();
         this.loading = false;

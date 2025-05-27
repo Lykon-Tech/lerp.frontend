@@ -1,8 +1,5 @@
-import { GrupoConta } from "./grupoconta.model";
-
 export interface ReceitaDespesa{
-    mes: string;
+    mes: number;
     valor: number;
-    grupoConta : GrupoConta; 
     tipo? : string;
 }
