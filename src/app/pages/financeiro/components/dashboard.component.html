@@ -6,58 +6,6 @@
   </div>
 
   <div class="col-span-12 grid grid-cols-12 gap-4 mb-4">
-    <div class="col-span-12 md:col-span-6 lg:col-span-4">
-      <label for="dataInicio" class="block mb-2 font-semibold text-gray-700"
-        >Data Início</label
-      >
-      <p-date-picker
-        [(ngModel)]="filtro.dataInicio"
-        inputId="dataInicio"
-        placeholder="Selecione a Data de Início"
-        fluid
-        [showClear]="true"
-        dateFormat="dd/mm/yy"
-      ></p-date-picker>
-    </div>
-
-    <div class="col-span-12 md:col-span-6 lg:col-span-4">
-      <label for="dataFim" class="block mb-2 font-semibold text-gray-700"
-        >Data Fim</label
-      >
-      <p-date-picker
-        [(ngModel)]="filtro.dataFim"
-        inputId="dataFim"
-        placeholder="Selecione a Data Final"
-        fluid
-        [showClear]="true"
-        dateFormat="dd/mm/yy"
-      ></p-date-picker>
-    </div>
-
-    <div class="col-span-12 md:col-span-6 lg:col-span-2 flex items-end">
-      <button
-        pButton
-        type="button"
-        label="Buscar"
-        (click)="buscarMovimentos()"
-        icon="pi pi-search"
-        class="w-full p-button-primary p-button-md"
-      ></button>
-    </div>
-
-    <div class="col-span-12 md:col-span-6 lg:col-span-2 flex items-end">
-      <button
-        pButton
-        type="button"
-        label="Limpar"
-        (click)="limparFiltros()"
-        icon="pi pi-times"
-        class="w-full p-button-outlined p-button-secondary p-button-md"
-      ></button>
-    </div>
-  </div>
-
-  <div class="col-span-12 grid grid-cols-12 gap-4 mb-4">
     <div class="col-span-12 sm:col-span-6 lg:col-span-3">
       <p-card class="bg-green-500 text-white shadow-md rounded-lg">
         <div class="p-d-flex p-flex-column p-jc-between p-ai-center h-full">

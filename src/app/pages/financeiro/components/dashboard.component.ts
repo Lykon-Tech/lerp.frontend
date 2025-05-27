@@ -79,9 +79,6 @@ export class DashboardFinanceiroComponent implements OnInit {
     });
   }
 
-  limparFiltros(){
-    this.filtro = {};
-  }
   
   buscarMovimentos() {
     this.loading = true;
