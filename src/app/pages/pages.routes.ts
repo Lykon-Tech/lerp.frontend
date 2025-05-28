@@ -1,34 +1,38 @@
 import { Routes } from '@angular/router';
 import { Documentation } from './documentation/documentation';
-import { Bancos } from './financeiro/components/banco.component';
+import { BancoComponent } from './financeiro/components/banco.component';
 import { Crud } from './crud/crud';
 import { Empty } from './empty/empty';
-import { Bolsas } from './financeiro/components/bolsa.component';
-import { GrupoContas } from './financeiro/components/grupocontas.component';
-import { Contas } from './financeiro/components/conta.component';
-import { subcontas } from './financeiro/components/subconta.component';
-import { TipoDocumentos } from './financeiro/components/tipodocumento.component';
-import { TipoCursos } from './cursos/components/tipocurso.component';
-import { Modalidades } from './cursos/components/modalidade.component';
-import { Disciplinas } from './cursos/components/disciplina.component';
-import { Tags } from './financeiro/components/tag.component';
-import { MatrizesCurriculares } from './cursos/components/matrizcurricular.component';
-import { Movimentos } from './financeiro/components/movimento.component';
+import { BolsaComponent } from './financeiro/components/bolsa.component';
+import { GrupoContaComponent } from './financeiro/components/grupoconta.component';
+import { ContaComponent } from './financeiro/components/conta.component';
+import { SubcontaComponent } from './financeiro/components/subconta.component';
+import { TipoDocumentoComponent } from './financeiro/components/tipodocumento.component';
+import { TipoCursoComponent } from './cursos/components/tipocurso.component';
+import { ModalidadeComponent } from './cursos/components/modalidade.component';
+import { DisciplinaComponent } from './cursos/components/disciplina.component';
+import { TagComponent } from './financeiro/components/tag.component';
+import { MatrizCurricularComponent } from './cursos/components/matrizcurricular.component';
+import { MovimentoComponent } from './financeiro/components/movimento.component';
+import { SituacaoTurmaComponent } from './turmas/components/situacaoturma.component';
+import { TurnoComponent } from './turmas/components/turnos.component';
 
 export default [
     { path: 'documentation', component: Documentation },
-    { path: 'movimentos', component: Movimentos },
-    { path: 'bancos', component: Bancos },
-    { path: 'bolsas', component: Bolsas },
-    { path: 'grupos_contas', component: GrupoContas },
-    { path: 'contas', component: Contas },
-    { path: 'subcontas', component: subcontas },
-    { path: 'tags', component: Tags },
-    { path: 'tipos_documentos', component: TipoDocumentos },
-    { path: 'tipos_cursos', component: TipoCursos },
-    { path: 'modalidades', component: Modalidades },
-    { path: 'disciplinas', component: Disciplinas },
-    { path: 'matrizes_curriculares', component: MatrizesCurriculares },
+    { path: 'movimentos', component: MovimentoComponent },
+    { path: 'bancos', component: BancoComponent },
+    { path: 'bolsas', component: BolsaComponent },
+    { path: 'grupos_contas', component: GrupoContaComponent },
+    { path: 'contas', component: ContaComponent },
+    { path: 'subcontas', component: SubcontaComponent },
+    { path: 'tags', component: TagComponent },
+    { path: 'tipos_documentos', component: TipoDocumentoComponent },
+    { path: 'tipos_cursos', component: TipoCursoComponent },
+    { path: 'modalidades', component: ModalidadeComponent },
+    { path: 'disciplinas', component: DisciplinaComponent },
+    { path: 'situacoes_turmas', component: SituacaoTurmaComponent },
+    { path: 'matrizes_curriculares', component: MatrizCurricularComponent },
+    { path: 'turnos', component: TurnoComponent },
     { path: 'crud', component: Crud },
     { path: 'empty', component: Empty },
     { path: '**', redirectTo: '/notfound' }

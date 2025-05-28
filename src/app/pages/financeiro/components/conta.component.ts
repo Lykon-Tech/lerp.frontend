@@ -1,43 +1,34 @@
-import { Component, OnInit, signal, ViewChild } from '@angular/core';
-import { ConfirmationService, MessageService } from 'primeng/api';
-import { Table, TableModule } from 'primeng/table';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
-import { RippleModule } from 'primeng/ripple';
-import { ToastModule } from 'primeng/toast';
-import { ToolbarModule } from 'primeng/toolbar';
-import { RatingModule } from 'primeng/rating';
-import { InputTextModule } from 'primeng/inputtext';
-import { TextareaModule } from 'primeng/textarea';
-import { SelectModule } from 'primeng/select';
-import { RadioButtonModule } from 'primeng/radiobutton';
-import { InputNumberModule } from 'primeng/inputnumber';
-import { DialogModule } from 'primeng/dialog';
-import { TagModule } from 'primeng/tag';
-import { InputIconModule } from 'primeng/inputicon';
-import { IconFieldModule } from 'primeng/iconfield';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ContaSaida } from '../models/conta.saida.model';
-import { Conta } from '../models/conta.model';
-import { ContaService } from '../services/conta.service';
-import { CheckboxModule } from 'primeng/checkbox';
-import { Banco } from '../models/banco.model';
-import { BancoService } from '../services/banco.service';
+import { ConfirmationService, MessageService } from "primeng/api";
+import { BaseComponente } from "../../bases/components/base.component";
+import { Conta } from "../models/conta.model";
+import { ContaService } from "../services/conta.service";
+import { Component, signal } from "@angular/core";
+import { ConfirmDialogModule } from "primeng/confirmdialog";
+import { CheckboxModule } from "primeng/checkbox";
+import { IconFieldModule } from "primeng/iconfield";
+import { InputIconModule } from "primeng/inputicon";
+import { TagModule } from "primeng/tag";
+import { DialogModule } from "primeng/dialog";
+import { InputNumberModule } from "primeng/inputnumber";
+import { RadioButtonModule } from "primeng/radiobutton";
+import { SelectModule } from "primeng/select";
+import { TextareaModule } from "primeng/textarea";
+import { InputTextModule } from "primeng/inputtext";
+import { RatingModule } from "primeng/rating";
+import { ToolbarModule } from "primeng/toolbar";
+import { ToastModule } from "primeng/toast";
+import { RippleModule } from "primeng/ripple";
+import { ButtonModule } from "primeng/button";
+import { FormsModule } from "@angular/forms";
+import { TableModule } from "primeng/table";
+import { CommonModule } from "@angular/common";
+import { Banco } from "../models/banco.model";
+import { BancoService } from "../services/banco.service";
+import { ContaSaida } from "../models/conta.saida.model";
 
-interface Column {
-    field: string;
-    header: string;
-    customExportHeader?: string;
-}
-
-interface ExportColumn {
-    title: string;
-    dataKey: string;
-}
 
 @Component({
-    selector: 'app-crud',
+    selector: 'app-conta',
     standalone: true,
     imports: [
         CommonModule,
@@ -60,198 +51,65 @@ interface ExportColumn {
         CheckboxModule,
         ConfirmDialogModule
     ],
-    templateUrl: './conta.component.html',
+    templateUrl: `./conta.component.html`,
     providers: [MessageService, ContaService, ConfirmationService]
 })
-export class Contas implements OnInit {
-    contaDialog: boolean = false;
-
-    contas = signal<Conta[]>([]);
+export class ContaComponent extends BaseComponente<Conta> {
+   
+    constructor(
+        messageService: MessageService,
+        confirmationService: ConfirmationService,
+        service: ContaService,
+        private bancoService : BancoService
+    ) {
+        super(
+            messageService,
+            confirmationService,
+            service
+        );
+        this.titulo = 'conta';
+        this.genero = 'a';
+    }
 
     bancos = signal<Banco[]>([]);
 
-    exportColumns!: ExportColumn[];
+    bancos_select! : any[]
 
-    conta!: Conta;
-
-    submitted: boolean = false;
-
-    statuses!: any[];
-
-    bancos_select!: any[];
-
-    @ViewChild('dt') dt!: Table;
-
-    cols!: Column[];
-
-    constructor(
-        private contaService: ContaService,
-        private messageService: MessageService,
-        private confirmationService: ConfirmationService,
-        private bancoService : BancoService
-        
-    ) {}
-
-    ngOnInit() {
-        
-        this.loadDemoData();
-    }
-
-    loadDemoData() {
-        this.contaService.getContas().then((data) => {
-            this.contas.set(data);
-        });
-
-        this.bancoService.getBancos(true).then((data)=>{
+    override loadDemoData(): void {
+        this.bancoService.findAll(true).then((data) => {
             this.bancos.set(data);
-            this.bancos_select = this.bancos().map(banco => ({
-                label: banco.nome,
-                value: banco
-            }));
         });
 
-        this.statuses = [
-            { label: 'ATIVO', value: true },
-            { label: 'INATIVO', value: false }
-            
-        ];
+        this.bancos_select = this.bancos().map(banco => ({
+            label: banco.nome,
+            value: banco
+        }));
 
-        this.cols = [
-            { field: 'banco', header: 'Banco', customExportHeader: 'Banco' },
-            { field: 'agencia', header: 'Agência' },
-            { field: 'numero_conta', header: 'Número da conta' },
-            { field: 'ativo', header: 'Status' }
-        ];
-
-        this.exportColumns = this.cols.map((col) => ({ title: col.header, dataKey: col.field }));
+        super.loadDemoData();
     }
 
-    onGlobalFilter(table: Table, event: Event) {
-        table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
+    override getValidacoes(): boolean {
+        return (this.objeto as any).agencia.trim() && (this.objeto as any).numeroConta.trim() && (this.objeto as any).ativo != undefined && (this.objeto as any).banco != undefined;
     }
 
-    openNew() {
-        this.conta = {ativo:true};
-        this.submitted = false;
-        this.contaDialog = true;
-    }
-
-    editConta(conta: Conta) {
-        this.conta = {
-            id: conta.id,
-            banco: this.bancos().find(b => b.id === conta.banco?.id),
-            agencia: conta.agencia,
-            numeroConta: conta.numeroConta,
-            ativo: conta.ativo
-        };
-        this.contaDialog = true;
-    }
-
-    hideDialog() {
-        this.contaDialog = false;
-        this.submitted = false;
-    }
-
-    async deleteConta(conta: Conta) {
-        this.confirmationService.confirm({
-            message: 'Você tem certeza que deseja deletar a conta de agência: ' + conta.agencia + '?',
-            header: 'Confirmar',
-            icon: 'pi pi-exclamation-triangle',
-            accept: async () => {
-                if (conta.id != null) {
-                    try {
-                        await this.contaService.deleteConta(conta.id);
-
-                        const novaLista = this.contas().filter(b => b.id !== conta.id);
-                        this.contas.set([...novaLista]);
-                        this.messageService.add({
-                            severity: 'success',
-                            summary: 'Sucesso',
-                            detail: 'Conta deletada',
-                            life: 3000
-                        });
-                    } catch (err) {
-                        this.messageService.add({
-                            severity: 'error',
-                            summary: 'Erro',
-                            detail: 'Falha ao deletar a conta: ' + err,
-                            life: 3000
-                        });
-                    }
-                }
-            }
-        });
-    }
-
-    findIndexById(id: string): number {
-        let index = -1;
-        for (let i = 0; i < this.contas().length; i++) {
-            if (this.contas()[i].id === id) {
-                index = i;
-                break;
-            }
-        }
-
-        return index;
-    }
-
-    getSeverity(ativo: boolean) {
-        return ativo ? 'success' : 'danger';
-    }
-
-    async saveConta() {
-        this.submitted = true;
-        let _bancos = this.contas();
-
-        if (this.conta.agencia != undefined && this.conta.numeroConta != undefined && this.conta.banco != undefined && this.conta.ativo != undefined) {
-            try {
-            if (this.conta.id) {
-                const updatedBanco = await this.contaService.updateConta(this.converterContaParaContaSaida(this.conta));
-                const index = this.findIndexById(updatedBanco.id!);
-                const updatedBancos = [..._bancos];
-                updatedBancos[index] = updatedBanco;
-                this.contas.set(updatedBancos);
-
-                this.messageService.add({
-                severity: 'success',
-                summary: 'Sucesso',
-                detail: 'Conta atualizada',
-                life: 3000
-                });
-            } else {
-                const createdBanco = await this.contaService.createConta(this.converterContaParaContaSaida(this.conta));
-                this.contas.set([..._bancos, createdBanco]);
-                
-
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Sucesso',
-                    detail: 'Conta criada',
-                life: 3000
-                });
-            }
-
-            this.contaDialog = false;
-            this.conta = {};
-            } catch (error) {
-                this.messageService.add({
-                    severity: 'error',
-                    summary: 'Erro',
-                    detail: 'Falha ao salvar Conta: ' + error,
-                    life: 3000
-                });
-            }
-        }
-    }
-
-    converterContaParaContaSaida(conta: Conta): ContaSaida {
+    override getObjetoEdit(objeto: Conta): Conta {
         return {
-            id: conta.id,
-            bancoId: conta.banco?.id, 
-            ativo: conta.ativo,
-            agencia: conta.agencia,
-            numeroConta: conta.numeroConta
-        };
+            id : objeto.id,
+            agencia : objeto.agencia,
+            numeroConta : objeto.numeroConta,
+            banco : this.bancos().find(b => b.id === objeto.banco?.id),
+            ativo : objeto.ativo
+        }
+    }
+
+    override converterObjeto(objeto: Conta): ContaSaida {
+        return {
+            id : objeto.id,
+            agencia : objeto.agencia,
+            numeroConta : objeto.numeroConta,
+            bancoId : objeto.banco?.id,
+            ativo : objeto.ativo
+        }
     }
 
 }

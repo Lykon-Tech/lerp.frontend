@@ -7,7 +7,7 @@
 
 <p-table
     #dt
-    [value]="matrizCurriculars()"
+    [value]="lista()"
     [rows]="10"
     [columns]="cols"
     [paginator]="true"
@@ -15,13 +15,13 @@
     [tableStyle]="{ 'min-width': '75rem' }"
     [rowHover]="true"
     dataKey="id"
-    currentPageReportTemplate="Mostrando de {first} até {last} de {totalRecords} Matrizes Curriculares"
+    currentPageReportTemplate="Mostrando de {first} até {last} de {totalRecords} matrizes curriculares"
     [showCurrentPageReport]="true"
     [rowsPerPageOptions]="[10, 20, 30]"
 >
     <ng-template #caption>
         <div class="flex items-center justify-between">
-            <h5 class="m-0">Gerenciar Matriz Curricular</h5>
+            <h5 class="m-0">Gerenciar matrizes curriculares</h5>
             <p-iconfield>
                 <p-inputicon styleClass="pi pi-search" />
                 <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Pesquisar..." />
@@ -47,35 +47,35 @@
             <th style="min-width: 12rem"></th>
         </tr>
     </ng-template>
-    <ng-template #body let-matrizCurricular>
+    <ng-template #body let-objeto>
         <tr>
-            <td style="min-width: 16rem">{{ matrizCurricular.nome }}</td>
+            <td style="min-width: 16rem">{{ objeto.nome }}</td>
             <td>
-                <ng-container *ngFor="let disciplina of matrizCurricular.disciplinas; let last = last">
+                <ng-container *ngFor="let disciplina of objeto.disciplinas; let last = last">
                     <span class="p-chip p-chip-text p-1 px-3 mr-2 mb-1 rounded-full bg-blue-100 text-blue-800">
                         {{ disciplina.nome }}
                     </span>
                 </ng-container>
             </td>
             <td>
-                <p-tag [value]="matrizCurricular.ativo ? 'ATIVO' : 'INATIVO' " [severity]="getSeverity(matrizCurricular.ativo)" />
+                <p-tag [value]="objeto.ativo ? 'ATIVO' : 'INATIVO' " [severity]="getSeverity(objeto.ativo)" />
             </td>
 
             <td>
-                <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="editmatrizCurricular(matrizCurricular)" />
-                <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (click)="deletematrizCurricular(matrizCurricular)" />
+                <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="edit(objeto)" />
+                <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (click)="delete(objeto)" />
             </td>
         </tr>
     </ng-template>
 </p-table>
 
-<p-dialog [(visible)]="matrizCurricularDialog" [style]="{ width: '450px' }" header="Detalhes da Matriz Curricular" [modal]="true">
+<p-dialog [(visible)]="dialogo" [style]="{ width: '450px' }" header="Detalhes da matriz curricular" [modal]="true">
     <ng-template #content>
         <div class="flex flex-col gap-6">
             <div>
                 <label for="name" class="block font-bold mb-3">Nome</label>
-                <input name="name" type="text" pInputText id="nome" [(ngModel)]="matrizCurricular.nome" required autofocus fluid />
-                <small class="text-red-500" *ngIf="submitted && !matrizCurricular.nome">Nome é obrigatório.</small>
+                <input name="name" type="text" pInputText id="nome" [(ngModel)]="objeto.nome" required autofocus fluid />
+                <small class="text-red-500" *ngIf="submitted && !objeto.nome">Nome é obrigatório.</small>
             </div>
             <div>
                 <label for="disciplinas" class="block font-bold mb-3">Disciplinas</label>
@@ -84,7 +84,7 @@
                     name="disciplinas" 
                     fluid 
                     [options]="disciplinas_multi_select" 
-                    [(ngModel)]="matrizCurricular.disciplinas" 
+                    [(ngModel)]="objeto.disciplinas" 
                     placeholder="Selecionar disciplinas" 
                     optionLabel="label" 
                     optionValue="value" 
@@ -99,13 +99,13 @@
                         </ng-container>
                     </ng-template>
                 </p-multiselect>
-                <small class="text-red-500" *ngIf="submitted && matrizCurricular.disciplinas == undefined">Disciplinas é obrigatório.</small>
+                <small class="text-red-500" *ngIf="submitted && (objeto.disciplinas == undefined || objeto.disciplinas.length == 0)">Disciplinas é obrigatório.</small>
             </div>
             <div>
                 <label for="status" class="block font-bold mb-3">Status</label>
                 <p-select 
                     name="status" 
-                    [(ngModel)]="matrizCurricular.ativo" 
+                    [(ngModel)]="objeto.ativo" 
                     inputId="ativo" 
                     [options]="statuses" 
                     optionLabel="label" 
@@ -114,14 +114,14 @@
                     fluid 
                     [appendTo]="'body'"
                 />
-                <small class="text-red-500" *ngIf="submitted && matrizCurricular.ativo == undefined">Status é obrigatório.</small>
+                <small class="text-red-500" *ngIf="submitted && objeto.ativo == undefined">Status é obrigatório.</small>
             </div>
         </div>
     </ng-template>
 
     <ng-template #footer>
         <p-button label="Cancel" icon="pi pi-times" text (click)="hideDialog()" />
-        <p-button label="Save" icon="pi pi-check" (click)="savematrizCurricular()" />
+        <p-button label="Save" icon="pi pi-check" (click)="save()" />
     </ng-template>
 </p-dialog>
 

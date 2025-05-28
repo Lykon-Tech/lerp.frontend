@@ -7,21 +7,21 @@
 
 <p-table
     #dt
-    [value]="contas()"
+    [value]="lista()"
     [rows]="10"
     [columns]="cols"
     [paginator]="true"
-    [globalFilterFields]="['agencia', 'numero_conta', 'ativo']"
+    [globalFilterFields]="['agencia', 'numero_objeto', 'ativo']"
     [tableStyle]="{ 'min-width': '75rem' }"
     [rowHover]="true"
     dataKey="id"
-    currentPageReportTemplate="Mostrando de {first} até {last} de {totalRecords} Contas"
+    currentPageReportTemplate="Mostrando de {first} até {last} de {totalRecords} contas"
     [showCurrentPageReport]="true"
     [rowsPerPageOptions]="[10, 20, 30]"
 >
     <ng-template #caption>
         <div class="flex items-center justify-between">
-            <h5 class="m-0">Gerenciar Contas</h5>
+            <h5 class="m-0">Gerenciar contas</h5>
             <p-iconfield>
                 <p-inputicon styleClass="pi pi-search" />
                 <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Pesquisar..." />
@@ -49,30 +49,30 @@
             <th style="min-width: 12rem"></th>
         </tr>
     </ng-template>
-    <ng-template #body let-conta>
+    <ng-template #body let-objeto>
         <tr>
-            <td style="min-width: 16rem">{{ conta.banco.nome + " - " + conta.banco.numeroBanco }}</td>
-            <td>{{ conta.agencia}}</td>
-            <td>{{ conta.numeroConta}}</td>
+            <td style="min-width: 16rem">{{ objeto.banco.nome + " - " + objeto.banco.numeroBanco }}</td>
+            <td>{{ objeto.agencia}}</td>
+            <td>{{ objeto.numeroConta}}</td>
             <td>
-                <p-tag [value]="conta.ativo ? 'ATIVO' : 'INATIVO' " [severity]="getSeverity(conta.ativo)" />
+                <p-tag [value]="objeto.ativo ? 'ATIVO' : 'INATIVO' " [severity]="getSeverity(objeto.ativo)" />
             </td>
             <td>
-                <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="editConta(conta)" />
-                <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (click)="deleteConta(conta)" />
+                <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="edit(objeto)" />
+                <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (click)="delete(objeto)" />
             </td>
         </tr>
     </ng-template>
 </p-table>
 
-<p-dialog [(visible)]="contaDialog" [style]="{ width: '450px' }" header="Detalhes da Conta" [modal]="true">
+<p-dialog [(visible)]="dialogo" [style]="{ width: '450px' }" header="Detalhes da conta" [modal]="true">
     <ng-template #content>
         <div class="flex flex-col gap-6">
             <div>
                 <label for="bancos" class="block font-bold mb-3">Banco</label>
                 <p-select 
                     name="bancos" 
-                    [(ngModel)]="conta.banco" 
+                    [(ngModel)]="objeto.banco" 
                     inputId="banco" 
                     [options]="bancos_select" 
                     optionLabel="label" 
@@ -81,25 +81,25 @@
                     fluid 
                     [appendTo]="'body'"
                 />
-                <small class="text-red-500" *ngIf="submitted && conta.banco == undefined">Banco é obrigatório.</small>
+                <small class="text-red-500" *ngIf="submitted && objeto.banco == undefined">Banco é obrigatório.</small>
             </div>
             <div>
                 <label for="agencia" class="block font-bold mb-3">Agência</label>
-                <input name="agencia" id="agencia" type="text" pInputText [(ngModel)]="conta.agencia" required fluid/>
-                <small class="text-red-500" *ngIf="submitted && conta.agencia == undefined">Agência é obrigatória.</small>
+                <input name="agencia" id="agencia" type="text" pInputText [(ngModel)]="objeto.agencia" required fluid/>
+                <small class="text-red-500" *ngIf="submitted && objeto.agencia == undefined">Agência é obrigatória.</small>
             </div>
 
             <div>
-                <label for="numero_conta" class="block font-bold mb-3">Número da conta</label>
-                <input name="numero_conta" id="numero_conta" type="text" pInputText [(ngModel)]="conta.numeroConta" required fluid/>
-                <small class="text-red-500" *ngIf="submitted && conta.numeroConta == undefined">Número da conta é obrigatório.</small>
+                <label for="numero_objeto" class="block font-bold mb-3">Número da objeto</label>
+                <input name="numero_objeto" id="numero_objeto" type="text" pInputText [(ngModel)]="objeto.numeroConta" required fluid/>
+                <small class="text-red-500" *ngIf="submitted && objeto.numeroConta == undefined">Número da objeto é obrigatório.</small>
             </div>
 
             <div>
                 <label for="status" class="block font-bold mb-3">Status</label>
                 <p-select 
                     name="status" 
-                    [(ngModel)]="conta.ativo" 
+                    [(ngModel)]="objeto.ativo" 
                     inputId="ativo" 
                     [options]="statuses" 
                     optionLabel="label" 
@@ -108,14 +108,14 @@
                     fluid 
                     [appendTo]="'body'"
                 />
-                <small class="text-red-500" *ngIf="submitted && conta.ativo == undefined">Status é obrigatório.</small>
+                <small class="text-red-500" *ngIf="submitted && objeto.ativo == undefined">Status é obrigatório.</small>
             </div>
         </div>
     </ng-template>
 
     <ng-template #footer>
         <p-button label="Cancel" icon="pi pi-times" text (click)="hideDialog()" />
-        <p-button label="Save" icon="pi pi-check" (click)="saveConta()" />
+        <p-button label="Save" icon="pi pi-check" (click)="save()" />
     </ng-template>
 </p-dialog>
 

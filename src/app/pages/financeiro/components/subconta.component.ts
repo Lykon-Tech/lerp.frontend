@@ -1,43 +1,34 @@
-import { Component, OnInit, signal, ViewChild } from '@angular/core';
-import { ConfirmationService, MessageService } from 'primeng/api';
-import { Table, TableModule } from 'primeng/table';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
-import { RippleModule } from 'primeng/ripple';
-import { ToastModule } from 'primeng/toast';
-import { ToolbarModule } from 'primeng/toolbar';
-import { RatingModule } from 'primeng/rating';
-import { InputTextModule } from 'primeng/inputtext';
-import { TextareaModule } from 'primeng/textarea';
-import { SelectModule } from 'primeng/select';
-import { RadioButtonModule } from 'primeng/radiobutton';
-import { InputNumberModule } from 'primeng/inputnumber';
-import { DialogModule } from 'primeng/dialog';
-import { TagModule } from 'primeng/tag';
-import { InputIconModule } from 'primeng/inputicon';
-import { IconFieldModule } from 'primeng/iconfield';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { SubcontaSaida } from '../models/subconta.saida.model';
-import { Subconta } from '../models/subconta.model';
-import { SubcontaService } from '../services/subconta.service';
-import { CheckboxModule } from 'primeng/checkbox';
-import { GrupoConta } from '../models/grupoconta.model';
-import { GrupoContaService } from '../services/grupoconta.service';
+import { ConfirmationService, MessageService } from "primeng/api";
+import { BaseComponente } from "../../bases/components/base.component";
+import { Subconta } from "../models/subconta.model";
+import { SubcontaService } from "../services/subconta.service";
+import { Component, signal } from "@angular/core";
+import { ConfirmDialogModule } from "primeng/confirmdialog";
+import { CheckboxModule } from "primeng/checkbox";
+import { IconFieldModule } from "primeng/iconfield";
+import { InputIconModule } from "primeng/inputicon";
+import { TagModule } from "primeng/tag";
+import { DialogModule } from "primeng/dialog";
+import { InputNumberModule } from "primeng/inputnumber";
+import { RadioButtonModule } from "primeng/radiobutton";
+import { SelectModule } from "primeng/select";
+import { TextareaModule } from "primeng/textarea";
+import { InputTextModule } from "primeng/inputtext";
+import { RatingModule } from "primeng/rating";
+import { ToolbarModule } from "primeng/toolbar";
+import { ToastModule } from "primeng/toast";
+import { RippleModule } from "primeng/ripple";
+import { ButtonModule } from "primeng/button";
+import { FormsModule } from "@angular/forms";
+import { TableModule } from "primeng/table";
+import { CommonModule } from "@angular/common";
+import { GrupoConta } from "../models/grupoconta.model";
+import { GrupoContaService } from "../services/grupoconta.service";
+import { SubcontaSaida } from "../models/subconta.saida.model";
 
-interface Column {
-    field: string;
-    header: string;
-    customExportHeader?: string;
-}
-
-interface ExportColumn {
-    title: string;
-    dataKey: string;
-}
 
 @Component({
-    selector: 'app-crud',
+    selector: 'app-subconta',
     standalone: true,
     imports: [
         CommonModule,
@@ -60,193 +51,60 @@ interface ExportColumn {
         CheckboxModule,
         ConfirmDialogModule
     ],
-    templateUrl : './subconta.component.html',
+    templateUrl: `./subconta.component.html`,
     providers: [MessageService, SubcontaService, ConfirmationService]
 })
-export class subcontas implements OnInit {
-    subcontaDialog: boolean = false;
-
-    subcontas = signal<Subconta[]>([]);
-
-    gruposContas = signal<GrupoConta[]>([]);
-
-    exportColumns!: ExportColumn[];
-
-    subconta!: Subconta;
-
-    submitted: boolean = false;
-
-    statuses!: any[];
-
-    grupo_contas_select!: any[];
+export class SubcontaComponent extends BaseComponente<Subconta> {
 
     tipoTravado : boolean = false;
-
-    @ViewChild('dt') dt!: Table;
-
-    cols!: Column[];
-
+   
     constructor(
-        private subcontaService: SubcontaService,
-        private messageService: MessageService,
-        private confirmationService: ConfirmationService,
+        messageService: MessageService,
+        confirmationService: ConfirmationService,
+        service: SubcontaService,
         private grupoContaService : GrupoContaService
-        
-    ) {}
-
-    ngOnInit() {
-        
-        this.loadDemoData();
+    ) {
+        super(
+            messageService,
+            confirmationService,
+            service
+        );
+        this.titulo = 'subconta';
+        this.genero = 'a';
     }
 
-    loadDemoData() {
-        this.subcontaService.getSubcontas().then((data) => {
-            this.subcontas.set(data);
+    grupoContas = signal<GrupoConta[]>([]);
+
+    grupoContas_select! : any[]
+
+    override loadDemoData(): void {
+        this.grupoContaService.findAll(true).then((data) => {
+            this.grupoContas.set(data);
         });
 
-        this.grupoContaService.getGrupoContas(true).then((data)=>{
-            this.gruposContas.set(data);
-            this.grupo_contas_select = this.gruposContas().map(grupoConta => ({
-                label: grupoConta.nome,
-                value: grupoConta
-            }));
-        });
+        this.grupoContas_select = this.grupoContas().map(grupoConta => ({
+            label: grupoConta.nome,
+            value: grupoConta
+        }));
 
-        this.statuses = [
-            { label: 'ATIVO', value: true },
-            { label: 'INATIVO', value: false }
-            
-        ];
-
-        this.cols = [
-            { field: 'nome', header: 'nome', customExportHeader: 'Nome' },
-            { field: 'grupo_conta', header: 'Grupo de conta' },
-            { field: 'tipo', header: 'Tipo' },
-            { field: 'ativo', header: 'Status' }
-        ];
-
-        this.exportColumns = this.cols.map((col) => ({ title: col.header, dataKey: col.field }));
+        super.loadDemoData();
     }
 
-    onGlobalFilter(table: Table, event: Event) {
-        table.filterGlobal((event.target as HTMLInputElement).value, 'subcontains');
+    override getValidacoes(): boolean {
+        return (this.objeto as any).agencia.trim() && (this.objeto as any).ativo != undefined && (this.objeto as any).grupoConta != undefined && (this.objeto as any).tipo != undefined;
     }
 
-    openNew() {
-        this.subconta = {ativo:true, tipo:'ENTRADA'};
-        this.submitted = false;
-        this.subcontaDialog = true;
-    }
-
-    editSubconta(subconta: Subconta) {
-        this.subconta = {
-            id: subconta.id,
-            nome: subconta.nome,
-            grupoConta: this.gruposContas().find(b => b.id === subconta.grupoConta?.id),
-            tipo: subconta.tipo,
-            ativo: subconta.ativo
-        };
-        this.subcontaDialog = true;
-    }
-
-    hideDialog() {
-        this.subcontaDialog = false;
-        this.submitted = false;
-    }
-
-    async deletesubconta(subconta: Subconta) {
-        this.confirmationService.confirm({
-            message: 'Você tem certeza que deseja deletar a subconta ' + subconta.nome + '?',
-            header: 'Confirmar',
-            icon: 'pi pi-exclamation-triangle',
-            accept: async () => {
-                if (subconta.id != null) {
-                    try {
-                        await this.subcontaService.deleteSubconta(subconta.id);
-
-                        const novaLista = this.subcontas().filter(b => b.id !== subconta.id);
-                        this.subcontas.set([...novaLista]);
-                        this.messageService.add({
-                            severity: 'success',
-                            summary: 'Sucesso',
-                            detail: 'Subconta deletada',
-                            life: 3000
-                        });
-                    } catch (err) {
-                        this.messageService.add({
-                            severity: 'error',
-                            summary: 'Erro',
-                            detail: 'Falha ao deletar a subconta: ' + err,
-                            life: 3000
-                        });
-                    }
-                }
-            }
-        });
-    }
-
-    findIndexById(id: string): number {
-        let index = -1;
-        for (let i = 0; i < this.subcontas().length; i++) {
-            if (this.subcontas()[i].id === id) {
-                index = i;
-                break;
-            }
-        }
-
-        return index;
-    }
-
-    getSeverity(ativo: boolean) {
-        return ativo ? 'success' : 'danger';
-    }
-
-    async savesubconta() {
-        this.submitted = true;
-        let _subcontas = this.subcontas();
-
-        if (this.subconta.nome?.trim() && this.subconta.tipo != undefined && this.subconta.grupoConta != undefined && this.subconta.ativo != undefined) {
-            try {
-            if (this.subconta.id) {
-                const updatedSubconta = await this.subcontaService.updateSubconta(this.convertersubcontaParasubcontaSaida(this.subconta));
-                const index = this.findIndexById(updatedSubconta.id!);
-                const updatedSubcontas = [..._subcontas];
-                updatedSubcontas[index] = updatedSubconta;
-                this.subcontas.set(updatedSubcontas);
-
-                this.messageService.add({
-                severity: 'success',
-                summary: 'Sucesso',
-                detail: 'subconta atualizada',
-                life: 3000
-                });
-            } else {
-                const createdsubconta = await this.subcontaService.createSubconta(this.convertersubcontaParasubcontaSaida(this.subconta));
-                this.subcontas.set([..._subcontas, createdsubconta]);
-                
-
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Sucesso',
-                    detail: 'subconta criada',
-                life: 3000
-                });
-            }
-
-            this.subcontaDialog = false;
-            this.subconta = {};
-            } catch (error) {
-                this.messageService.add({
-                    severity: 'error',
-                    summary: 'Erro',
-                    detail: 'Falha ao salvar subconta: ' + error,
-                    life: 3000
-                });
-            }
+    override getObjetoEdit(objeto: Subconta): Subconta {
+        return {
+            id : objeto.id,
+            nome : objeto.nome,
+            tipo : objeto.tipo,
+            grupoConta : this.grupoContas().find(b => b.id === objeto.grupoConta?.id),
+            ativo : objeto.ativo
         }
     }
 
-    convertersubcontaParasubcontaSaida(subconta: Subconta): SubcontaSaida {
+    override converterObjeto(subconta: Subconta): SubcontaSaida {
         return {
             id: subconta.id,
             nome:subconta.nome,
@@ -258,13 +116,11 @@ export class subcontas implements OnInit {
 
     aoSelecionar(event: any) {
         if (event.value.recebimentoVendas) {
-            this.subconta.tipo = 'ENTRADA';
+            this.objeto.tipo = 'ENTRADA';
             this.tipoTravado = true;
         } else {
             this.tipoTravado = false; 
         }
     }
-
-
 
 }

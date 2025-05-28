@@ -7,7 +7,7 @@
 
 <p-table
     #dt
-    [value]="subcontas()"
+    [value]="lista()"
     [rows]="10"
     [columns]="cols"
     [paginator]="true"
@@ -15,13 +15,13 @@
     [tableStyle]="{ 'min-width': '75rem' }"
     [rowHover]="true"
     dataKey="id"
-    currentPageReportTemplate="Mostrando de {first} até {last} de {totalRecords} Subcontas"
+    currentPageReportTemplate="Mostrando de {first} até {last} de {totalRecords} subcontas"
     [showCurrentPageReport]="true"
     [rowsPerPageOptions]="[10, 20, 30]"
 >
     <ng-template #caption>
         <div class="flex items-center justify-between">
-            <h5 class="m-0">Gerenciar Subcontas</h5>
+            <h5 class="m-0">Gerenciar subcontas</h5>
             <p-iconfield>
                 <p-inputicon styleClass="pi pi-search" />
                 <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Pesquisar..." />
@@ -49,39 +49,39 @@
             <th style="min-width: 12rem"></th>
         </tr>
     </ng-template>
-    <ng-template #body let-subconta>
+    <ng-template #body let-objeto>
         <tr>
-            <td style="min-width: 16rem">{{ subconta.nome}}</td>
-            <td>{{ subconta.grupoConta.nome}}</td>
+            <td style="min-width: 16rem">{{ objeto.nome}}</td>
+            <td>{{ objeto.grupoConta.nome}}</td>
             <td>
-                <p-tag [value]="subconta.tipo" [severity]="getSeverity(subconta.tipo == 'ENTRADA')" />
+                <p-tag [value]="objeto.tipo" [severity]="getSeverity(objeto.tipo == 'ENTRADA')" />
             </td>
             <td>
-                <p-tag [value]="subconta.ativo ? 'ATIVO' : 'INATIVO' " [severity]="getSeverity(subconta.ativo)" />
+                <p-tag [value]="objeto.ativo ? 'ATIVO' : 'INATIVO' " [severity]="getSeverity(objeto.ativo)" />
             </td>
             <td>
-                <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="editSubconta(subconta)" />
-                <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (click)="deletesubconta(subconta)" />
+                <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="edit(objeto)" />
+                <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (click)="delete(objeto)" />
             </td>
         </tr>
     </ng-template>
 </p-table>
 
-<p-dialog [(visible)]="subcontaDialog" [style]="{ width: '450px' }" header="Detalhes da subconta" [modal]="true">
+<p-dialog [(visible)]="dialogo" [style]="{ width: '450px' }" header="Detalhes da objeto" [modal]="true">
     <ng-template #content>
         <div class="flex flex-col gap-6">
             <div>
                 <label for="name" class="block font-bold mb-3">Nome</label>
-                <input name="name" type="text" pInputText id="nome" [(ngModel)]="subconta.nome" required autofocus fluid />
-                <small class="text-red-500" *ngIf="submitted && !subconta.nome">Nome é obrigatório.</small>
+                <input name="name" type="text" pInputText id="nome" [(ngModel)]="objeto.nome" required autofocus fluid />
+                <small class="text-red-500" *ngIf="submitted && !objeto.nome">Nome é obrigatório.</small>
             </div>
             <div>
                 <label for="grupo_conta" class="block font-bold mb-3">Grupo de conta</label>
                 <p-select 
                     name="grupo_conta" 
-                    [(ngModel)]="subconta.grupoConta" 
+                    [(ngModel)]="objeto.grupoConta" 
                     inputId="grupo_conta" 
-                    [options]="grupo_contas_select" 
+                    [options]="grupoContas_select" 
                     optionLabel="label" 
                     optionValue="value"
                     placeholder="Selecione um grupo de conta"
@@ -89,29 +89,29 @@
                     (onChange)="aoSelecionar($event)"
                     [appendTo]="'body'"
                 />
-                <small class="text-red-500" *ngIf="submitted && subconta.grupoConta == undefined">Grupo de conta é obrigatório.</small>
+                <small class="text-red-500" *ngIf="submitted && objeto.grupoConta == undefined">Grupo de conta é obrigatório.</small>
             </div>
 
             <div>
                 <span class="block font-bold mb-4">Tipo</span>
                 <div class="grid grid-cols-12 gap-4">
                     <div class="flex items-center gap-2 col-span-6">
-                        <p-radiobutton [disabled]="tipoTravado" id="tipo1" name="tipo" value="ENTRADA" [(ngModel)]="subconta.tipo" />
+                        <p-radiobutton [disabled]="tipoTravado" id="tipo1" name="tipo" value="ENTRADA" [(ngModel)]="objeto.tipo" />
                         <label for="tipo1">Entrada</label>
                     </div>
                     <div class="flex items-center gap-2 col-span-6">
-                        <p-radiobutton [disabled]="tipoTravado" id="tipo2" name="tipo" value="SAIDA" [(ngModel)]="subconta.tipo" />
+                        <p-radiobutton [disabled]="tipoTravado" id="tipo2" name="tipo" value="SAIDA" [(ngModel)]="objeto.tipo" />
                         <label for="tipo2">Saída</label>
                     </div>
                 </div>
-                <small class="text-red-500" *ngIf="submitted && subconta.tipo == undefined">Tipo é obrigatório.</small>
+                <small class="text-red-500" *ngIf="submitted && objeto.tipo == undefined">Tipo é obrigatório.</small>
             </div>
 
             <div>
                 <label for="status" class="block font-bold mb-3">Status</label>
                 <p-select 
                     name="status" 
-                    [(ngModel)]="subconta.ativo" 
+                    [(ngModel)]="objeto.ativo" 
                     inputId="ativo" 
                     [options]="statuses" 
                     optionLabel="label" 
@@ -120,14 +120,14 @@
                     fluid 
                     [appendTo]="'body'"
                 />
-                <small class="text-red-500" *ngIf="submitted && subconta.ativo == undefined">Status é obrigatório.</small>
+                <small class="text-red-500" *ngIf="submitted && objeto.ativo == undefined">Status é obrigatório.</small>
             </div>
         </div>
     </ng-template>
 
     <ng-template #footer>
         <p-button label="Cancel" icon="pi pi-times" text (click)="hideDialog()" />
-        <p-button label="Save" icon="pi pi-check" (click)="savesubconta()" />
+        <p-button label="Save" icon="pi pi-check" (click)="save()" />
     </ng-template>
 </p-dialog>
 

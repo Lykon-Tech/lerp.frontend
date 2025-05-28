@@ -1,43 +1,45 @@
-import { Component, ElementRef, OnInit, signal, ViewChild } from '@angular/core';
-import { ConfirmationService, MessageService } from 'primeng/api';
-import { Table, TableModule } from 'primeng/table';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
-import { RippleModule } from 'primeng/ripple';
-import { ToastModule } from 'primeng/toast';
-import { ToolbarModule } from 'primeng/toolbar';
-import { RatingModule } from 'primeng/rating';
-import { InputTextModule } from 'primeng/inputtext';
-import { TextareaModule } from 'primeng/textarea';
-import { SelectModule } from 'primeng/select';
-import { RadioButtonModule } from 'primeng/radiobutton';
-import { InputNumberModule } from 'primeng/inputnumber';
-import { DialogModule } from 'primeng/dialog';
-import { TagModule } from 'primeng/tag';
-import { InputIconModule } from 'primeng/inputicon';
-import { IconFieldModule } from 'primeng/iconfield';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { Movimento } from '../models/movimento.model';
-import { MovimentoService } from '../services/movimento.service';
-import { MovimentoSaida } from '../models/movimento.saida.model';
-import { SubcontaService } from '../services/subconta.service';
-import { Subconta } from '../models/subconta.model';
-import { DatePicker } from 'primeng/datepicker';
-import { TipoDocumentoService } from '../services/tipodocumento.service';
-import { TipoDocumento } from '../models/tipodocumento.model';
-import { DropdownModule } from 'primeng/dropdown';
-import { OfxImportService } from '../services/ofximport.service';
-import { TagService } from '../services/tag.service';
-import { Conta } from '../models/conta.model';
-import { ContaService } from '../services/conta.service';
-import { TagModel } from '../models/tag.model';
-import { FiltroMovimento } from '../models/filtromovimento.model';
+import { ConfirmationService, MessageService } from "primeng/api";
+import { BaseComponente } from "../../bases/components/base.component";
+import { Movimento } from "../models/movimento.model";
+import { Component, signal } from "@angular/core";
+import { ConfirmDialogModule } from "primeng/confirmdialog";
+import { CheckboxModule } from "primeng/checkbox";
+import { IconFieldModule } from "primeng/iconfield";
+import { InputIconModule } from "primeng/inputicon";
+import { TagModule } from "primeng/tag";
+import { DialogModule } from "primeng/dialog";
+import { InputNumberModule } from "primeng/inputnumber";
+import { RadioButtonModule } from "primeng/radiobutton";
+import { SelectModule } from "primeng/select";
+import { TextareaModule } from "primeng/textarea";
+import { InputTextModule } from "primeng/inputtext";
+import { RatingModule } from "primeng/rating";
+import { ToolbarModule } from "primeng/toolbar";
+import { ToastModule } from "primeng/toast";
+import { RippleModule } from "primeng/ripple";
+import { ButtonModule } from "primeng/button";
+import { FormsModule } from "@angular/forms";
+import { TableModule } from "primeng/table";
+import { CommonModule } from "@angular/common";
+import { MovimentoService } from "../services/movimento.service";
+import { FiltroMovimento } from "../models/filtromovimento.model";
+import { ContaService } from "../services/conta.service";
+import { Conta } from "../models/conta.model";
+import { Subconta } from "../models/subconta.model";
+import { SubcontaService } from "../services/subconta.service";
+import { TipoDocumentoService } from "../services/tipodocumento.service";
+import { TagModel } from "../models/tag.model";
+import { TagService } from "../services/tag.service";
+import { OfxImportService } from "../services/ofximport.service";
+import { TipoDocumento } from "../models/tipodocumento.model";
+import { MovimentoSaida } from "../models/movimento.saida.model";
+import { DatePicker } from "primeng/datepicker";
+
+
 @Component({
-    selector: 'app-movimentos',
-    templateUrl: './movimento.component.html',
+    selector: 'app-movimento',
     standalone: true,
-    imports:[
+    imports: [
         CommonModule,
         TableModule,
         FormsModule,
@@ -55,43 +57,52 @@ import { FiltroMovimento } from '../models/filtromovimento.model';
         TagModule,
         InputIconModule,
         IconFieldModule,
+        CheckboxModule,
         ConfirmDialogModule,
-        DatePicker,
-        DropdownModule
+        DatePicker
     ],
-    providers: [MessageService,ConfirmationService]
-
+    templateUrl: `./Movimento.component.html`,
+    providers: [MessageService, MovimentoService, ConfirmationService]
 })
-export class Movimentos implements OnInit {
-    movimentos = signal<Movimento[]>([]);
-    movimentoDialog: boolean = false;
-    loading: boolean = false;
-    exportColumns!: any[];
-    cols!: any[];
-    movimento! : Movimento;
-    submitted: boolean = false;
-    subcontas_select!: any[];
-    subcontas = signal<Subconta[]>([]);
-    contas_select!: any[];
-    contas = signal<Conta[]>([]);
-    tipo_documentos_select!: any[];
-    tiposDocumentos = signal<TipoDocumento[]>([]);
-    totalRecords : number = 0;
-    @ViewChild('dt') dt!: Table;
-    @ViewChild('fileInput') fileInput!: ElementRef;
-    filtro : FiltroMovimento = {};
+export class MovimentoComponent extends BaseComponente<Movimento> {
+   
     constructor(
-    private movimentoService: MovimentoService,
-    private messageService: MessageService,
-    private confirmationService: ConfirmationService,
-    private subcontaService : SubcontaService,
-    private tipoDocumentoService : TipoDocumentoService,
-    private ofxService : OfxImportService,
-    private tagService : TagService,
-    private contaService : ContaService
-    ) {}
+        messageService: MessageService,
+        confirmationService: ConfirmationService,
+        service: MovimentoService,
+        private movimentoService : MovimentoService,
+        private contaService : ContaService,
+        private subcontaService : SubcontaService,
+        private tipoDocumentoService : TipoDocumentoService,
+        private tagService : TagService,
+        private ofxService : OfxImportService
+    ) {
+        super(
+            messageService,
+            confirmationService,
+            service
+        );
 
-    ngOnInit() {
+        this.titulo = 'movimento';
+    }
+
+    filtro : FiltroMovimento = {};
+    loading: boolean = false;
+
+    contas = signal<Conta[]>([]);
+    contas_select! : any[];
+
+    subcontas = signal<Subconta[]>([]);
+    subcontas_select! : any[];
+
+    tipoDocumentos = signal<Subconta[]>([]);
+    tipoDocumentos_select! : any[];
+
+    override getValidacoes(): boolean {
+        return (this.objeto as any).historico.trim() && (this.objeto as any).subconta != undefined  && (this.objeto as any).dataLancamento != undefined;
+    }
+
+    override loadDemoData(): void {
         const hoje = new Date();
 
         this.filtro = {
@@ -99,31 +110,14 @@ export class Movimentos implements OnInit {
             dataFim: new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate())     
         };
 
-        this.loadMovimentos();
-
-        this.cols = [
-            { field: 'subconta.nome', header: 'Subconta', customExportHeader: 'Subconta' },
-            { field: 'tipoDocumento.nome', header: 'Tipo Documento' },
-            { field: 'valor', header: 'Valor' },
-            { field: 'dataLancamento', header: 'Data' },
-            { field: 'numeroDocumento', header: 'Nº Documento' },
-            { field: 'historico', header: 'Histórico' }
-        ];
-
-        this.exportColumns = this.cols.map(col => ({
-            title: col.header,
-            dataKey: col.field
-        }));
-    }
-
-    loadMovimentos() {
         this.loading = true;
+        
         this.movimentoService.getMovimentosFiltro(this.filtro).then(data => {
             const movimentosComDataConvertida = data.map(mov => ({
                 ...mov,
                 dataLancamento: mov.dataLancamento ? new Date(mov.dataLancamento) : undefined
             }));
-            this.movimentos.set(movimentosComDataConvertida);
+            this.lista.set(movimentosComDataConvertida);
             this.loading = false;
         }).catch(error => {
             this.loading = false;
@@ -135,7 +129,7 @@ export class Movimentos implements OnInit {
             });
         });
 
-        this.contaService.getContas(true).then((data)=>{
+        this.contaService.findAll(true).then((data)=>{
             this.contas.set(data);
             this.contas_select = this.contas().map(conta => ({
                 label: conta.numeroConta,
@@ -144,7 +138,7 @@ export class Movimentos implements OnInit {
         });
 
 
-        this.subcontaService.getSubcontas(true).then((data)=>{
+        this.subcontaService.findAll(true).then((data)=>{
             this.subcontas.set(data);
             this.subcontas_select = this.subcontas().map(subconta => ({
                 label: subconta.nome,
@@ -152,14 +146,36 @@ export class Movimentos implements OnInit {
             }));
         });
 
-        this.tipoDocumentoService.getTipoDocumentos(true).then((data)=>{
-            this.tiposDocumentos.set(data);
-            this.tipo_documentos_select = this.tiposDocumentos().map(tipoDocumento => ({
+        this.tipoDocumentoService.findAll(true).then((data)=>{
+            this.tipoDocumentos.set(data);
+            this.tipoDocumentos_select = this.tipoDocumentos().map(tipoDocumento => ({
                 label: tipoDocumento.nome,
                 value: tipoDocumento
             }));
         });
     }
+
+    override getObjectNew(): Movimento {
+        return {dataLancamento : new Date};
+    }
+
+    override getObjetoEdit(objeto: Movimento): Movimento {
+         return {
+            id: objeto.id,
+            subconta: this.subcontas().find(b => b.id === objeto.subconta?.id),
+            conta : this.contas().find(b => b.id === objeto.conta?.id),
+            tipoDocumento : this.tipoDocumentos().find(b => b.id === objeto.tipoDocumento?.id),
+            valor: objeto.valor,
+            dataLancamento : objeto.dataLancamento ? new Date(objeto.dataLancamento) : new Date(),
+            historico: objeto.historico,
+            observacao: objeto.observacao,
+            numeroDocumento: objeto.numeroDocumento,
+            numeroMovimento: objeto.numeroMovimento,
+            importadoOfx: objeto.importadoOfx,
+        };
+        
+    }
+
     async importOfx(event: Event) {
         const input = event.target as HTMLInputElement;
         
@@ -168,7 +184,7 @@ export class Movimentos implements OnInit {
                 const file = input.files[0];
                 this.loading = true;
 
-           
+            
                 const ofxData = await this.ofxService.importarOfx(file);
                 
                 const conta = await this.contaService.findByAgenciaNumeroConta(ofxData[0].agencia, ofxData[0].numeroConta);
@@ -223,10 +239,10 @@ export class Movimentos implements OnInit {
 
                 if (movimentosValidos.length > 0) {
                     const movimentosSaida = movimentosValidos
-                        .map(mov => this.converterMovimentoComObjetosParaIds(mov));
+                        .map(mov => this.converterObjeto(mov));
 
                     await this.movimentoService.createmovimentos(movimentosSaida);
-                    await this.loadMovimentos();
+                    await this.loadDemoData();
                     
                     this.messageService.add({
                         severity: 'success',
@@ -266,7 +282,7 @@ export class Movimentos implements OnInit {
                     historicosSemTag.add(item.historico);
                     continue;
                 }
-               
+                
 
             } catch (error) {
                 historicosSemTag.add(item.historico);
@@ -283,7 +299,7 @@ export class Movimentos implements OnInit {
                 tipoDocumento: tipoDocumento || {},
                 importadoOfx: true
             });
-           
+            
         }
 
         return { 
@@ -295,8 +311,8 @@ export class Movimentos implements OnInit {
     private async importarMovimentosManualmente(movimentos: any[], tipodocumento :TipoDocumento): Promise<void> {
         for (const mov of movimentos) {
             try {
-               
-                this.movimento = {
+                
+                this.objeto = {
                     dataLancamento: mov.dataLancamento,
                     valor: mov.valor,
                     historico: mov.historico,
@@ -307,7 +323,7 @@ export class Movimentos implements OnInit {
                 };
 
 
-                this.movimentoDialog = true;
+                this.dialogo = true;
                 
                 await new Promise<void>((resolve) => {
                     const subscription = this.messageService.messageObserver.subscribe((msg) => {
@@ -336,141 +352,7 @@ export class Movimentos implements OnInit {
         }
     }
 
-    onGlobalFilter(event: Event) {
-        const input = event.target as HTMLInputElement;
-        const value = input?.value || '';
-        this.dt?.filterGlobal(value, 'contains');
-    }
-
-    openNew() {
-        this.movimento = {dataLancamento : new Date}
-        this.submitted = false;
-        this.movimentoDialog = true;
-    }
-
-    editMovimento(movimento: Movimento) {
-        this.movimento = {
-            id: movimento.id,
-            subconta: this.subcontas().find(b => b.id === movimento.subconta?.id),
-            tipoDocumento : this.tiposDocumentos().find(b => b.id === movimento.tipoDocumento?.id),
-            valor: movimento.valor,
-            dataLancamento : movimento.dataLancamento ? new Date(movimento.dataLancamento) : new Date(),
-            historico: movimento.historico,
-            observacao: movimento.observacao,
-            numeroDocumento: movimento.numeroDocumento,
-            numeroMovimento: movimento.numeroMovimento,
-            importadoOfx: movimento.importadoOfx,
-        };
-        
-        this.movimentoDialog = true;
-    }
-
-    hideDialog() {
-        this.movimentoDialog = false;
-        this.submitted = false;
-    }
-
-    async deleteMovimento(movimento: Movimento) {
-        this.confirmationService.confirm({
-            message: 'Você tem certeza que deseja deletar ' + movimento.historico + '?',
-            header: 'Confirmar',
-            acceptLabel: 'Sim',
-            rejectLabel: 'Não',
-            icon: 'pi pi-exclamation-triangle',
-            accept: async () => {
-                if (movimento.id != null) {
-                    try {
-                        await this.movimentoService.deleteMovimento(movimento.id);
-
-                        const novaLista = this.movimentos().filter(b => b.id !== movimento.id);
-                        this.movimentos.set([...novaLista]);
-                        this.messageService.add({
-                            severity: 'success',
-                            summary: 'Sucesso',
-                            detail: 'Movimento deletado',
-                            life: 3000
-                        });
-                    } catch (err) {
-                        this.messageService.add({
-                            severity: 'error',
-                            summary: 'Erro',
-                            detail: 'Falha ao deletar a Movimento: ' + err,
-                            life: 3000
-                        });
-                    }
-                }
-            }
-        });
-    }
-
-    findIndexById(id: string): number {
-        let index = -1;
-        for (let i = 0; i < this.movimentos().length; i++) {
-            if (this.movimentos()[i].id === id) {
-                index = i;
-                break;
-            }
-        }
-
-        return index;
-    }
-
-    getSeverity(ativo: boolean) {
-        return ativo ? 'success' : 'danger';
-    }
-
-    async savemovimento() {
-        this.submitted = true;
-        let _movimentos = this.movimentos();
-
-        if (this.movimento.valor != undefined && 
-            this.movimento.conta && 
-            Object.keys(this.movimento.conta).length > 0 && 
-            this.movimento.subconta && 
-            Object.keys(this.movimento.subconta).length > 0 && 
-            this.movimento?.historico?.trim != undefined
-        ) {
-            try {
-            if (this.movimento.id) {
-                const updatedmovimento = await this.movimentoService.updateMovimento(this.converterMovimentoComObjetosParaIds(this.movimento));
-                const index = this.findIndexById(updatedmovimento.id!);
-                const updatedmovimentos = [..._movimentos];
-                updatedmovimentos[index] = updatedmovimento;
-                this.movimentos.set(updatedmovimentos);
-
-                this.messageService.add({
-                severity: 'success',
-                summary: 'Sucesso',
-                detail: 'Movimento atualizado',
-                life: 3000
-                });
-            } else {
-                const createdmovimento = await this.movimentoService.createMovimento(this.converterMovimentoComObjetosParaIds(this.movimento));
-                this.movimentos.set([..._movimentos, createdmovimento]);
-                
-
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Sucesso',
-                    detail: 'Movimento criado',
-                life: 3000
-                });
-            }
-
-            this.movimentoDialog = false;
-            this.movimento = {};
-            } catch (error) {
-                this.messageService.add({
-                    severity: 'error',
-                    summary: 'Erro',
-                    detail: 'Falha ao salvar Movimento: ' + error,
-                    life: 3000
-                });
-            }
-        }
-    }
-
-    converterMovimentoComObjetosParaIds(movimento: Movimento): MovimentoSaida {
+    override converterObjeto(movimento: Movimento): MovimentoSaida {
         return {
             id: movimento.id,
             subcontaId: movimento.subconta?.id ?? '',
@@ -487,7 +369,7 @@ export class Movimentos implements OnInit {
     }
 
     totalSaldo(): number {
-        return this.movimentos()
+        return this.lista()
             .reduce((acc, mov) => {
                 return mov?.subconta?.tipo === 'ENTRADA'
                     ? acc + (mov?.valor ?? 0)

@@ -1,10 +1,8 @@
 import { CommonModule } from "@angular/common";
-import { Movimento } from "../models/movimento.model";
 import { MovimentoService } from "../services/movimento.service";
 import { ChartModule } from "primeng/chart";
 import { Component, OnInit, signal } from "@angular/core";
 import { FluidModule } from "primeng/fluid";
-import { DatePicker } from "primeng/datepicker";
 import { DropdownModule } from "primeng/dropdown";
 import { InputTextModule } from "primeng/inputtext";
 import { CheckboxModule } from "primeng/checkbox";
@@ -66,7 +64,7 @@ export class DashboardFinanceiroComponent implements OnInit {
     this.filtro = {dataInicio:new Date(new Date().getFullYear(), 0, 1), dataFim:new Date(new Date().getFullYear(), 11, 31)}
     this.buscarMovimentos();
 
-    this.grupoContasService.getGrupoContas(true).then((data)=>{
+    this.grupoContasService.findAll(true).then((data)=>{
         this.grupoContas.set(data);
         this.grupo_contas_select = this.grupoContas().map(grupoConta => ({
             label: grupoConta.nome,

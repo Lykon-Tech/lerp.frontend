@@ -7,7 +7,7 @@
 
 <p-table
     #dt
-    [value]="grupoContas()"
+    [value]="lista()"
     [rows]="10"
     [columns]="cols"
     [paginator]="true"
@@ -15,13 +15,13 @@
     [tableStyle]="{ 'min-width': '75rem' }"
     [rowHover]="true"
     dataKey="id"
-    currentPageReportTemplate="Mostrando de {first} até {last} de {totalRecords} Grupo de Contas"
+    currentPageReportTemplate="Mostrando de {first} até {last} de {totalRecords} grupo de contas"
     [showCurrentPageReport]="true"
     [rowsPerPageOptions]="[10, 20, 30]"
 >
     <ng-template #caption>
         <div class="flex items-center justify-between">
-            <h5 class="m-0">Gerenciar Grupo de Contas</h5>
+            <h5 class="m-0">Gerenciar grupo de contas</h5>
             <p-iconfield>
                 <p-inputicon styleClass="pi pi-search" />
                 <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Pesquisar..." />
@@ -45,44 +45,44 @@
             <th style="min-width: 12rem"></th>
         </tr>
     </ng-template>
-    <ng-template #body let-grupoConta>
+    <ng-template #body let-objeto>
         <tr>
-            <td style="min-width: 16rem">{{ grupoConta.nome }}</td>
+            <td style="min-width: 16rem">{{ objeto.nome }}</td>
             <td>
                 <i
                     class="pi"
                     [ngClass]="{
-                    'pi-check text-green-600': grupoConta.recebimentoVendas,
-                    'pi-times text-red-600': !grupoConta.recebimentoVendas
+                    'pi-check text-green-600': objeto.recebimentoVendas,
+                    'pi-times text-red-600': !objeto.recebimentoVendas
                     }"
                     aria-label="aut_sup">
                 </i>
             </td>
             <td>
-                <p-tag [value]="grupoConta.ativo ? 'ATIVO' : 'INATIVO' " [severity]="getSeverity(grupoConta.ativo)" />
+                <p-tag [value]="objeto.ativo ? 'ATIVO' : 'INATIVO' " [severity]="getSeverity(objeto.ativo)" />
             </td>
             <td>
-                <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="editGrupoConta(grupoConta)" />
-                <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (click)="deleteGrupoConta(grupoConta)" />
+                <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="edit(objeto)" />
+                <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (click)="delete(objeto)" />
             </td>
         </tr>
     </ng-template>
 </p-table>
 
-<p-dialog [(visible)]="grupoContaDialog" [style]="{ width: '450px' }" header="Detalhes do Grupo de Conta" [modal]="true">
+<p-dialog [(visible)]="dialogo" [style]="{ width: '450px' }" header="Detalhes do grupo de conta" [modal]="true">
     <ng-template #content>
         <div class="flex flex-col gap-6">
             <div>
                 <label for="name" class="block font-bold mb-3">Nome</label>
-                <input name="name" type="text" pInputText id="nome" [(ngModel)]="grupoConta.nome" required autofocus fluid />
-                <small class="text-red-500" *ngIf="submitted && !grupoConta.nome">Nome é obrigatório.</small>
+                <input name="name" type="text" pInputText id="nome" [(ngModel)]="objeto.nome" required autofocus fluid />
+                <small class="text-red-500" *ngIf="submitted && !objeto.nome">Nome é obrigatório.</small>
             </div>
 
             <div>
                 <label for="status" class="block font-bold mb-3">Status</label>
                 <p-select 
                     name="status" 
-                    [(ngModel)]="grupoConta.ativo" 
+                    [(ngModel)]="objeto.ativo" 
                     inputId="ativo" 
                     [options]="statuses" 
                     optionLabel="label" 
@@ -91,14 +91,14 @@
                     fluid 
                     [appendTo]="'body'"
                 />
-                    <small class="text-red-500" *ngIf="submitted && grupoConta.ativo == undefined">Status é obrigatório.</small>
+                    <small class="text-red-500" *ngIf="submitted && objeto.ativo == undefined">Status é obrigatório.</small>
             </div>
 
             <div>
                 <span class="block font-bold mb-4">Opções</span>
                 <div class="grid grid-cols-2 gap-2">
                     <div class="flex items-center gap-2 col-span-6">
-                        <p-checkbox id="recebimento_vendas" name="recebimento_vendas" binary="true" [(ngModel)]="grupoConta.recebimentoVendas"></p-checkbox>
+                        <p-checkbox id="recebimento_vendas" name="recebimento_vendas" binary="true" [(ngModel)]="objeto.recebimentoVendas"></p-checkbox>
                         <label for="recebimento_vendas">Recebimento de vendas</label>
                     </div>
                 </div>
@@ -108,7 +108,7 @@
 
     <ng-template #footer>
         <p-button label="Cancel" icon="pi pi-times" text (click)="hideDialog()" />
-        <p-button label="Save" icon="pi pi-check" (click)="saveGrupoConta()" />
+        <p-button label="Save" icon="pi pi-check" (click)="save()" />
     </ng-template>
 </p-dialog>
 

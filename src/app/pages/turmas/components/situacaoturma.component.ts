@@ -1,8 +1,8 @@
 import { ConfirmationService, MessageService } from "primeng/api";
-import { BaseComponente } from "../../bases/components/base.component";
-import { TagModel } from "../models/tag.model";
-import { TagService } from "../services/tag.service";
-import { Component, signal } from "@angular/core";
+import { BaseComponente, Column } from "../../bases/components/base.component";
+import { SituacaoTurma } from "../models/situacaoturma.model";
+import { SituacaoTurmaService } from "../services/situacaoturma.service";
+import { Component } from "@angular/core";
 import { ConfirmDialogModule } from "primeng/confirmdialog";
 import { CheckboxModule } from "primeng/checkbox";
 import { IconFieldModule } from "primeng/iconfield";
@@ -22,13 +22,10 @@ import { ButtonModule } from "primeng/button";
 import { FormsModule } from "@angular/forms";
 import { TableModule } from "primeng/table";
 import { CommonModule } from "@angular/common";
-import { Subconta } from "../models/subconta.model";
-import { SubcontaService } from "../services/subconta.service";
-import { TagSaida } from "../models/tag.saida.model";
 
 
 @Component({
-    selector: 'app-tag',
+    selector: 'app-situacao-turma',
     standalone: true,
     imports: [
         CommonModule,
@@ -51,63 +48,30 @@ import { TagSaida } from "../models/tag.saida.model";
         CheckboxModule,
         ConfirmDialogModule
     ],
-    templateUrl: `./tag.component.html`,
-    providers: [MessageService, TagService, ConfirmationService]
+    templateUrl: `./situacaoturma.component.html`,
+    providers: [MessageService, SituacaoTurmaService, ConfirmationService]
 })
-export class TagComponent extends BaseComponente<TagModel> {
+export class SituacaoTurmaComponent extends BaseComponente<SituacaoTurma> {
    
     constructor(
         messageService: MessageService,
         confirmationService: ConfirmationService,
-        service: TagService,
-        private subcontaService : SubcontaService
+        service: SituacaoTurmaService
     ) {
         super(
             messageService,
             confirmationService,
             service
         );
-        this.titulo = 'tag';
-        this.genero = 'a';
-    }
-
-    subcontas = signal<Subconta[]>([]);
-
-    subcontas_select! : any[]
-
-    override loadDemoData(): void {
-        this.subcontaService.findAll(true).then((data) => {
-            this.subcontas.set(data);
-        });
-
-        this.subcontas_select = this.subcontas().map(subconta => ({
-            label: subconta.nome,
-            value: subconta
-        }));
-
-        super.loadDemoData();
+        this.titulo = 'situação de turma'
     }
 
     override getValidacoes(): boolean {
-        return (this.objeto as any).nome.trim()  && (this.objeto as any).ativo != undefined && (this.objeto as any).subconta != undefined;
+        return (this.objeto as any).nome.trim() && (this.objeto as any).ativo != undefined;
     }
 
-    override getObjetoEdit(objeto: TagModel): TagModel {
-        return {
-            id : objeto.id,
-            nome : objeto.nome,
-            subconta : this.subcontas().find(b => b.id === objeto.subconta?.id),
-            ativo : objeto.ativo
-        }
-    }
-
-    override converterObjeto(objeto: TagModel): TagSaida {
-         return {
-            id : objeto.id,
-            nome : objeto.nome,
-            subcontaId : objeto.subconta?.id,
-            ativo : objeto.ativo
-        }
+    override getObjetoEdit(objeto: SituacaoTurma): SituacaoTurma {
+        return {...objeto}
     }
 
 }

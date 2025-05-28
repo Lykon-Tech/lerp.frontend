@@ -1,44 +1,35 @@
-import { Component, OnInit, signal, ViewChild } from '@angular/core';
-import { ConfirmationService, MessageService } from 'primeng/api';
-import { Table, TableModule } from 'primeng/table';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
-import { RippleModule } from 'primeng/ripple';
-import { ToastModule } from 'primeng/toast';
-import { ToolbarModule } from 'primeng/toolbar';
-import { RatingModule } from 'primeng/rating';
-import { InputTextModule } from 'primeng/inputtext';
-import { TextareaModule } from 'primeng/textarea';
-import { SelectModule } from 'primeng/select';
-import { RadioButtonModule } from 'primeng/radiobutton';
-import { InputNumberModule } from 'primeng/inputnumber';
-import { DialogModule } from 'primeng/dialog';
-import { TagModule } from 'primeng/tag';
-import { InputIconModule } from 'primeng/inputicon';
-import { IconFieldModule } from 'primeng/iconfield';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { MatrizCurricular } from '../models/matrizcurricular.model';
-import { MatrizCurricularService } from '../services/matrizcurricular.service';
-import { CheckboxModule } from 'primeng/checkbox';
-import { Disciplina } from '../models/disciplina.model';
-import { DisciplinaService } from '../services/disciplina.service';
-import { MultiSelectModule } from 'primeng/multiselect';
-import { MatrizCurricularSaida } from '../models/matrizcurricular.saida.model';
+import { ConfirmationService, MessageService } from "primeng/api";
+import { BaseComponente } from "../../bases/components/base.component";
+import { MatrizCurricular } from "../models/matrizcurricular.model";
+import { Component, signal } from "@angular/core";
+import { ConfirmDialogModule } from "primeng/confirmdialog";
+import { CheckboxModule } from "primeng/checkbox";
+import { IconFieldModule } from "primeng/iconfield";
+import { InputIconModule } from "primeng/inputicon";
+import { TagModule } from "primeng/tag";
+import { DialogModule } from "primeng/dialog";
+import { InputNumberModule } from "primeng/inputnumber";
+import { RadioButtonModule } from "primeng/radiobutton";
+import { SelectModule } from "primeng/select";
+import { TextareaModule } from "primeng/textarea";
+import { InputTextModule } from "primeng/inputtext";
+import { RatingModule } from "primeng/rating";
+import { ToolbarModule } from "primeng/toolbar";
+import { ToastModule } from "primeng/toast";
+import { RippleModule } from "primeng/ripple";
+import { ButtonModule } from "primeng/button";
+import { FormsModule } from "@angular/forms";
+import { TableModule } from "primeng/table";
+import { CommonModule } from "@angular/common";
+import { MatrizCurricularService } from "../services/matrizcurricular.service";
+import { MatrizCurricularSaida } from "../models/matrizcurricular.saida.model";
+import { MultiSelect } from "primeng/multiselect";
+import { DisciplinaService } from "../services/disciplina.service";
+import { Disciplina } from "../models/disciplina.model";
 
-interface Column {
-    field: string;
-    header: string;
-    customExportHeader?: string;
-}
-
-interface ExportColumn {
-    title: string;
-    dataKey: string;
-}
 
 @Component({
-    selector: 'app-crud',
+    selector: 'app-MatrizCurricular',
     standalone: true,
     imports: [
         CommonModule,
@@ -60,51 +51,39 @@ interface ExportColumn {
         IconFieldModule,
         CheckboxModule,
         ConfirmDialogModule,
-        MultiSelectModule
+        MultiSelect
     ],
     templateUrl: `./matrizcurricular.component.html`,
     providers: [MessageService, MatrizCurricularService, ConfirmationService]
 })
-export class MatrizesCurriculares implements OnInit {
-    matrizCurricularDialog: boolean = false;
+export class MatrizCurricularComponent extends BaseComponente<MatrizCurricular> {
+   
+    constructor(
+        messageService: MessageService,
+        confirmationService: ConfirmationService,
+        service: MatrizCurricularService,
+        private disciplinaService : DisciplinaService
+    ) {
+        super(
+            messageService,
+            confirmationService,
+            service
+        );
 
-    matrizCurriculars = signal<MatrizCurricular[]>([]);
+        this.titulo = 'matriz curricular';
+        this.genero = 'a';
+    }
 
     disciplinas = signal<Disciplina[]>([]);
 
-    exportColumns!: ExportColumn[];
+    disciplinas_multi_select! : any[];
 
-    matrizCurricular!: MatrizCurricular;
-
-    disciplinas_multi_select: any[] = [];
-
-    submitted: boolean = false;
-
-    statuses!: any[];
-
-    @ViewChild('dt') dt!: Table;
-
-    cols!: Column[];
-
-    constructor(
-        private matrizCurricularService: MatrizCurricularService,
-        private messageService: MessageService,
-        private confirmationService: ConfirmationService,
-        private disciplinaService : DisciplinaService
-        
-    ) {}
-
-    ngOnInit() {
-        
-        this.loadDemoData();
+    override getValidacoes(): boolean {
+        return (this.objeto as any).nome.trim() && (this.objeto as any).ativo != undefined && (this.objeto as any).disciplinas != undefined && (this.objeto as any).disciplinas.length > 0;
     }
-
-    loadDemoData() {
-        this.matrizCurricularService.getMatrizCurriculars().then((data) => {
-            this.matrizCurriculars.set(data);
-        });
-
-        this.disciplinaService.getdisciplinas(true).then((data)=>{
+    
+    override loadDemoData(): void {
+        this.disciplinaService.findAll(true).then((data)=>{
             this.disciplinas.set(data);
             this.disciplinas_multi_select = this.disciplinas().map(disciplina => ({
                 label: disciplina.nome,
@@ -113,133 +92,22 @@ export class MatrizesCurriculares implements OnInit {
             }));
         });
 
-        this.statuses = [
-            { label: 'ATIVO', value: true },
-            { label: 'INATIVO', value: false }
-        ];
-
-        this.cols = [
-            { field: 'nome', header: 'Nome', customExportHeader: 'Nome' },
-            { field: 'disciplinas', header: 'Disciplinas' },
-            { field: 'ativo', header: 'Status' }
-        ];
-
-        this.exportColumns = this.cols.map((col) => ({ title: col.header, dataKey: col.field }));
+        super.loadDemoData();
     }
 
-    onGlobalFilter(table: Table, event: Event) {
-        table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
+    override getObjetoEdit(matriz: MatrizCurricular) {
+        return {
+            id: matriz.id,
+            nome: matriz.nome,
+            ativo: matriz.ativo,
+            disciplinas: this.disciplinas().filter(d =>
+                matriz.disciplinas?.some(md => md.id === d.id)
+            )
+        };
     }
 
-    openNew() {
-        this.matrizCurricular = {ativo:true};
-        this.submitted = false;
-        this.matrizCurricularDialog = true;
-    }
 
-    editmatrizCurricular(matrizCurricular: MatrizCurricular) {
-        this.matrizCurricular = { ...matrizCurricular };
-        this.matrizCurricularDialog = true;
-    }
-
-    hideDialog() {
-        this.matrizCurricularDialog = false;
-        this.submitted = false;
-    }
-
-    async deletematrizCurricular(matrizCurricular: MatrizCurricular) {
-        this.confirmationService.confirm({
-            message: 'Você tem certeza que deseja deletar ' + matrizCurricular.nome + '?',
-            header: 'Confirmar',
-            icon: 'pi pi-exclamation-triangle',
-            accept: async () => {
-                if (matrizCurricular.id != null) {
-                    try {
-                        await this.matrizCurricularService.deleteMatrizCurricular(matrizCurricular.id);
-
-                        const novaLista = this.matrizCurriculars().filter(b => b.id !== matrizCurricular.id);
-                        this.matrizCurriculars.set([...novaLista]);
-                        this.messageService.add({
-                            severity: 'success',
-                            summary: 'Sucesso',
-                            detail: 'Matriz curricular deletada',
-                            life: 3000
-                        });
-                    } catch (err) {
-                        this.messageService.add({
-                            severity: 'error',
-                            summary: 'Erro',
-                            detail: 'Falha ao deletar a matriz curricular: ' + err,
-                            life: 3000
-                        });
-                    }
-                }
-            }
-        });
-    }
-
-    findIndexById(id: string): number {
-        let index = -1;
-        for (let i = 0; i < this.matrizCurriculars().length; i++) {
-            if (this.matrizCurriculars()[i].id === id) {
-                index = i;
-                break;
-            }
-        }
-
-        return index;
-    }
-
-    getSeverity(ativo: boolean) {
-        return ativo ? 'success' : 'danger';
-    }
-
-    async savematrizCurricular() {
-        this.submitted = true;
-        let _matrizCurriculars = this.matrizCurriculars();
-
-        if (this.matrizCurricular.nome?.trim() && this.matrizCurricular.disciplinas != undefined && this.matrizCurricular.ativo != undefined) {
-            try {
-            if (this.matrizCurricular.id) {
-                const updatedmatrizCurricular = await this.matrizCurricularService.updateMatrizCurricular(this.converterMatrizComObjetosParaIds(this.matrizCurricular));
-                const index = this.findIndexById(updatedmatrizCurricular.id!);
-                const updatedmatrizCurriculars = [..._matrizCurriculars];
-                updatedmatrizCurriculars[index] = updatedmatrizCurricular;
-                this.matrizCurriculars.set(updatedmatrizCurriculars);
-
-                this.messageService.add({
-                severity: 'success',
-                summary: 'Sucesso',
-                detail: 'Matriz curricular atualizada',
-                life: 3000
-                });
-            } else {
-                const createdmatrizCurricular = await this.matrizCurricularService.createMatrizCurricular(this.converterMatrizComObjetosParaIds(this.matrizCurricular));
-                this.matrizCurriculars.set([..._matrizCurriculars, createdmatrizCurricular]);
-                
-
-                this.messageService.add({
-                    severity: 'success',
-                    summary: 'Sucesso',
-                    detail: 'Matriz curricular criada',
-                life: 3000
-                });
-            }
-
-            this.matrizCurricularDialog = false;
-            this.matrizCurricular = {};
-            } catch (error) {
-                this.messageService.add({
-                    severity: 'error',
-                    summary: 'Erro',
-                    detail: 'Falha ao salvar matriz curricular: ' + error,
-                    life: 3000
-                });
-            }
-        }
-    }
-
-    converterMatrizComObjetosParaIds(matriz: MatrizCurricular): MatrizCurricularSaida {
+    override converterObjeto(matriz: MatrizCurricular): MatrizCurricularSaida {
         return {
             id: matriz.id,
             nome: matriz.nome,
@@ -249,6 +117,5 @@ export class MatrizesCurriculares implements OnInit {
                 .filter((id): id is string => !!id) ?? []
         };
     }
-
 
 }

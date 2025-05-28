@@ -43,18 +43,7 @@
     </div>
   </div>
 
-  <div class="col-span-12">
-    <p-card header="Receita por Mês" class="h-full shadow-md rounded-lg">
-      <p-chart
-        type="bar"
-        [data]="barData"
-        [options]="barOptions"
-        class="w-full h-full"
-      ></p-chart>
-    </p-card>
-  </div>
-
-  <div class="col-span-12 grid grid-cols-12 gap-4 mt-4">
+    <div class="col-span-12 grid grid-cols-12 gap-4 mt-4">
     <div class="col-span-12 sm:col-span-6 lg:col-span-3">
       <p-card class="shadow-md rounded-lg h-full">
         <div class="bg-red-500 text-white p-4 rounded-lg h-full flex flex-col justify-between items-center">
@@ -90,5 +79,16 @@
         </div>
       </p-card>
     </div>
+  </div>
+
+  <div class="col-span-12">
+    <p-card header="Receita por Mês" class="h-full shadow-md rounded-lg">
+      <p-chart
+        type="bar"
+        [data]="barData"
+        [options]="barOptions"
+        class="w-full h-full"
+      ></p-chart>
+    </p-card>
   </div>
 </div>
