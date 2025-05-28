@@ -109,7 +109,7 @@ export abstract class BaseComponente<T extends Object> implements OnInit{
                     } catch (err) {
                         this.messageService.add({
                             severity: 'error',
-                            summary: 'Erro',
+                            summary: 'Falha',
                             detail: 'Falha ao deletar '+ this.genero + ' ' +  this.titulo + ': ' + err,
                             life: 3000
                         });
@@ -178,8 +178,8 @@ export abstract class BaseComponente<T extends Object> implements OnInit{
             } catch (error) {
                 this.messageService.add({
                     severity: 'error',
-                    summary: 'Erro',
-                    detail: 'Falha ao salvar ' + this.titulo + ':' + error,
+                    summary: 'Falha',
+                    detail: 'Falha ao salvar ' + this.titulo + ': ' + error,
                     life: 3000
                 });
             }

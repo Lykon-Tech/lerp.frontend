@@ -102,13 +102,18 @@ export class MovimentoComponent extends BaseComponente<Movimento> {
         return (this.objeto as any).historico.trim() && (this.objeto as any).subconta != undefined  && (this.objeto as any).dataLancamento != undefined;
     }
 
-    override loadDemoData(): void {
+    override ngOnInit(): void {
         const hoje = new Date();
 
         this.filtro = {
             dataInicio: new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate()),
             dataFim: new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate())     
         };
+
+        super.ngOnInit();
+    }
+
+    override loadDemoData(): void {
 
         this.loading = true;
         
@@ -123,7 +128,7 @@ export class MovimentoComponent extends BaseComponente<Movimento> {
             this.loading = false;
             this.messageService.add({
             severity: 'error',
-            summary: 'Erro',
+            summary: 'Falha',
             detail: 'Falha ao carregar movimentos: ' + error,
             life: 3000
             });
@@ -192,7 +197,7 @@ export class MovimentoComponent extends BaseComponente<Movimento> {
                 if(!conta){
                     this.messageService.add({
                         severity: 'error',
-                        summary: 'Erro',
+                        summary: 'Falha',
                         detail: 'Conta não cadastrada ou inativa, não foi possível importar OFX. \n Agência: ' + ofxData[0].agencia + ' Número da conta: ' + ofxData[0].numeroConta,
                         life: 5000
                     });
@@ -255,7 +260,7 @@ export class MovimentoComponent extends BaseComponente<Movimento> {
             } catch (error) {
                 this.messageService.add({
                     severity: 'error',
-                    summary: 'Erro',
+                    summary: 'Falha',
                     detail: 'Falha ao importar arquivo OFX: ' + error,
                     life: 5000
                 });
@@ -344,7 +349,7 @@ export class MovimentoComponent extends BaseComponente<Movimento> {
                 console.error(`Erro ao importar: ${mov.historico}`, error);
                 this.messageService.add({
                     severity: 'error',
-                    summary: 'Erro',
+                    summary: 'Falha',
                     detail: `Falha ao importar: ${mov.historico}`,
                     life: 3000
                 });

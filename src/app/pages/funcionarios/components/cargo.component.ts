@@ -1,7 +1,6 @@
 import { ConfirmationService, MessageService } from "primeng/api";
 import { BaseComponente, Column } from "../../bases/components/base.component";
-import { SituacaoTurma } from "../models/situacaoturma.model";
-import { SituacaoTurmaService } from "../services/situacaoturma.service";
+import { Cargo } from "../models/cargo.model";
 import { Component } from "@angular/core";
 import { ConfirmDialogModule } from "primeng/confirmdialog";
 import { CheckboxModule } from "primeng/checkbox";
@@ -22,10 +21,10 @@ import { ButtonModule } from "primeng/button";
 import { FormsModule } from "@angular/forms";
 import { TableModule } from "primeng/table";
 import { CommonModule } from "@angular/common";
-
+import { CargoService } from "../services/cargo.service";
 
 @Component({
-    selector: 'app-situacao-turma',
+    selector: 'app-Cargo',
     standalone: true,
     imports: [
         CommonModule,
@@ -48,27 +47,40 @@ import { CommonModule } from "@angular/common";
         CheckboxModule,
         ConfirmDialogModule
     ],
-    templateUrl: `./situacaoturma.component.html`,
-    providers: [MessageService, SituacaoTurmaService, ConfirmationService]
+    templateUrl: `./cargo.component.html`,
+    providers: [MessageService, CargoService, ConfirmationService]
 })
-export class SituacaoTurmaComponent extends BaseComponente<SituacaoTurma> {
+export class CargoComponent extends BaseComponente<Cargo> {
    
     constructor(
         messageService: MessageService,
         confirmationService: ConfirmationService,
-        service: SituacaoTurmaService
+        service: CargoService
     ) {
         super(
             messageService,
             confirmationService,
             service
         );
-        this.titulo = 'situação de turma'
+
+        this.titulo = 'cargo';
+    }
+
+    permissoes! : any[];
+    
+    override loadDemoData(): void {
+        this.permissoes = [
+            { label: 'VENDEDOR', value: 'VENDEDOR' },
+            { label: 'FINANCEIRO', value: 'FINANCEIRO' },
+            { label: 'SUPERVISOR', value: 'SUPERVISOR' },
+            { label: 'GESTOR', value: 'GESTOR' }
+        ];
+
+        super.loadDemoData();
     }
 
     override getValidacoes(): boolean {
-        return (this.objeto as any).nome.trim() && (this.objeto as any).ativo != undefined;
+        return (this.objeto as any).nome.trim() && (this.objeto as any).ativo != undefined && (this.objeto as any).permissao != undefined;
     }
-
 
 }

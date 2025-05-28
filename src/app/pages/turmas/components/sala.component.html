@@ -11,17 +11,17 @@
     [rows]="10"
     [columns]="cols"
     [paginator]="true"
-    [globalFilterFields]="['agencia', 'numero_objeto', 'ativo']"
+    [globalFilterFields]="['nome', 'ativo']"
     [tableStyle]="{ 'min-width': '75rem' }"
     [rowHover]="true"
     dataKey="id"
-    currentPageReportTemplate="Mostrando de {first} até {last} de {totalRecords} contas"
+    currentPageReportTemplate="Mostrando de {first} até {last} de {totalRecords} salas"
     [showCurrentPageReport]="true"
     [rowsPerPageOptions]="[10, 20, 30]"
 >
     <ng-template #caption>
         <div class="flex items-center justify-between">
-            <h5 class="m-0">Gerenciar contas</h5>
+            <h5 class="m-0">Gerenciar salas</h5>
             <p-iconfield>
                 <p-inputicon styleClass="pi pi-search" />
                 <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Pesquisar..." />
@@ -30,17 +30,9 @@
     </ng-template>
     <ng-template #header>
         <tr>
-            <th pSortableColumn="banco" style="min-width:16rem">
-                Banco
-                <p-sortIcon field="banco" />
-            </th>
-            <th pSortableColumn="agencia" style="min-width:12rem">
-                Agência
-                <p-sortIcon field="agencia" />
-            </th>
-            <th pSortableColumn="numero_conta" style="min-width: 12rem">
-                Número da conta
-                <p-sortIcon field="numero_conta" />
+            <th pSortableColumn="nome" style="min-width:16rem">
+                Nome
+                <p-sortIcon field="nome" />
             </th>
             <th pSortableColumn="ativo" style="min-width: 12rem">
                 Ativo
@@ -51,9 +43,7 @@
     </ng-template>
     <ng-template #body let-objeto>
         <tr>
-            <td style="min-width: 16rem">{{ objeto.banco.nome + " - " + objeto.banco.numeroBanco }}</td>
-            <td>{{ objeto.agencia}}</td>
-            <td>{{ objeto.numeroConta}}</td>
+            <td style="min-width: 16rem">{{ objeto.nome }}</td>
             <td>
                 <p-tag [value]="objeto.ativo ? 'ATIVO' : 'INATIVO' " [severity]="getSeverity(objeto.ativo)" />
             </td>
@@ -65,36 +55,14 @@
     </ng-template>
 </p-table>
 
-<p-dialog [(visible)]="dialogo" [style]="{ width: '450px' }" header="Detalhes da conta" [modal]="true">
+<p-dialog [(visible)]="dialogo" [style]="{ width: '450px' }" header="Detalhes do sala" [modal]="true">
     <ng-template #content>
         <div class="flex flex-col gap-6">
             <div>
-                <label for="bancos" class="block font-bold mb-3">Banco</label>
-                <p-select 
-                    name="bancos" 
-                    [(ngModel)]="objeto.banco" 
-                    inputId="banco" 
-                    [options]="bancos_select" 
-                    optionLabel="label" 
-                    optionValue="value"
-                    placeholder="Selecione um banco"
-                    fluid 
-                    [appendTo]="'body'"
-                />
-                <small class="text-red-500" *ngIf="submitted && objeto.banco == undefined">Banco é obrigatório.</small>
+                <label for="name" class="block font-bold mb-3">Nome</label>
+                <input name="name" type="text" pInputText id="nome" [(ngModel)]="objeto.nome" required autofocus fluid />
+                <small class="text-red-500" *ngIf="submitted && !objeto.nome">Nome é obrigatório.</small>
             </div>
-            <div>
-                <label for="agencia" class="block font-bold mb-3">Agência</label>
-                <input name="agencia" id="agencia" type="text" pInputText [(ngModel)]="objeto.agencia" required fluid/>
-                <small class="text-red-500" *ngIf="submitted && objeto.agencia == undefined">Agência é obrigatória.</small>
-            </div>
-
-            <div>
-                <label for="numero_objeto" class="block font-bold mb-3">Número da objeto</label>
-                <input name="numero_objeto" id="numero_objeto" type="text" pInputText [(ngModel)]="objeto.numeroConta" required fluid/>
-                <small class="text-red-500" *ngIf="submitted && objeto.numeroConta == undefined">Número da objeto é obrigatório.</small>
-            </div>
-
             <div>
                 <label for="status" class="block font-bold mb-3">Status</label>
                 <p-select 

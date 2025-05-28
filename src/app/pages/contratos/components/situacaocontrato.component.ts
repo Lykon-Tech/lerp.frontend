@@ -1,7 +1,6 @@
 import { ConfirmationService, MessageService } from "primeng/api";
 import { BaseComponente, Column } from "../../bases/components/base.component";
-import { SituacaoTurma } from "../models/situacaoturma.model";
-import { SituacaoTurmaService } from "../services/situacaoturma.service";
+import { SituacaoContrato } from "../models/situacaocontrato.model";
 import { Component } from "@angular/core";
 import { ConfirmDialogModule } from "primeng/confirmdialog";
 import { CheckboxModule } from "primeng/checkbox";
@@ -22,10 +21,10 @@ import { ButtonModule } from "primeng/button";
 import { FormsModule } from "@angular/forms";
 import { TableModule } from "primeng/table";
 import { CommonModule } from "@angular/common";
-
+import { SituacaoContratoService } from "../services/situacaocontrato.service";
 
 @Component({
-    selector: 'app-situacao-turma',
+    selector: 'app-SituacaoContrato',
     standalone: true,
     imports: [
         CommonModule,
@@ -48,22 +47,24 @@ import { CommonModule } from "@angular/common";
         CheckboxModule,
         ConfirmDialogModule
     ],
-    templateUrl: `./situacaoturma.component.html`,
-    providers: [MessageService, SituacaoTurmaService, ConfirmationService]
+    templateUrl: `./situacaoContrato.component.html`,
+    providers: [MessageService, SituacaoContratoService, ConfirmationService]
 })
-export class SituacaoTurmaComponent extends BaseComponente<SituacaoTurma> {
+export class SituacaoContratoComponent extends BaseComponente<SituacaoContrato> {
    
     constructor(
         messageService: MessageService,
         confirmationService: ConfirmationService,
-        service: SituacaoTurmaService
+        service: SituacaoContratoService
     ) {
         super(
             messageService,
             confirmationService,
             service
         );
-        this.titulo = 'situação de turma'
+
+        this.titulo = 'situacao de contrato';
+        this.genero = 'a';
     }
 
     override getValidacoes(): boolean {

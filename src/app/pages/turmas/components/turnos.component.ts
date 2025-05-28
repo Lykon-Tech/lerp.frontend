@@ -71,8 +71,4 @@ export class TurnoComponent extends BaseComponente<Turno> {
         return (this.objeto as any).nome.trim() && (this.objeto as any).ativo != undefined;
     }
 
-    override getObjetoEdit(objeto: Turno): Turno {
-        return {...objeto}
-    }
-
 }

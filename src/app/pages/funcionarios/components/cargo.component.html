@@ -11,17 +11,17 @@
     [rows]="10"
     [columns]="cols"
     [paginator]="true"
-    [globalFilterFields]="['nome', 'numeroobjeto', 'exigeOfx', 'caixa', 'ativo']"
+    [globalFilterFields]="['nome','professor','coordenador','atendente','permissao','ativo']"
     [tableStyle]="{ 'min-width': '75rem' }"
     [rowHover]="true"
     dataKey="id"
-    currentPageReportTemplate="Mostrando de {first} até {last} de {totalRecords} objetos"
+    currentPageReportTemplate="Mostrando de {first} até {last} de {totalRecords} cargos"
     [showCurrentPageReport]="true"
     [rowsPerPageOptions]="[10, 20, 30]"
 >
     <ng-template #caption>
         <div class="flex items-center justify-between">
-            <h5 class="m-0">Gerenciar objetos</h5>
+            <h5 class="m-0">Gerenciar cargos</h5>
             <p-iconfield>
                 <p-inputicon styleClass="pi pi-search" />
                 <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Pesquisar..." />
@@ -34,17 +34,21 @@
                 Nome
                 <p-sortIcon field="nome" />
             </th>
-            <th pSortableColumn="numero_banco" style="min-width:12rem">
-                Número
-                <p-sortIcon field="numero_banco" />
+             <th pSortableColumn="ativo" style="min-width: 12rem">
+                Professor
+                <p-sortIcon field="ativo" />
             </th>
-            <th pSortableColumn="exigeOfx" style="min-width: 12rem">
-                Exige OFX
-                <p-sortIcon field="exigeOfx" />
+             <th pSortableColumn="ativo" style="min-width: 12rem">
+                Coordenador
+                <p-sortIcon field="ativo" />
             </th>
-            <th pSortableColumn="caixa" style="min-width: 12rem">
-                Caixa
-                <p-sortIcon field="caixa" />
+             <th pSortableColumn="ativo" style="min-width: 12rem">
+                Atendente
+                <p-sortIcon field="ativo" />
+            </th>
+             <th pSortableColumn="ativo" style="min-width: 12rem">
+                Permissão
+                <p-sortIcon field="ativo" />
             </th>
             <th pSortableColumn="ativo" style="min-width: 12rem">
                 Ativo
@@ -56,26 +60,39 @@
     <ng-template #body let-objeto>
         <tr>
             <td style="min-width: 16rem">{{ objeto.nome }}</td>
-            <td>{{ objeto.numeroBanco }}</td>
+
             <td>
                 <i
                     class="pi"
                     [ngClass]="{
-                    'pi-check text-green-600': objeto.exigeOfx,
-                    'pi-times text-red-600': !objeto.exigeOfx
+                    'pi-check text-green-600': objeto.professor,
+                    'pi-times text-red-600': !objeto.professor
                     }"
-                    aria-label="exige OFX">
+                    aria-label="professor">
                 </i>
             </td>
             <td>
                 <i
                     class="pi"
                     [ngClass]="{
-                    'pi-check text-green-600': objeto.caixa,
-                    'pi-times text-red-600': !objeto.caixa
+                    'pi-check text-green-600': objeto.coordenador,
+                    'pi-times text-red-600': !objeto.coordenador
                     }"
-                    aria-label="caixa">
+                    aria-label="coordenador">
                 </i>
+            </td>
+            <td>
+                <i
+                    class="pi"
+                    [ngClass]="{
+                    'pi-check text-green-600': objeto.atendente,
+                    'pi-times text-red-600': !objeto.atendente
+                    }"
+                    aria-label="atendente">
+                </i>
+            </td>
+            <td>
+                <p-tag [value]="objeto.permissao" [severity]="'info'" />
             </td>
             <td>
                 <p-tag [value]="objeto.ativo ? 'ATIVO' : 'INATIVO' " [severity]="getSeverity(objeto.ativo)" />
@@ -88,7 +105,7 @@
     </ng-template>
 </p-table>
 
-<p-dialog [(visible)]="dialogo" [style]="{ width: '450px' }" header="Detalhes do objeto" [modal]="true">
+<p-dialog [(visible)]="dialogo" [style]="{ width: '450px' }" header="Detalhes do cargo" [modal]="true">
     <ng-template #content>
         <div class="flex flex-col gap-6">
             <div>
@@ -96,12 +113,39 @@
                 <input name="name" type="text" pInputText id="nome" [(ngModel)]="objeto.nome" required autofocus fluid />
                 <small class="text-red-500" *ngIf="submitted && !objeto.nome">Nome é obrigatório.</small>
             </div>
+            
             <div>
-                <label for="nr_objeto" class="block font-bold mb-3">Número do objeto</label>
-                <input name="nr_objeto" id="numero_objeto" type="number" pInputText [(ngModel)]="objeto.numeroBanco" required fluid/>
-                <small class="text-red-500" *ngIf="submitted && (objeto.numeroBanco == null)">Número é obrigatório.</small>
+                <span class="block font-bold mb-4">Opções</span>
+                <div class="grid grid-cols-2 gap-2">
+                    <div class="flex items-center gap-2 col-span-6">
+                        <p-checkbox id="professor" name="professor" binary="true" [(ngModel)]="objeto.professor"></p-checkbox>
+                        <label for="professor">Professor</label>
+                    </div>
+                    <div class="flex items-center gap-2 col-span-6">
+                        <p-checkbox id="coordenador" name="coordenador" binary="true" [(ngModel)]="objeto.coordenador"></p-checkbox>
+                        <label for="coordenador">Coordenador</label>
+                    </div>
+                    <div class="flex items-center gap-2 col-span-6">
+                        <p-checkbox id="atendente" name="atendente" binary="true" [(ngModel)]="objeto.atendente"></p-checkbox>
+                        <label for="atendente">Atendente</label>
+                    </div>
+                </div>
             </div>
-
+            <div>
+                <label for="permissoes" class="block font-bold mb-3">Permissões</label>
+                <p-select 
+                    name="permissoes" 
+                    [(ngModel)]="objeto.permissao" 
+                    inputId="permissao" 
+                    [options]="permissoes" 
+                    optionLabel="label" 
+                    optionValue="value"
+                    placeholder="Selecione uma permissão" 
+                    fluid 
+                    [appendTo]="'body'"
+                />
+                <small class="text-red-500" *ngIf="submitted && objeto.permissao == undefined">Permissão é obrigatório.</small>
+            </div>
             <div>
                 <label for="status" class="block font-bold mb-3">Status</label>
                 <p-select 
@@ -116,20 +160,6 @@
                     [appendTo]="'body'"
                 />
                 <small class="text-red-500" *ngIf="submitted && objeto.ativo == undefined">Status é obrigatório.</small>
-            </div>
-
-            <div>
-                <span class="block font-bold mb-4">Opções</span>
-                <div class="grid grid-cols-2 gap-2">
-                    <div class="flex items-center gap-2 col-span-6">
-                        <p-checkbox id="exige_ofx" name="exige_ofx" binary="true" [(ngModel)]="objeto.exigeOfx"></p-checkbox>
-                        <label for="exige_ofx">Exige OFX</label>
-                    </div>
-                    <div class="flex items-center gap-2 col-span-6">
-                        <p-checkbox id="caixa" name="caixa" binary="true" [(ngModel)]="objeto.caixa"></p-checkbox>
-                        <label for="caixa">Caixa</label>
-                    </div>
-                </div>
             </div>
         </div>
     </ng-template>

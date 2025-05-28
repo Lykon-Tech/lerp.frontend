@@ -16,6 +16,11 @@ import { MatrizCurricularComponent } from './cursos/components/matrizcurricular.
 import { MovimentoComponent } from './financeiro/components/movimento.component';
 import { SituacaoTurmaComponent } from './turmas/components/situacaoturma.component';
 import { TurnoComponent } from './turmas/components/turnos.component';
+import { SalaComponent } from './turmas/components/sala.component';
+import { CargoComponent } from './funcionarios/components/cargo.component';
+import { SituacaoContratoComponent } from './contratos/components/situacaocontrato.component';
+import { TipoContratoComponent } from './contratos/components/tipocontrato.component';
+import { CursoComponent } from './cursos/components/curso.component';
 
 export default [
     { path: 'documentation', component: Documentation },
@@ -30,9 +35,14 @@ export default [
     { path: 'tipos_cursos', component: TipoCursoComponent },
     { path: 'modalidades', component: ModalidadeComponent },
     { path: 'disciplinas', component: DisciplinaComponent },
-    { path: 'situacoes_turmas', component: SituacaoTurmaComponent },
     { path: 'matrizes_curriculares', component: MatrizCurricularComponent },
+    { path: 'situacoes_turmas', component: SituacaoTurmaComponent },
     { path: 'turnos', component: TurnoComponent },
+    { path: 'salas', component: SalaComponent },
+    { path: 'cargos', component: CargoComponent },
+    { path: 'situacoes_contratos', component: SituacaoContratoComponent },
+    { path: 'tipos_contratos', component: TipoContratoComponent },
+    { path: 'cursos', component: CursoComponent },
     { path: 'crud', component: Crud },
     { path: 'empty', component: Empty },
     { path: '**', redirectTo: '/notfound' }

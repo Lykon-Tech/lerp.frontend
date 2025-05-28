@@ -1,7 +1,6 @@
 import { ConfirmationService, MessageService } from "primeng/api";
 import { BaseComponente, Column } from "../../bases/components/base.component";
-import { SituacaoTurma } from "../models/situacaoturma.model";
-import { SituacaoTurmaService } from "../services/situacaoturma.service";
+import { Sala } from "../models/sala.model";
 import { Component } from "@angular/core";
 import { ConfirmDialogModule } from "primeng/confirmdialog";
 import { CheckboxModule } from "primeng/checkbox";
@@ -22,10 +21,10 @@ import { ButtonModule } from "primeng/button";
 import { FormsModule } from "@angular/forms";
 import { TableModule } from "primeng/table";
 import { CommonModule } from "@angular/common";
-
+import { SalaService } from "../services/sala.service";
 
 @Component({
-    selector: 'app-situacao-turma',
+    selector: 'app-sala',
     standalone: true,
     imports: [
         CommonModule,
@@ -48,22 +47,23 @@ import { CommonModule } from "@angular/common";
         CheckboxModule,
         ConfirmDialogModule
     ],
-    templateUrl: `./situacaoturma.component.html`,
-    providers: [MessageService, SituacaoTurmaService, ConfirmationService]
+    templateUrl: `./sala.component.html`,
+    providers: [MessageService, SalaService, ConfirmationService]
 })
-export class SituacaoTurmaComponent extends BaseComponente<SituacaoTurma> {
+export class SalaComponent extends BaseComponente<Sala> {
    
     constructor(
         messageService: MessageService,
         confirmationService: ConfirmationService,
-        service: SituacaoTurmaService
+        service: SalaService
     ) {
         super(
             messageService,
             confirmationService,
             service
         );
-        this.titulo = 'situação de turma'
+
+        this.titulo = 'sala';
     }
 
     override getValidacoes(): boolean {

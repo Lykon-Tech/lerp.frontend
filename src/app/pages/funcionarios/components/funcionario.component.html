@@ -1,0 +1,146 @@
+<p-toast></p-toast>
+
+<p-toolbar>
+    <ng-template #end>
+        <p-button label="Novo" icon="pi pi-plus" severity="secondary" (onClick)="openNew()" />
+    </ng-template>
+</p-toolbar>
+
+<p-table
+    #dt
+    [value]="lista()"
+    [rows]="10"
+    [columns]="cols"
+    [paginator]="true"
+    [globalFilterFields]="['nome', 'email', 'cpf', 'ativo']"
+    [tableStyle]="{ 'min-width': '75rem' }"
+    [rowHover]="true"
+    dataKey="id"
+    currentPageReportTemplate="Mostrando de {first} até {last} de {totalRecords} funcionários"
+    [showCurrentPageReport]="true"
+    [rowsPerPageOptions]="[10, 20, 30]"
+>
+    <ng-template #caption>
+        <div class="flex items-center justify-between">
+            <h5 class="m-0">Gerenciar Funcionários</h5>
+            <p-iconfield>
+                <p-inputicon styleClass="pi pi-search" />
+                <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Pesquisar..." />
+            </p-iconfield>
+        </div>
+    </ng-template>
+
+    <ng-template #header>
+        <tr>
+            <th pSortableColumn="nome">Nome <p-sortIcon field="nome" /></th>
+            <th pSortableColumn="email">Email <p-sortIcon field="email" /></th>
+            <th pSortableColumn="cpf">CPF <p-sortIcon field="cpf" /></th>
+            <th pSortableColumn="ativo">Ativo <p-sortIcon field="ativo" /></th>
+            <th>Ações</th>
+        </tr>
+    </ng-template>
+
+    <ng-template #body let-objeto>
+        <tr>
+            <td>{{ objeto.nome }}</td>
+            <td>{{ objeto.email }}</td>
+            <td>{{ objeto.cpf }}</td>
+            <td>
+                <p-tag [value]="objeto.ativo ? 'ATIVO' : 'INATIVO'" [severity]="getSeverity(objeto.ativo)" />
+            </td>
+            <td>
+                <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="edit(objeto)" />
+                <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (click)="delete(objeto)" />
+            </td>
+        </tr>
+    </ng-template>
+</p-table>
+
+<p-dialog [(visible)]="dialogo" [style]="{ width: '600px' }" header="Detalhes do Funcionário" [modal]="true">
+    <ng-template #content>
+        <div class="grid formgrid p-fluid">
+            <div class="field col-12 md:col-6">
+                <label for="nome">Nome</label>
+                <input id="nome" pInputText [(ngModel)]="objeto.nome" required autofocus />
+                <small class="text-red-500" *ngIf="submitted && !objeto.nome">Nome é obrigatório.</small>
+            </div>
+
+            <div class="field col-12 md:col-6">
+                <label for="email">Email</label>
+                <input id="email" type="email" pInputText [(ngModel)]="objeto.email" required />
+                <small class="text-red-500" *ngIf="submitted && !objeto.email">Email é obrigatório.</small>
+            </div>
+
+            <div class="field col-12 md:col-6">
+                <label for="cpf">CPF</label>
+                <input id="cpf" pInputText [(ngModel)]="objeto.cpf" required />
+                <small class="text-red-500" *ngIf="submitted && !objeto.cpf">CPF é obrigatório.</small>
+            </div>
+
+            <div class="field col-12 md:col-6">
+                <label for="rg">RG</label>
+                <input id="rg" pInputText [(ngModel)]="objeto.rg" />
+            </div>
+
+            <div class="field col-12 md:col-6">
+                <label for="telefone">Telefone</label>
+                <input id="telefone" pInputText [(ngModel)]="objeto.telefone" />
+            </div>
+
+            <div class="field col-12 md:col-6">
+                <label for="cep">CEP</label>
+                <input id="cep" pInputText [(ngModel)]="objeto.cep" />
+            </div>
+
+            <div class="field col-12 md:col-6">
+                <label for="logradouro">Logradouro</label>
+                <input id="logradouro" pInputText [(ngModel)]="objeto.logradouro" />
+            </div>
+
+            <div class="field col-12 md:col-6">
+                <label for="numero">Número</label>
+                <input id="numero" pInputText [(ngModel)]="objeto.numero" />
+            </div>
+
+            <div class="field col-12 md:col-6">
+                <label for="complemento">Complemento</label>
+                <input id="complemento" pInputText [(ngModel)]="objeto.complemento" />
+            </div>
+
+            <div class="field col-12 md:col-6">
+                <label for="bairro">Bairro</label>
+                <input id="bairro" pInputText [(ngModel)]="objeto.bairro" />
+            </div>
+
+            <div class="field col-12 md:col-6">
+                <label for="cidade">Cidade</label>
+                <input id="cidade" pInputText [(ngModel)]="objeto.cidade" />
+            </div>
+
+            <div class="field col-12 md:col-6">
+                <label for="uf">UF</label>
+                <input id="uf" pInputText [(ngModel)]="objeto.uf" />
+            </div>
+
+            <div class="field col-12">
+                <label for="ativo">Status</label>
+                <p-select
+                    id="ativo"
+                    [options]="statuses"
+                    optionLabel="label"
+                    optionValue="value"
+                    [(ngModel)]="objeto.ativo"
+                    placeholder="Selecione o status"
+                ></p-select>
+                <small class="text-red-500" *ngIf="submitted && objeto.ativo == undefined">Status é obrigatório.</small>
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template #footer>
+        <p-button label="Cancelar" icon="pi pi-times" text (click)="hideDialog()" />
+        <p-button label="Salvar" icon="pi pi-check" (click)="save()" />
+    </ng-template>
+</p-dialog>
+
+<p-confirmdialog [style]="{ width: '450px' }" />

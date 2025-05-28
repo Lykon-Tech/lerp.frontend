@@ -15,13 +15,13 @@
     [tableStyle]="{ 'min-width': '75rem' }"
     [rowHover]="true"
     dataKey="id"
-    currentPageReportTemplate="Mostrando de {first} até {last} de {totalRecords} objetos"
+    currentPageReportTemplate="Mostrando de {first} até {last} de {totalRecords} modalidades"
     [showCurrentPageReport]="true"
     [rowsPerPageOptions]="[10, 20, 30]"
 >
     <ng-template #caption>
         <div class="flex items-center justify-between">
-            <h5 class="m-0">Gerenciar objetos</h5>
+            <h5 class="m-0">Gerenciar modalidades</h5>
             <p-iconfield>
                 <p-inputicon styleClass="pi pi-search" />
                 <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Pesquisar..." />

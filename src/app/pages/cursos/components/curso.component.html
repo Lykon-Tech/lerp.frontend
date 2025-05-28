@@ -1,0 +1,230 @@
+<p-toast></p-toast>
+<p-toolbar>
+    <ng-template #end>
+        <p-button label="Novo" icon="pi pi-plus" severity="secondary"(onClick)="openNew()" />
+    </ng-template>
+</p-toolbar>
+
+<p-table
+    #dt
+    [value]="lista()"
+    [rows]="10"
+    [columns]="cols"
+    [paginator]="true"
+    [globalFilterFields]="['nome', 'ativo']"
+    [tableStyle]="{ 'min-width': '75rem' }"
+    [rowHover]="true"
+    dataKey="id"
+    currentPageReportTemplate="Mostrando de {first} até {last} de {totalRecords} cursos"
+    [showCurrentPageReport]="true"
+    [rowsPerPageOptions]="[10, 20, 30]"
+>
+    <ng-template #caption>
+        <div class="flex items-center justify-between">
+            <h5 class="m-0">Gerenciar cursos</h5>
+            <p-iconfield>
+                <p-inputicon styleClass="pi pi-search" />
+                <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Pesquisar..." />
+            </p-iconfield>
+        </div>
+    </ng-template>
+    <ng-template #header>
+        <tr>
+            <th pSortableColumn="nome" style="min-width:16rem">
+                Nome
+                <p-sortIcon field="nome" />
+            </th>
+            <th pSortableColumn="tipo_curso" style="min-width:12rem">
+                Tipo curso
+                <p-sortIcon field="coordenador" />
+            </th>
+            <th pSortableColumn="coordenador" style="min-width:12rem">
+                Coordenador
+                <p-sortIcon field="coordenador" />
+            </th>
+            <th pSortableColumn="valor" style="min-width:12rem">
+                Valor
+                <p-sortIcon field="valor" />
+            </th>
+            <th pSortableColumn="numero_aulas" style="min-width:12rem">
+                Número de aulas
+                <p-sortIcon field="numero_aulas" />
+            </th>
+            <th pSortableColumn="carga_horaria" style="min-width:12rem">
+                Carga horária
+                <p-sortIcon field="carga_horaria" />
+            </th>
+            <th pSortableColumn="matriz_curricular" style="min-width:12rem">
+                Matriz curricular
+                <p-sortIcon field="matriz_curricular" />
+            </th>
+            <th pSortableColumn="bolsas" style="min-width:12rem">
+                Bolsas
+                <p-sortIcon field="bolsas" />
+            </th>
+            <th pSortableColumn="ativo" style="min-width: 12rem">
+                Ativo
+                <p-sortIcon field="ativo" />
+            </th>
+            <th style="min-width: 12rem"></th>
+        </tr>
+    </ng-template>
+    <ng-template #body let-objeto>
+        <tr>
+            <td style="min-width: 16rem">{{ objeto.nome }}</td>
+            <td>
+                <span class="p-chip p-chip-text p-1 px-3 mr-2 mb-1 rounded-full bg-blue-100 text-blue-800">
+                    {{ objeto.tipoCurso }}
+                </span>
+            </td>
+            <td>{{ objeto.coordenador }}</td>
+            <td>{{ objeto.valor }}</td>
+            <td>{{ objeto.numeroAulas }}</td>
+            <td>{{ objeto.cargaHoraria }}</td>
+            <td>
+                <span class="p-chip p-chip-text p-1 px-3 mr-2 mb-1 rounded-full bg-blue-100 text-blue-800">
+                    {{ objeto.matrizCurricular }}
+                </span>
+            </td>
+            <td>
+                <ng-container *ngFor="let bolsa of objeto.bolsas; let last = last">
+                    <span class="p-chip p-chip-text p-1 px-3 mr-2 mb-1 rounded-full bg-blue-100 text-blue-800">
+                        {{ bolsa.nome }}
+                    </span>
+                </ng-container>
+            </td>
+
+            <td>
+                <p-tag [value]="objeto.ativo ? 'ATIVO' : 'INATIVO' " [severity]="getSeverity(objeto.ativo)" />
+            </td>
+            
+            <td>
+                <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="edit(objeto)" />
+                <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (click)="delete(objeto)" />
+            </td>
+        </tr>
+    </ng-template>
+</p-table>
+
+<p-dialog [(visible)]="dialogo" [style]="{ width: '450px' }" header="Detalhes do curso" [modal]="true">
+    <ng-template #content>
+        <div class="flex flex-col gap-6">
+            <div>
+                <label for="name" class="block font-bold mb-3">Nome</label>
+                <input name="name" type="text" pInputText id="nome" [(ngModel)]="objeto.nome" required autofocus fluid />
+                <small class="text-red-500" *ngIf="submitted && !objeto.nome">Nome é obrigatório.</small>
+            </div>
+
+            <div>
+                <label for="valor" class="block font-bold mb-3">Valor</label>
+                <input name="valor" id="valor" type="number" pInputText [(ngModel)]="objeto.valor" required fluid/>
+                <small class="text-red-500" *ngIf="submitted && objeto.valor == undefined">Valor é obrigatório.</small>
+            </div>
+            <div>
+                <label for="tipoCursos" class="block font-bold mb-3">Tipo de curso</label>
+                <p-select 
+                    name="tipoCursos" 
+                    [(ngModel)]="objeto.tipoCurso" 
+                    inputId="tipoCurso" 
+                    [options]="tiposCursos_select" 
+                    optionLabel="label" 
+                    optionValue="value"
+                    placeholder="Selecione um tipoCurso"
+                    fluid 
+                    [appendTo]="'body'"
+                />
+                <small class="text-red-500" *ngIf="submitted && objeto.tipoCurso == undefined">Tipo de curso é obrigatório.</small>
+            </div>
+            
+            <div>
+                <label for="coordenadores" class="block font-bold mb-3">Coordenador</label>
+                <p-select 
+                    name="coordenadores" 
+                    [(ngModel)]="objeto.coordenador" 
+                    inputId="coordenadores" 
+                    [options]="coordenadores_select" 
+                    optionLabel="label" 
+                    optionValue="value"
+                    placeholder="Selecione um coordenador"
+                    fluid 
+                    [appendTo]="'body'"
+                />
+                <small class="text-red-500" *ngIf="submitted && objeto.coordenador == undefined">Coordenador é obrigatório.</small>
+            </div>
+
+            <div>
+                <label for="numero_aulas" class="block font-bold mb-3">Número de aulas</label>
+                <input name="numero_aulas" id="number" type="text" pInputText [(ngModel)]="objeto.numeroAulas" required fluid/>
+                <small class="text-red-500" *ngIf="submitted && objeto.numeroAulas == undefined">Número de aulas é obrigatória.</small>
+            </div>
+
+            <div>
+                <label for="carga_horaria" class="block font-bold mb-3">Carga horária</label>
+                <input name="carga_horaria" id="number" type="text" pInputText [(ngModel)]="objeto.cargaHoraria" required fluid/>
+                <small class="text-red-500" *ngIf="submitted && objeto.cargaHoraria == undefined">Carga horária é obrigatória.</small>
+            </div>
+
+            <div>
+                <label for="matrizesCurriculares" class="block font-bold mb-3">Matriz curricular</label>
+                <p-select 
+                    name="matrizesCurriculares" 
+                    [(ngModel)]="objeto.matrizCurricular" 
+                    inputId="matrizesCurriculares" 
+                    [options]="matrizes_select" 
+                    optionLabel="label" 
+                    optionValue="value"
+                    placeholder="Selecione uma matriz curricular"
+                    fluid 
+                    [appendTo]="'body'"
+                />
+                <small class="text-red-500" *ngIf="submitted && objeto.matrizCurricular == undefined">Matriz curricular é obrigatório.</small>
+            </div>
+
+             <div>
+                <label for="bolsas" class="block font-bold mb-3">Bolsas</label>
+                <p-multiselect 
+                    [appendTo]="'body'" 
+                    name="bolsas" 
+                    fluid 
+                    [options]="bolsas_multi_select" 
+                    [(ngModel)]="objeto.bolsas" 
+                    placeholder="Selecionar bolsas" 
+                    optionLabel="label" 
+                    optionValue="value" 
+                    display="chip" 
+                    [filter]="true"
+                >
+                    <ng-template #selecteditems let-bolsas>
+                        <ng-container *ngFor="let bolsa of bolsas">
+                            <div class="flex flex-col py-1 px-2 bg-primary text-primary-contrast rounded-border mb-2">
+                            {{ bolsa.nome }}
+                            </div>
+                        </ng-container>
+                    </ng-template>
+                </p-multiselect>
+            </div>
+            <div>
+                <label for="status" class="block font-bold mb-3">Status</label>
+                <p-select 
+                    name="status" 
+                    [(ngModel)]="objeto.ativo" 
+                    inputId="ativo" 
+                    [options]="statuses" 
+                    optionLabel="label" 
+                    optionValue="value"
+                    placeholder="Selecione um status" 
+                    fluid 
+                    [appendTo]="'body'"
+                />
+                <small class="text-red-500" *ngIf="submitted && objeto.ativo == undefined">Status é obrigatório.</small>
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template #footer>
+        <p-button label="Cancel" icon="pi pi-times" text (click)="hideDialog()" />
+        <p-button label="Save" icon="pi pi-check" (click)="save()" />
+    </ng-template>
+</p-dialog>
+
+<p-confirmdialog [style]="{ width: '450px' }" />
