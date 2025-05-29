@@ -80,12 +80,13 @@ export class SubcontaComponent extends BaseComponente<Subconta, SubcontaSaida> {
     override loadDemoData(): void {
         this.grupoContaService.findAll(true).then((data) => {
             this.grupoContas.set(data);
+            this.grupoContas_select = this.grupoContas().map(grupoConta => ({
+                label: grupoConta.nome,
+                value: grupoConta
+            }));
         });
 
-        this.grupoContas_select = this.grupoContas().map(grupoConta => ({
-            label: grupoConta.nome,
-            value: grupoConta
-        }));
+
 
         super.loadDemoData();
     }

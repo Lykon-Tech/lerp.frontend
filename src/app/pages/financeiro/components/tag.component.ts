@@ -78,12 +78,12 @@ export class TagComponent extends BaseComponente<TagModel, TagSaida> {
     override loadDemoData(): void {
         this.subcontaService.findAll(true).then((data) => {
             this.subcontas.set(data);
-        });
 
-        this.subcontas_select = this.subcontas().map(subconta => ({
-            label: subconta.nome,
-            value: subconta
-        }));
+            this.subcontas_select = this.subcontas().map(subconta => ({
+                label: subconta.nome,
+                value: subconta
+            }));
+        });
 
         super.loadDemoData();
     }
