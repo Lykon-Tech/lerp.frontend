@@ -102,7 +102,20 @@ export class FuncionarioComponent extends BaseComponente<Funcionario, Funcionari
     }
 
     override getValidacoes(): boolean {
-        return (this.objeto as any).nome.trim() && (this.objeto as any).ativo != undefined;
+        return (this.objeto as any).nome.trim() && 
+                (this.objeto as any).ativo != undefined && 
+                (this.objeto as any).cargo != undefined && 
+                (this.objeto as any).cpf.trim() &&
+                (this.objeto as any).rg.trim() &&
+                (this.objeto as any).cep.trim() &&
+                (this.objeto as any).logradouro.trim() &&
+                (this.objeto as any).numero.trim() &&
+                (this.objeto as any).complemento.trim() &&
+                (this.objeto as any).bairro.trim() &&
+                (this.objeto as any).cidade.trim() &&
+                (this.objeto as any).uf.trim() &&
+                (this.objeto as any).telefone.trim() &&
+                (this.objeto as any).email.trim();
     }
 
     override getObjetoEdit(objeto: Funcionario): Funcionario {
