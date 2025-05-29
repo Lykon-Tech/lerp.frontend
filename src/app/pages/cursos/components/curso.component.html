@@ -58,6 +58,10 @@
                 Matriz curricular
                 <p-sortIcon field="matriz_curricular" />
             </th>
+            <th pSortableColumn="matriz_curricular" style="min-width:12rem">
+                Modalidade
+                <p-sortIcon field="matriz_curricular" />
+            </th>
             <th pSortableColumn="bolsas" style="min-width:12rem">
                 Bolsas
                 <p-sortIcon field="bolsas" />
@@ -84,6 +88,12 @@
             <td>
                 <span class="p-chip p-chip-text p-1 px-3 mr-2 mb-1 rounded-full bg-blue-100 text-blue-800">
                     {{ objeto.matrizCurricular }}
+                </span>
+            </td>
+
+            <td>
+                <span class="p-chip p-chip-text p-1 px-3 mr-2 mb-1 rounded-full bg-green-100 text-blue-800">
+                    {{ objeto.modalidade }}
                 </span>
             </td>
             <td>
@@ -178,6 +188,22 @@
                     [appendTo]="'body'"
                 />
                 <small class="text-red-500" *ngIf="submitted && objeto.matrizCurricular == undefined">Matriz curricular é obrigatório.</small>
+            </div>
+
+            <div>
+                <label for="modalidades" class="block font-bold mb-3">Modalidade</label>
+                <p-select 
+                    name="modalidades" 
+                    [(ngModel)]="objeto.modalidade" 
+                    inputId="modalidades" 
+                    [options]="modalidades_select" 
+                    optionLabel="label" 
+                    optionValue="value"
+                    placeholder="Selecione uma modalidade"
+                    fluid 
+                    [appendTo]="'body'"
+                />
+                <small class="text-red-500" *ngIf="submitted && objeto.modalidade == undefined">Modalidade é obrigatório.</small>
             </div>
 
              <div>

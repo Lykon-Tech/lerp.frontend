@@ -78,12 +78,11 @@ export class ContaComponent extends BaseComponente<Conta, ContaSaida> {
     override loadDemoData(): void {
         this.bancoService.findAll(true).then((data) => {
             this.bancos.set(data);
+            this.bancos_select = this.bancos().map(banco => ({
+                label: banco.nome,
+                value: banco
+            }));
         });
-
-        this.bancos_select = this.bancos().map(banco => ({
-            label: banco.nome,
-            value: banco
-        }));
 
         super.loadDemoData();
     }

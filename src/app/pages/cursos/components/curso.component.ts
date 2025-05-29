@@ -32,6 +32,8 @@ import { MatrizCurricularService } from "../services/matrizcurricular.service";
 import { BolsaService } from "../../financeiro/services/bolsa.service";
 import { CursoSaida } from "../models/curso.saida.model";
 import { MultiSelectModule } from "primeng/multiselect";
+import { ModalidadeService } from "../services/modalidade.service";
+import { Modalidade } from "../models/modalidade.model";
 
 
 @Component({
@@ -71,7 +73,8 @@ export class CursoComponent extends BaseComponente<Curso, CursoSaida> {
         private tipoCursoService : TipoCursoService,
         private funcionarioService : FuncionarioService,
         private matrizService : MatrizCurricularService,
-        private bolsaService : BolsaService
+        private bolsaService : BolsaService, 
+        private modalidadeService : ModalidadeService
     ) {
         super(
             messageService,
@@ -85,11 +88,13 @@ export class CursoComponent extends BaseComponente<Curso, CursoSaida> {
     tiposCursos = signal<TipoCurso[]>([]);
     coordenadores = signal<Funcionario[]>([]);
     matrizesCurriculares = signal<MatrizCurricular[]>([]);
+    modalidades = signal<Modalidade[]>([]);
     bolsas = signal<Bolsa[]>([]);
 
     tiposCursos_select! : any[];
     coordenadores_select! : any[];
     matrizes_select! : any[];
+    modalidades_select! : any[];
     bolsas_multi_select! : any[];
 
     override loadDemoData(): void {
@@ -115,6 +120,14 @@ export class CursoComponent extends BaseComponente<Curso, CursoSaida> {
             this.matrizes_select = data.map(matriz => ({
                 label: matriz.nome,
                 value: matriz
+            }));
+        });
+
+        this.modalidadeService.findAll(true).then((data) => {
+            this.modalidades.set(data);
+            this.modalidades_select = data.map(modalidade => ({
+                label: modalidade.nome,
+                value: modalidade
             }));
         });
 
@@ -147,6 +160,7 @@ export class CursoComponent extends BaseComponente<Curso, CursoSaida> {
         return {
             id: objeto.id,
             nome: objeto.nome,
+            modalidade : this.modalidades().find(c=>c.id === objeto.modalidade?.id),
             ativo: objeto.ativo,
             valor: objeto.valor,
             coordenador : this.coordenadores().find(c=>c.id === objeto.coordenador?.id),
@@ -165,6 +179,7 @@ export class CursoComponent extends BaseComponente<Curso, CursoSaida> {
         return {
             id: objeto.id,
             nome: objeto.nome,
+            modalidadeId : objeto.modalidade?.id,
             ativo: objeto.ativo,
             valor: objeto.valor,
             coordenadorId : objeto.coordenador?.id,

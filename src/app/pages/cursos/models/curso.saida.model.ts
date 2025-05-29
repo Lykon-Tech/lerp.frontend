@@ -1,6 +1,7 @@
 export interface CursoSaida {
   id?: string;          
   nome?: string;
+  modalidadeId? : string;
   ativo?: boolean;
   valor? : number;
   coordenadorId?: string;
