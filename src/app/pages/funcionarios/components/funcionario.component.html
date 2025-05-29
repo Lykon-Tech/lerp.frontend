@@ -22,7 +22,7 @@
 >
     <ng-template #caption>
         <div class="flex items-center justify-between">
-            <h5 class="m-0">Gerenciar Funcionários</h5>
+            <h5 class="m-0">Gerenciar funcionários</h5>
             <p-iconfield>
                 <p-inputicon styleClass="pi pi-search" />
                 <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Pesquisar..." />
@@ -56,7 +56,7 @@
     </ng-template>
 </p-table>
 
-<p-dialog [(visible)]="dialogo" [style]="{ width: '600px' }" header="Detalhes do Funcionário" [modal]="true">
+<p-dialog [(visible)]="dialogo" [style]="{ width: '600px' }" header="Detalhes do funcionário" [modal]="true">
     <ng-template #content>
         <div class="grid formgrid p-fluid">
             <div>
@@ -184,7 +184,23 @@
                     optionValue="value"
                     placeholder="Selecione o tipo de pagamento"
                     fluid
+                    (onChange)="alterarTipoPagamento($event)"
                 ></p-select>
+            </div>
+
+            <div *ngIf="tipoPagamentoSelecionado === 'MENSALISTA'">
+                <label for="salario" class="block font-bold mb-3">Salário mensal</label>
+                <input id="salario" pInputText type="number" [(ngModel)]="objeto.valorSalario" fluid/>
+            </div>
+
+            <div *ngIf="tipoPagamentoSelecionado === 'MENSALISTA'">
+                <label for="inss" class="block font-bold mb-3">% INSS</label>
+                <input id="inss" pInputText type="number" [(ngModel)]="objeto.percentualInss" fluid />
+            </div>
+
+            <div *ngIf="tipoPagamentoSelecionado === 'HORISTA'">
+                <label for="valorHora" class="block font-bold mb-3">Valor hora</label>
+                <input id="valorHora" pInputText type="number" [(ngModel)]="objeto.valorHora" fluid/>
             </div>
             
             <div>
@@ -200,6 +216,7 @@
                 ></p-select>
                 <small class="text-red-500" *ngIf="submitted && objeto.ativo == undefined">Status é obrigatório.</small>
             </div>
+
         </div>
     </ng-template>
 

@@ -67,11 +67,13 @@ export class FuncionarioComponent extends BaseComponente<Funcionario, Funcionari
             service
         );
 
-        this.titulo = 'Funcionario';
+        this.titulo = 'funcionario';
     }
 
     chavesPix_select! : any[];
     tipoPagamento_select! : any[];
+
+    tipoPagamentoSelecionado = '';
 
     cargos = signal<Cargo[]>([]);
 
@@ -173,6 +175,10 @@ export class FuncionarioComponent extends BaseComponente<Funcionario, Funcionari
             agencia : objeto.agencia,
             numeroConta : objeto.numeroConta
         };
+    }
+
+    alterarTipoPagamento(event : any){
+        this.tipoPagamentoSelecionado = event.value;
     }
 
 }
