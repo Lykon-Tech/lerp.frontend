@@ -80,58 +80,65 @@
             <div>
                 <label for="rg" class="block font-bold mb-3">RG</label>
                 <input id="rg" pInputText [(ngModel)]="objeto.rg" fluid />
+                <small class="text-red-500" *ngIf="submitted && !objeto.rg">RG é obrigatório.</small>
             </div>
 
             <div>
                 <label for="telefone" class="block font-bold mb-3">Telefone</label>
                 <input id="telefone" pInputText [(ngModel)]="objeto.telefone" fluid />
+                <small class="text-red-500" *ngIf="submitted && !objeto.telefone">Telefone é obrigatório.</small>
             </div>
 
             <div>
                 <label for="cep" class="block font-bold mb-3">CEP</label>
                 <input id="cep" pInputText [(ngModel)]="objeto.cep" fluid />
+                <small class="text-red-500" *ngIf="submitted && !objeto.cep">CEP é obrigatório.</small>
             </div>
 
             <div>
                 <label for="logradouro" class="block font-bold mb-3">Logradouro</label>
                 <input id="logradouro" pInputText [(ngModel)]="objeto.logradouro" fluid />
+                <small class="text-red-500" *ngIf="submitted && !objeto.logradouro">Logradouro é obrigatório.</small>
             </div>
 
             <div>
                 <label for="numero" class="block font-bold mb-3">Número</label>
                 <input id="numero" pInputText [(ngModel)]="objeto.numero" fluid />
+                <small class="text-red-500" *ngIf="submitted && !objeto.numero">Número é obrigatório.</small>
             </div>
 
             <div>
                 <label for="complemento" class="block font-bold mb-3">Complemento</label>
                 <input id="complemento" pInputText [(ngModel)]="objeto.complemento" fluid />
+                <small class="text-red-500" *ngIf="submitted && !objeto.complemento">Complemento é obrigatório.</small>
             </div>
 
             <div>
                 <label for="bairro" class="block font-bold mb-3">Bairro</label>
                 <input id="bairro" pInputText [(ngModel)]="objeto.bairro" fluid />
+                <small class="text-red-500" *ngIf="submitted && !objeto.bairro">Bairro é obrigatório.</small>
             </div>
 
             <div>
                 <label for="cidade" class="block font-bold mb-3">Cidade</label>
                 <input id="cidade" pInputText [(ngModel)]="objeto.cidade" fluid />
+                <small class="text-red-500" *ngIf="submitted && !objeto.cidade">Cidade é obrigatório.</small>
             </div>
 
             <div>
                 <label for="uf" class="block font-bold mb-3">UF</label>
                 <input id="uf" pInputText [(ngModel)]="objeto.uf" fluid />
+                <small class="text-red-500" *ngIf="submitted && !objeto.uf">UF é obrigatório.</small>
             </div>
 
             <div>
                 <label for="agencia" class="block font-bold mb-3">Agência</label>
                 <input name="agencia" id="agencia" type="text" pInputText [(ngModel)]="objeto.agencia" required fluid/>
-                <small class="text-red-500" *ngIf="submitted && objeto.agencia == undefined">Agência é obrigatória.</small>
             </div>
 
             <div>
                 <label for="numero_objeto" class="block font-bold mb-3">Número da conta</label>
                 <input name="numero_objeto" id="numero_objeto" type="text" pInputText [(ngModel)]="objeto.numeroConta" required fluid/>
-                <small class="text-red-500" *ngIf="submitted && objeto.numeroConta == undefined">Número da conta é obrigatório.</small>
             </div>
             
             <div class="field col-12">
@@ -145,7 +152,6 @@
                     placeholder="Selecione o tipo de chave"
                     fluid
                 ></p-select>
-                <small class="text-red-500" *ngIf="submitted && objeto.tipoChavePix == undefined">Tipo pix é obrigatório.</small>
             </div>
 
             <div>
