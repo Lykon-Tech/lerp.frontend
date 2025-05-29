@@ -75,7 +75,7 @@ export class AppMenu {
             {
                 label: 'Usuários',
                 items: [
-                    { label: 'Funcionários', icon: 'pi pi-id-card', routerLink: ['/pages/movimentos'] },
+                    { label: 'Funcionários', icon: 'pi pi-id-card', routerLink: ['/pages/funcionarios'] },
                     { label: 'Cargos', icon: 'pi pi-sitemap', routerLink: ['/pages/cargos'] }
                 ]
             },

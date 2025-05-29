@@ -51,7 +51,7 @@ import { DisciplinaService } from "../services/disciplina.service";
     templateUrl: `./disciplina.component.html`,
     providers: [MessageService, DisciplinaService, ConfirmationService]
 })
-export class DisciplinaComponent extends BaseComponente<Disciplina> {
+export class DisciplinaComponent extends BaseComponente<Disciplina,Disciplina> {
    
     constructor(
         messageService: MessageService,

@@ -59,71 +59,130 @@
 <p-dialog [(visible)]="dialogo" [style]="{ width: '600px' }" header="Detalhes do Funcionário" [modal]="true">
     <ng-template #content>
         <div class="grid formgrid p-fluid">
-            <div class="field col-12 md:col-6">
-                <label for="nome">Nome</label>
-                <input id="nome" pInputText [(ngModel)]="objeto.nome" required autofocus />
+            <div>
+                <label for="nome" class="block font-bold mb-3">Nome</label>
+                <input id="nome" pInputText [(ngModel)]="objeto.nome" required autofocus fluid />
                 <small class="text-red-500" *ngIf="submitted && !objeto.nome">Nome é obrigatório.</small>
             </div>
 
-            <div class="field col-12 md:col-6">
-                <label for="email">Email</label>
-                <input id="email" type="email" pInputText [(ngModel)]="objeto.email" required />
+            <div>
+                <label for="email" class="block font-bold mb-3">Email</label>
+                <input id="email" type="email" pInputText [(ngModel)]="objeto.email" required fluid />
                 <small class="text-red-500" *ngIf="submitted && !objeto.email">Email é obrigatório.</small>
             </div>
 
-            <div class="field col-12 md:col-6">
-                <label for="cpf">CPF</label>
-                <input id="cpf" pInputText [(ngModel)]="objeto.cpf" required />
+            <div>
+                <label for="cpf" class="block font-bold mb-3">CPF</label>
+                <input id="cpf" pInputText [(ngModel)]="objeto.cpf" required fluid />
                 <small class="text-red-500" *ngIf="submitted && !objeto.cpf">CPF é obrigatório.</small>
             </div>
 
-            <div class="field col-12 md:col-6">
-                <label for="rg">RG</label>
-                <input id="rg" pInputText [(ngModel)]="objeto.rg" />
+            <div>
+                <label for="rg" class="block font-bold mb-3">RG</label>
+                <input id="rg" pInputText [(ngModel)]="objeto.rg" fluid />
             </div>
 
-            <div class="field col-12 md:col-6">
-                <label for="telefone">Telefone</label>
-                <input id="telefone" pInputText [(ngModel)]="objeto.telefone" />
+            <div>
+                <label for="telefone" class="block font-bold mb-3">Telefone</label>
+                <input id="telefone" pInputText [(ngModel)]="objeto.telefone" fluid />
             </div>
 
-            <div class="field col-12 md:col-6">
-                <label for="cep">CEP</label>
-                <input id="cep" pInputText [(ngModel)]="objeto.cep" />
+            <div>
+                <label for="cep" class="block font-bold mb-3">CEP</label>
+                <input id="cep" pInputText [(ngModel)]="objeto.cep" fluid />
             </div>
 
-            <div class="field col-12 md:col-6">
-                <label for="logradouro">Logradouro</label>
-                <input id="logradouro" pInputText [(ngModel)]="objeto.logradouro" />
+            <div>
+                <label for="logradouro" class="block font-bold mb-3">Logradouro</label>
+                <input id="logradouro" pInputText [(ngModel)]="objeto.logradouro" fluid />
             </div>
 
-            <div class="field col-12 md:col-6">
-                <label for="numero">Número</label>
-                <input id="numero" pInputText [(ngModel)]="objeto.numero" />
+            <div>
+                <label for="numero" class="block font-bold mb-3">Número</label>
+                <input id="numero" pInputText [(ngModel)]="objeto.numero" fluid />
             </div>
 
-            <div class="field col-12 md:col-6">
-                <label for="complemento">Complemento</label>
-                <input id="complemento" pInputText [(ngModel)]="objeto.complemento" />
+            <div>
+                <label for="complemento" class="block font-bold mb-3">Complemento</label>
+                <input id="complemento" pInputText [(ngModel)]="objeto.complemento" fluid />
             </div>
 
-            <div class="field col-12 md:col-6">
-                <label for="bairro">Bairro</label>
-                <input id="bairro" pInputText [(ngModel)]="objeto.bairro" />
+            <div>
+                <label for="bairro" class="block font-bold mb-3">Bairro</label>
+                <input id="bairro" pInputText [(ngModel)]="objeto.bairro" fluid />
             </div>
 
-            <div class="field col-12 md:col-6">
-                <label for="cidade">Cidade</label>
-                <input id="cidade" pInputText [(ngModel)]="objeto.cidade" />
+            <div>
+                <label for="cidade" class="block font-bold mb-3">Cidade</label>
+                <input id="cidade" pInputText [(ngModel)]="objeto.cidade" fluid />
             </div>
 
-            <div class="field col-12 md:col-6">
-                <label for="uf">UF</label>
-                <input id="uf" pInputText [(ngModel)]="objeto.uf" />
+            <div>
+                <label for="uf" class="block font-bold mb-3">UF</label>
+                <input id="uf" pInputText [(ngModel)]="objeto.uf" fluid />
             </div>
 
+            <div>
+                <label for="agencia" class="block font-bold mb-3">Agência</label>
+                <input name="agencia" id="agencia" type="text" pInputText [(ngModel)]="objeto.agencia" required fluid/>
+                <small class="text-red-500" *ngIf="submitted && objeto.agencia == undefined">Agência é obrigatória.</small>
+            </div>
+
+            <div>
+                <label for="numero_objeto" class="block font-bold mb-3">Número da conta</label>
+                <input name="numero_objeto" id="numero_objeto" type="text" pInputText [(ngModel)]="objeto.numeroConta" required fluid/>
+                <small class="text-red-500" *ngIf="submitted && objeto.numeroConta == undefined">Número da conta é obrigatório.</small>
+            </div>
+            
             <div class="field col-12">
-                <label for="ativo">Status</label>
+                <label for="pix" class="block font-bold mb-3">Tipo chave pix</label>
+                <p-select
+                    id="pix"
+                    [options]="chavesPix_select"
+                    optionLabel="label"
+                    optionValue="value"
+                    [(ngModel)]="objeto.tipoChavePix"
+                    placeholder="Selecione o tipo de chave"
+                    fluid
+                ></p-select>
+                <small class="text-red-500" *ngIf="submitted && objeto.tipoChavePix == undefined">Tipo pix é obrigatório.</small>
+            </div>
+
+            <div>
+                <label for="chave_pix" class="block font-bold mb-3">Chave pix</label>
+                <input name="chave_pix" id="chave_pix" type="text" pInputText [(ngModel)]="objeto.chavePix" required fluid/>
+            </div>
+
+            <div>
+                <label for="cargos" class="block font-bold mb-3">Cargo</label>
+                <p-select 
+                    name="cargos" 
+                    [(ngModel)]="objeto.cargo" 
+                    inputId="cargo" 
+                    [options]="cargos_select" 
+                    optionLabel="label" 
+                    optionValue="value"
+                    placeholder="Selecione um cargo"
+                    fluid 
+                    [appendTo]="'body'"
+                />
+                <small class="text-red-500" *ngIf="submitted && objeto.cargo == undefined">Cargo é obrigatório.</small>
+            </div>
+            
+             <div>
+                <label for="tipo_pagamento" class="block font-bold mb-3">Tipo de pagamento</label>
+                <p-select
+                    id="tipo_pagamento"
+                    [options]="tipoPagamento_select"
+                    optionLabel="label"
+                    optionValue="value"
+                    placeholder="Selecione o tipo de pagamento"
+                    fluid
+                ></p-select>
+            </div>
+            
+            <div>
+                <label for="ativo" class="block font-bold mb-3">Status</label>
                 <p-select
                     id="ativo"
                     [options]="statuses"
@@ -131,6 +190,7 @@
                     optionValue="value"
                     [(ngModel)]="objeto.ativo"
                     placeholder="Selecione o status"
+                    fluid
                 ></p-select>
                 <small class="text-red-500" *ngIf="submitted && objeto.ativo == undefined">Status é obrigatório.</small>
             </div>

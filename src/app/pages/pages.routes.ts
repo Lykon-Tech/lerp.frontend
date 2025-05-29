@@ -21,6 +21,7 @@ import { CargoComponent } from './funcionarios/components/cargo.component';
 import { SituacaoContratoComponent } from './contratos/components/situacaocontrato.component';
 import { TipoContratoComponent } from './contratos/components/tipocontrato.component';
 import { CursoComponent } from './cursos/components/curso.component';
+import { FuncionarioComponent } from './funcionarios/components/funcionario.component';
 
 export default [
     { path: 'documentation', component: Documentation },
@@ -42,6 +43,7 @@ export default [
     { path: 'cargos', component: CargoComponent },
     { path: 'situacoes_contratos', component: SituacaoContratoComponent },
     { path: 'tipos_contratos', component: TipoContratoComponent },
+    { path: 'funcionarios', component: FuncionarioComponent },
     { path: 'cursos', component: CursoComponent },
     { path: 'crud', component: Crud },
     { path: 'empty', component: Empty },

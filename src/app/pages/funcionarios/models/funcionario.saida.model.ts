@@ -1,9 +1,5 @@
-import { Horista } from "./horista.model";
-import { Mensalista } from "./mensalista.model";
-import { Pix } from "./pix.model";
-
 export interface FuncionarioSaida {
-  id?: number;
+  id?: string;
   nome?: string;
   email?: string;
   cpf?: string;
@@ -17,9 +13,13 @@ export interface FuncionarioSaida {
   cidade?: string;
   uf?: string;
   ativo?: boolean;
-  cargoid? : string;
-  contaId? : string;
-  pix? : Pix;
-  mensalista? : Mensalista;
-  horista? : Horista; 
+  cargoId? : string;
+  isMensalista : boolean;
+  valorSalario? : number;
+  percentualInss? : number;
+  valorHora? : number;
+  chavePix? : string;
+  tipoChavePix? : string;
+  agencia?: string;
+  numeroConta?: string;
 }

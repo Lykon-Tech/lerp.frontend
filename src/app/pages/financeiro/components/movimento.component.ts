@@ -64,7 +64,7 @@ import { DatePicker } from "primeng/datepicker";
     templateUrl: `./Movimento.component.html`,
     providers: [MessageService, MovimentoService, ConfirmationService]
 })
-export class MovimentoComponent extends BaseComponente<Movimento> {
+export class MovimentoComponent extends BaseComponente<Movimento, MovimentoSaida> {
    
     constructor(
         messageService: MessageService,

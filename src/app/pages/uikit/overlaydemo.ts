@@ -26,7 +26,7 @@ import { Product, ProductService } from '../service/product.service';
                         consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
                     </p>
                     <ng-template #footer>
-                        <p-button label="Save" (click)="close()" />
+                        <p-button label="Salvar" (click)="close()" />
                     </ng-template>
                 </p-dialog>
                 <p-button label="Show" [style]="{ width: 'auto' }" (click)="open()" />
@@ -62,7 +62,7 @@ import { Product, ProductService } from '../service/product.service';
                 <div class="font-semibold text-xl mb-4">Tooltip</div>
                 <div class="inline-flex gap-4">
                     <input pInputText type="text" placeholder="Username" pTooltip="Your username" />
-                    <p-button type="button" label="Save" pTooltip="Click to proceed" />
+                    <p-button type="button" label="Salvar" pTooltip="Click to proceed" />
                 </div>
             </div>
         </div>

@@ -51,7 +51,7 @@ import { BancoService } from "../services/banco.service";
     templateUrl: `./banco.component.html`,
     providers: [MessageService, BancoService, ConfirmationService]
 })
-export class BancoComponent extends BaseComponente<Banco> {
+export class BancoComponent extends BaseComponente<Banco, Banco> {
    
     constructor(
         messageService: MessageService,

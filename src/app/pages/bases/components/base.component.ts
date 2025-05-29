@@ -10,12 +10,12 @@ export interface Column {
 }
 
 @Injectable()
-export abstract class BaseComponente<T extends Object> implements OnInit{
+export abstract class BaseComponente<T extends Object, S> implements OnInit{
 
     constructor(
         protected messageService: MessageService,
         protected confirmationService: ConfirmationService,
-        private service : BaseService<T, T>,
+        private service : BaseService<T, S>,
     ) {
 
     }
@@ -137,8 +137,8 @@ export abstract class BaseComponente<T extends Object> implements OnInit{
 
     abstract getValidacoes() :boolean;
 
-    converterObjeto(objeto : T){
-        return objeto;
+    converterObjeto(objeto : T) : S{
+        return objeto as unknown as S;
     }
 
     async save() {

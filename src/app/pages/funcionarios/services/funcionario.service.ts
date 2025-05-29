@@ -8,7 +8,7 @@ import { firstValueFrom } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
-export class FuncionarioService extends BaseService<Funcionario,FuncionarioSaida>{
+export class FuncionarioService extends BaseService<Funcionario, FuncionarioSaida>{
    
     constructor(http: HttpClient) {
         super(http, 'usuario/funcionario');

@@ -51,7 +51,7 @@ import { CommonModule } from "@angular/common";
     templateUrl: `./bolsa.component.html`,
     providers: [MessageService, BolsaService, ConfirmationService]
 })
-export class BolsaComponent extends BaseComponente<Bolsa> {
+export class BolsaComponent extends BaseComponente<Bolsa, Bolsa> {
    
     constructor(
         messageService: MessageService,

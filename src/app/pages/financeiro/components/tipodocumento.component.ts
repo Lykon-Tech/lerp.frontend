@@ -51,7 +51,7 @@ import { TipoDocumentoService } from "../services/tipodocumento.service";
     templateUrl: `./tipodocumento.component.html`,
     providers: [MessageService, TipoDocumentoService, ConfirmationService]
 })
-export class TipoDocumentoComponent extends BaseComponente<TipoDocumento> {
+export class TipoDocumentoComponent extends BaseComponente<TipoDocumento, TipoDocumento> {
    
     constructor(
         messageService: MessageService,

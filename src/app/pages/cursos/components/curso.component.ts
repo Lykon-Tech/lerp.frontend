@@ -62,7 +62,7 @@ import { MultiSelectModule } from "primeng/multiselect";
     templateUrl: `./curso.component.html`,
     providers: [MessageService, CursoService, ConfirmationService]
 })
-export class CursoComponent extends BaseComponente<Curso> {
+export class CursoComponent extends BaseComponente<Curso, CursoSaida> {
    
     constructor(
         messageService: MessageService,
@@ -93,9 +93,6 @@ export class CursoComponent extends BaseComponente<Curso> {
     bolsas_multi_select! : any[];
 
     override loadDemoData(): void {
-        this.tipoCursoService.findAll(true).then((data) => {
-            this.tiposCursos.set(data);
-        });
 
         this.tipoCursoService.findAll(true).then((data) => {
             this.tiposCursos.set(data);

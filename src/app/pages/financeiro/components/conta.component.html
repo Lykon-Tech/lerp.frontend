@@ -90,9 +90,9 @@
             </div>
 
             <div>
-                <label for="numero_objeto" class="block font-bold mb-3">Número da objeto</label>
+                <label for="numero_objeto" class="block font-bold mb-3">Número da conta</label>
                 <input name="numero_objeto" id="numero_objeto" type="text" pInputText [(ngModel)]="objeto.numeroConta" required fluid/>
-                <small class="text-red-500" *ngIf="submitted && objeto.numeroConta == undefined">Número da objeto é obrigatório.</small>
+                <small class="text-red-500" *ngIf="submitted && objeto.numeroConta == undefined">Número da conta é obrigatório.</small>
             </div>
 
             <div>
@@ -114,8 +114,8 @@
     </ng-template>
 
     <ng-template #footer>
-        <p-button label="Cancel" icon="pi pi-times" text (click)="hideDialog()" />
-        <p-button label="Save" icon="pi pi-check" (click)="save()" />
+        <p-button label="Cancelar" icon="pi pi-times" text (click)="hideDialog()" />
+        <p-button label="Salvar" icon="pi pi-check" (click)="save()" />
     </ng-template>
 </p-dialog>
 

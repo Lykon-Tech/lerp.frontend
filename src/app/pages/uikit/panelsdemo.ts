@@ -58,7 +58,7 @@ import { ToolbarModule } from 'primeng/toolbar';
                         </p-iconfield>
                     </ng-template>
 
-                    <ng-template #end><p-splitbutton label="Save" [model]="items"></p-splitbutton></ng-template>
+                    <ng-template #end><p-splitbutton label="Salvar" [model]="items"></p-splitbutton></ng-template>
                 </p-toolbar>
             </div>
 

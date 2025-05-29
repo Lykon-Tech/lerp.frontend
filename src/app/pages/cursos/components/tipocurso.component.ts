@@ -51,7 +51,7 @@ import { TipoCursoService } from "../services/tipocurso.service";
     templateUrl: `./tipocurso.component.html`,
     providers: [MessageService, TipoCursoService, ConfirmationService]
 })
-export class TipoCursoComponent extends BaseComponente<TipoCurso> {
+export class TipoCursoComponent extends BaseComponente<TipoCurso, TipoCurso> {
    
     constructor(
         messageService: MessageService,

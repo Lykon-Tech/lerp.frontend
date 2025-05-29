@@ -1,5 +1,5 @@
 import { ConfirmationService, MessageService } from "primeng/api";
-import { BaseComponente, Column } from "../../bases/components/base.component";
+import { BaseComponente } from "../../bases/components/base.component";
 import { SituacaoTurma } from "../models/situacaoturma.model";
 import { SituacaoTurmaService } from "../services/situacaoturma.service";
 import { Component } from "@angular/core";
@@ -51,7 +51,7 @@ import { CommonModule } from "@angular/common";
     templateUrl: `./situacaoturma.component.html`,
     providers: [MessageService, SituacaoTurmaService, ConfirmationService]
 })
-export class SituacaoTurmaComponent extends BaseComponente<SituacaoTurma> {
+export class SituacaoTurmaComponent extends BaseComponente<SituacaoTurma,SituacaoTurma> {
    
     constructor(
         messageService: MessageService,

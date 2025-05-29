@@ -54,7 +54,7 @@ import { TagSaida } from "../models/tag.saida.model";
     templateUrl: `./tag.component.html`,
     providers: [MessageService, TagService, ConfirmationService]
 })
-export class TagComponent extends BaseComponente<TagModel> {
+export class TagComponent extends BaseComponente<TagModel, TagSaida> {
    
     constructor(
         messageService: MessageService,

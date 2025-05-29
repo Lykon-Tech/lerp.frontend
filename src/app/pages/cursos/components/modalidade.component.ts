@@ -51,7 +51,7 @@ import { ModalidadeService } from "../services/modalidade.service";
     templateUrl: `./modalidade.component.html`,
     providers: [MessageService, ModalidadeService, ConfirmationService]
 })
-export class ModalidadeComponent extends BaseComponente<Modalidade> {
+export class ModalidadeComponent extends BaseComponente<Modalidade, Modalidade> {
    
     constructor(
         messageService: MessageService,

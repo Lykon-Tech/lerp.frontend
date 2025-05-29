@@ -56,7 +56,7 @@ import { Disciplina } from "../models/disciplina.model";
     templateUrl: `./matrizcurricular.component.html`,
     providers: [MessageService, MatrizCurricularService, ConfirmationService]
 })
-export class MatrizCurricularComponent extends BaseComponente<MatrizCurricular> {
+export class MatrizCurricularComponent extends BaseComponente<MatrizCurricular, MatrizCurricularSaida> {
    
     constructor(
         messageService: MessageService,

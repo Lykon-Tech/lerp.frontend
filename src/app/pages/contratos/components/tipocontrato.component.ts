@@ -1,5 +1,5 @@
 import { ConfirmationService, MessageService } from "primeng/api";
-import { BaseComponente, Column } from "../../bases/components/base.component";
+import { BaseComponente } from "../../bases/components/base.component";
 import { TipoContrato } from "../models/tipocontrato.model";
 import { Component } from "@angular/core";
 import { ConfirmDialogModule } from "primeng/confirmdialog";
@@ -50,7 +50,7 @@ import { TipoContratoService } from "../services/tipocontrato.service";
     templateUrl: `./tipocontrato.component.html`,
     providers: [MessageService, TipoContratoService, ConfirmationService]
 })
-export class TipoContratoComponent extends BaseComponente<TipoContrato> {
+export class TipoContratoComponent extends BaseComponente<TipoContrato, TipoContrato> {
    
     constructor(
         messageService: MessageService,

@@ -54,7 +54,7 @@ import { ContaSaida } from "../models/conta.saida.model";
     templateUrl: `./conta.component.html`,
     providers: [MessageService, ContaService, ConfirmationService]
 })
-export class ContaComponent extends BaseComponente<Conta> {
+export class ContaComponent extends BaseComponente<Conta, ContaSaida> {
    
     constructor(
         messageService: MessageService,

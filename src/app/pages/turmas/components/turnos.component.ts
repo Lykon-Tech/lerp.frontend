@@ -1,5 +1,5 @@
 import { ConfirmationService, MessageService } from "primeng/api";
-import { BaseComponente, Column } from "../../bases/components/base.component";
+import { BaseComponente } from "../../bases/components/base.component";
 import { Turno } from "../models/turno.model";
 import { Component } from "@angular/core";
 import { ConfirmDialogModule } from "primeng/confirmdialog";
@@ -51,7 +51,7 @@ import { TurnoService } from "../services/turno.service";
     templateUrl: `./turno.component.html`,
     providers: [MessageService, TurnoService, ConfirmationService]
 })
-export class TurnoComponent extends BaseComponente<Turno> {
+export class TurnoComponent extends BaseComponente<Turno, Turno> {
    
     constructor(
         messageService: MessageService,

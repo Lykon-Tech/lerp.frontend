@@ -54,7 +54,7 @@ import { SubcontaSaida } from "../models/subconta.saida.model";
     templateUrl: `./subconta.component.html`,
     providers: [MessageService, SubcontaService, ConfirmationService]
 })
-export class SubcontaComponent extends BaseComponente<Subconta> {
+export class SubcontaComponent extends BaseComponente<Subconta, SubcontaSaida> {
 
     tipoTravado : boolean = false;
    

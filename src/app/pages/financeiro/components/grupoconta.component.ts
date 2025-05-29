@@ -51,7 +51,7 @@ import { CommonModule } from "@angular/common";
     templateUrl: `./grupoconta.component.html`,
     providers: [MessageService, GrupoContaService, ConfirmationService]
 })
-export class GrupoContaComponent extends BaseComponente<GrupoConta> {
+export class GrupoContaComponent extends BaseComponente<GrupoConta, GrupoConta> {
    
     constructor(
         messageService: MessageService,

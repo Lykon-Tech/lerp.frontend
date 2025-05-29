@@ -61,23 +61,23 @@ import { SplitButtonModule } from 'primeng/splitbutton';
                 <div class="font-semibold text-xl">Group</div>
                 <div class="flex flex-wrap gap-2">
                     <p-buttongroup>
-                        <p-button label="Save" icon="pi pi-check" />
+                        <p-button label="Salvar" icon="pi pi-check" />
                         <p-button label="Delete" icon="pi pi-trash" />
-                        <p-button label="Cancel" icon="pi pi-times" />
+                        <p-button label="Cancelar" icon="pi pi-times" />
                     </p-buttongroup>
                 </div>
             </div>
             <div class="card flex flex-col gap-4">
                 <div class="font-semibold text-xl">SplitButton</div>
                 <div class="flex flex-wrap gap-2">
-                    <p-splitbutton label="Save" [model]="items"></p-splitbutton>
-                    <p-splitbutton label="Save" [model]="items" severity="secondary"></p-splitbutton>
-                    <p-splitbutton label="Save" [model]="items" severity="success"></p-splitbutton>
-                    <p-splitbutton label="Save" [model]="items" severity="info"></p-splitbutton>
-                    <p-splitbutton label="Save" [model]="items" severity="warn"></p-splitbutton>
-                    <p-splitbutton label="Save" [model]="items" severity="help"></p-splitbutton>
-                    <p-splitbutton label="Save" [model]="items" severity="danger"></p-splitbutton>
-                    <p-splitbutton label="Save" [model]="items" severity="contrast"></p-splitbutton>
+                    <p-splitbutton label="Salvar" [model]="items"></p-splitbutton>
+                    <p-splitbutton label="Salvar" [model]="items" severity="secondary"></p-splitbutton>
+                    <p-splitbutton label="Salvar" [model]="items" severity="success"></p-splitbutton>
+                    <p-splitbutton label="Salvar" [model]="items" severity="info"></p-splitbutton>
+                    <p-splitbutton label="Salvar" [model]="items" severity="warn"></p-splitbutton>
+                    <p-splitbutton label="Salvar" [model]="items" severity="help"></p-splitbutton>
+                    <p-splitbutton label="Salvar" [model]="items" severity="danger"></p-splitbutton>
+                    <p-splitbutton label="Salvar" [model]="items" severity="contrast"></p-splitbutton>
                 </div>
             </div>
             <div class="card flex flex-col gap-4">
