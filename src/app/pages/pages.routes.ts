@@ -23,6 +23,8 @@ import { TipoContratoComponent } from './contratos/components/tipocontrato.compo
 import { CursoComponent } from './cursos/components/curso.component';
 import { FuncionarioComponent } from './funcionarios/components/funcionario.component';
 import { TurmaComponent } from './turmas/components/turma.component';
+import { ContratoComponent } from './contratos/components/contrato.component';
+import { AlunoComponent } from './funcionarios/components/aluno.component';
 
 export default [
     { path: 'documentation', component: Documentation },
@@ -43,9 +45,11 @@ export default [
     { path: 'salas', component: SalaComponent },
     { path: 'cargos', component: CargoComponent },
     { path: 'situacoes_contratos', component: SituacaoContratoComponent },
+    { path: 'contratos', component: ContratoComponent },
     { path: 'tipos_contratos', component: TipoContratoComponent },
     { path: 'funcionarios', component: FuncionarioComponent },
     { path: 'cursos', component: CursoComponent },
+    { path: 'alunos', component: AlunoComponent },
     { path: 'turmas', component: TurmaComponent },
     { path: 'crud', component: Crud },
     { path: 'empty', component: Empty },

@@ -15,5 +15,5 @@ export interface Curso {
   cargaHoraria? : number;
   matrizCurricular? : MatrizCurricular;
   tipoCurso? : TipoCurso;
-  bolsas? : Bolsa[];
+  bolsas : Bolsa[];
 }

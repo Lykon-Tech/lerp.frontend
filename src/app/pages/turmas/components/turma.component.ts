@@ -114,7 +114,7 @@ export class TurmaComponent extends BaseComponente<Turma,TurmaSaida> {
             }));
         });
 
-        this.funcionarioService.findAll(true).then((data) => {
+        this.funcionarioService.findProfessores().then((data) => {
             this.professores.set(data);
             this.professores_select = this.professores().map(professor => ({
                 label: professor.nome,
@@ -137,6 +137,8 @@ export class TurmaComponent extends BaseComponente<Turma,TurmaSaida> {
                 value: sala
             }));
         });
+
+        super.loadDemoData();
     }
 
     override getValidacoes(): boolean {

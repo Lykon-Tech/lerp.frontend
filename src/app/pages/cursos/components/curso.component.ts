@@ -1,7 +1,7 @@
 import { ConfirmationService, MessageService } from "primeng/api";
 import { BaseComponente } from "../../bases/components/base.component";
 import { Curso } from "../models/curso.model";
-import { Component, signal } from "@angular/core";
+import { Component, signal, ViewChild } from "@angular/core";
 import { ConfirmDialogModule } from "primeng/confirmdialog";
 import { CheckboxModule } from "primeng/checkbox";
 import { IconFieldModule } from "primeng/iconfield";
@@ -34,6 +34,7 @@ import { CursoSaida } from "../models/curso.saida.model";
 import { MultiSelectModule } from "primeng/multiselect";
 import { ModalidadeService } from "../services/modalidade.service";
 import { Modalidade } from "../models/modalidade.model";
+import { Panel } from "primeng/panel";
 
 
 @Component({
@@ -84,6 +85,17 @@ export class CursoComponent extends BaseComponente<Curso, CursoSaida> {
 
         this.titulo = 'curso';
     }
+
+    bolsasDialogVisible = false;
+    selectedBolsas: any[] = [];
+
+
+    showBolsasDialog(bolsas: any[]) {
+        this.selectedBolsas = bolsas || [];
+        this.bolsasDialogVisible = true;
+    }
+
+    currentBolsasInOverlay: Bolsa[] = [];
 
     tiposCursos = signal<TipoCurso[]>([]);
     coordenadores = signal<Funcionario[]>([]);

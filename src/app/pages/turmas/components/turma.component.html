@@ -68,12 +68,22 @@
                 Ativo
                 <p-sortIcon field="ativo" />
             </th>
-            <th style="min-width: 12rem"></th>
+            <th style="min-width: 12rem">Ações</th>
         </tr>
     </ng-template>
     <ng-template #body let-objeto>
         <tr>
             <td style="min-width: 16rem">{{ objeto.nome }}</td>
+            <td>{{ objeto.dataInicio | date:'dd/MM/yyyy'}}</td>
+            <td>{{ objeto.dataFim | date:'dd/MM/yyyy'}}</td>
+            <td>{{ objeto.maximoAlunos }}</td>
+            <td>{{ objeto.minimoAlunos }}</td>
+            <td>{{ objeto.metaAlunos }}</td>
+            <td>{{ objeto.curso.nome }}</td>
+            <td>{{ objeto.situacaoTurma.nome }}</td>
+            <td>{{ objeto.professor.nome }}</td>
+            <td>{{ objeto.turno.nome }}</td>
+            <td>{{ objeto.sala.nome }}</td>
             <td>
                 <p-tag [value]="objeto.ativo ? 'ATIVO' : 'INATIVO' " [severity]="getSeverity(objeto.ativo)" />
             </td>
