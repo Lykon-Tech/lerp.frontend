@@ -27,7 +27,7 @@ export abstract class BaseComponente<T extends Object, S> implements OnInit{
     
     lista = signal<T[]>([]);
 
-    objeto: T = {} as T;
+    objeto: T  = {} as T;
 
     submitted: boolean = false;
 

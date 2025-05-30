@@ -8,11 +8,11 @@ import { GrupoContaComponent } from './financeiro/components/grupoconta.componen
 import { ContaComponent } from './financeiro/components/conta.component';
 import { SubcontaComponent } from './financeiro/components/subconta.component';
 import { TipoDocumentoComponent } from './financeiro/components/tipodocumento.component';
-import { TipoCursoComponent } from './cursos/components/tipocurso.component';
-import { ModalidadeComponent } from './cursos/components/modalidade.component';
-import { DisciplinaComponent } from './cursos/components/disciplina.component';
+import { TipoCursoComponent } from './cursos/components/tipocurso/tipocurso.component';
+import { ModalidadeComponent } from './cursos/components/modalidade/modalidade.component';
+import { DisciplinaComponent } from './cursos/components/disciplina/disciplina.component';
 import { TagComponent } from './financeiro/components/tag.component';
-import { MatrizCurricularComponent } from './cursos/components/matrizcurricular.component';
+import { MatrizCurricularComponent } from './cursos/components/matrizcurricular/matrizcurricular.component';
 import { MovimentoComponent } from './financeiro/components/movimento.component';
 import { SituacaoTurmaComponent } from './turmas/components/situacaoturma.component';
 import { TurnoComponent } from './turmas/components/turnos.component';
@@ -20,7 +20,7 @@ import { SalaComponent } from './turmas/components/sala.component';
 import { CargoComponent } from './funcionarios/components/cargo.component';
 import { SituacaoContratoComponent } from './contratos/components/situacaocontrato.component';
 import { TipoContratoComponent } from './contratos/components/tipocontrato.component';
-import { CursoComponent } from './cursos/components/curso.component';
+import { CursoComponent } from './cursos/components/curso/curso.component';
 import { FuncionarioComponent } from './funcionarios/components/funcionario.component';
 
 export default [
