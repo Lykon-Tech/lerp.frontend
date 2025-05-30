@@ -12,6 +12,8 @@ import { StepperModule } from 'primeng/stepper';
 import { ScrollPanelModule } from 'primeng/scrollpanel';
 import { NgxMaskDirective, NgxMaskPipe } from 'ngx-mask';
 import { MessageModule } from 'primeng/message';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
 
 const ANGULAR_IMPORTS = [
     CommonModule,
@@ -28,11 +30,12 @@ const ANGULAR_IMPORTS = [
     ScrollPanelModule,
     NgxMaskDirective,
     NgxMaskPipe,
-    MessageModule
+    ToastModule
 ];
 
 @NgModule({
     imports: [ANGULAR_IMPORTS],
-    exports: [ANGULAR_IMPORTS]
+    exports: [ANGULAR_IMPORTS],
+    providers: [MessageService] 
 })
 export class AppCommonModule {}

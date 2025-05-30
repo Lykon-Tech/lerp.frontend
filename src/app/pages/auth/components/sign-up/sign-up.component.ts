@@ -6,6 +6,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ScrollPanelModule } from 'primeng/scrollpanel';
 import { NgxMaskDirective, NgxMaskPipe, provideNgxMask } from 'ngx-mask';
 import { MessageModule } from 'primeng/message';
+import { MessageService } from 'primeng/api';
 
 @Component({
     selector: 'app-sign-up',
@@ -49,11 +50,14 @@ export class SignUpComponent {
     });
 
     constructor(
-        public authService: AuthService,
-        public router: Router
+        private authService: AuthService,
+        private messageService: MessageService,
+        private router: Router
     ) {}
 
-    onSubmit(): void {}
+    onSubmit(): void {
+        this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Usuário cadastrado', life: 3000 });
+    }
 
     onRedirectToLogin(): void {
         this.router.navigate(['/auth/login']);
