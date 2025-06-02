@@ -67,11 +67,13 @@ export class FuncionarioComponent extends BaseComponente<Funcionario, Funcionari
             service
         );
 
-        this.titulo = 'Funcionario';
+        this.titulo = 'funcionario';
     }
 
     chavesPix_select! : any[];
     tipoPagamento_select! : any[];
+
+    tipoPagamentoSelecionado = '';
 
     cargos = signal<Cargo[]>([]);
 
@@ -102,7 +104,20 @@ export class FuncionarioComponent extends BaseComponente<Funcionario, Funcionari
     }
 
     override getValidacoes(): boolean {
-        return (this.objeto as any).nome.trim() && (this.objeto as any).ativo != undefined;
+        return (this.objeto as any).nome.trim() && 
+                (this.objeto as any).ativo != undefined && 
+                (this.objeto as any).cargo != undefined && 
+                (this.objeto as any).cpf.trim() &&
+                (this.objeto as any).rg.trim() &&
+                (this.objeto as any).cep.trim() &&
+                (this.objeto as any).logradouro.trim() &&
+                (this.objeto as any).numero.trim() &&
+                (this.objeto as any).complemento.trim() &&
+                (this.objeto as any).bairro.trim() &&
+                (this.objeto as any).cidade.trim() &&
+                (this.objeto as any).uf.trim() &&
+                (this.objeto as any).telefone.trim() &&
+                (this.objeto as any).email.trim();
     }
 
     override getObjetoEdit(objeto: Funcionario): Funcionario {
@@ -160,6 +175,10 @@ export class FuncionarioComponent extends BaseComponente<Funcionario, Funcionari
             agencia : objeto.agencia,
             numeroConta : objeto.numeroConta
         };
+    }
+
+    alterarTipoPagamento(event : any){
+        this.tipoPagamentoSelecionado = event.value;
     }
 
 }

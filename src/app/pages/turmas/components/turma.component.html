@@ -1,0 +1,254 @@
+<p-toast></p-toast>
+<p-toolbar>
+    <ng-template #end>
+        <p-button label="Novo" icon="pi pi-plus" severity="secondary"(onClick)="openNew()" />
+    </ng-template>
+</p-toolbar>
+
+<p-table
+    #dt
+    [value]="lista()"
+    [rows]="10"
+    [columns]="cols"
+    [paginator]="true"
+    [globalFilterFields]="['nome', 'ativo']"
+    [tableStyle]="{ 'min-width': '75rem' }"
+    [rowHover]="true"
+    dataKey="id"
+    currentPageReportTemplate="Mostrando de {first} até {last} de {totalRecords} turmas"
+    [showCurrentPageReport]="true"
+    [rowsPerPageOptions]="[10, 20, 30]"
+>
+    <ng-template #caption>
+        <div class="flex items-center justify-between">
+            <h5 class="m-0">Gerenciar turmas</h5>
+            <p-iconfield>
+                <p-inputicon styleClass="pi pi-search" />
+                <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Pesquisar..." />
+            </p-iconfield>
+        </div>
+    </ng-template>
+    <ng-template #header>
+        <tr>
+            <th pSortableColumn="nome" style="min-width:16rem">
+                Nome
+                <p-sortIcon field="nome" />
+            </th>
+            <th style="min-width: 12rem">
+                Data início
+            </th>
+            <th style="min-width: 12rem">
+                Data fim
+            </th>
+            <th style="min-width: 12rem">
+                Máximo de alunos
+            </th>
+            <th style="min-width: 12rem">
+                Mínimo de alunos
+            </th>
+            <th style="min-width: 12rem">
+                Meta de alunos
+            </th>
+            <th style="min-width: 12rem">
+                Curso
+            </th>
+            <th style="min-width: 12rem">
+                Situação de turma
+            </th>
+            <th style="min-width: 12rem">
+                Profesor
+            </th>
+            <th style="min-width: 12rem">
+                Turno
+            </th>
+            <th style="min-width: 12rem">
+                Sala
+            </th>
+            <th pSortableColumn="ativo" style="min-width: 12rem">
+                Ativo
+                <p-sortIcon field="ativo" />
+            </th>
+            <th style="min-width: 12rem">Ações</th>
+        </tr>
+    </ng-template>
+    <ng-template #body let-objeto>
+        <tr>
+            <td style="min-width: 16rem">{{ objeto.nome }}</td>
+            <td>{{ objeto.dataInicio | date:'dd/MM/yyyy'}}</td>
+            <td>{{ objeto.dataFim | date:'dd/MM/yyyy'}}</td>
+            <td>{{ objeto.maximoAlunos }}</td>
+            <td>{{ objeto.minimoAlunos }}</td>
+            <td>{{ objeto.metaAlunos }}</td>
+            <td>{{ objeto.curso.nome }}</td>
+            <td>{{ objeto.situacaoTurma.nome }}</td>
+            <td>{{ objeto.professor.nome }}</td>
+            <td>{{ objeto.turno.nome }}</td>
+            <td>{{ objeto.sala.nome }}</td>
+            <td>
+                <p-tag [value]="objeto.ativo ? 'ATIVO' : 'INATIVO' " [severity]="getSeverity(objeto.ativo)" />
+            </td>
+            <td>
+                <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="edit(objeto)" />
+                <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (click)="delete(objeto)" />
+            </td>
+        </tr>
+    </ng-template>
+</p-table>
+
+<p-dialog [(visible)]="dialogo" [style]="{ width: '450px' }" header="Detalhes da turma" [modal]="true">
+    <ng-template #content>
+        <div class="flex flex-col gap-6">
+            <div>
+                <label for="name" class="block font-bold mb-3">Nome</label>
+                <input name="name" type="text" pInputText id="nome" [(ngModel)]="objeto.nome" required autofocus fluid />
+                <small class="text-red-500" *ngIf="submitted && !objeto.nome">Nome é obrigatório.</small>
+            </div>
+            <div>
+                <label for="dataInicio" class="block font-bold mb-3">Data de início</label>
+                <p-datepicker
+                    id="dataInicio"
+                    [(ngModel)]="objeto.dataInicio"
+                    dateFormat="dd/mm/yy"
+                    inputId="dataInicio"
+                    placeholder="Selecione a data de início"
+                    [showIcon]="true"
+                    [showButtonBar]="true"
+                    fluid
+                />
+                <small class="text-red-500" *ngIf="submitted && !objeto.dataInicio">Data de início é obrigatória.</small>
+            </div>
+            <div>
+                <label for="dataFim" class="block font-bold mb-3">Data de fim</label>
+                <p-datepicker
+                    id="dataFim"
+                    [(ngModel)]="objeto.dataFim"
+                    dateFormat="dd/mm/yy"
+                    inputId="dataFim"
+                    placeholder="Selecione a data de fim"
+                    [showIcon]="true"
+                    [showButtonBar]="true"
+                    fluid
+                />
+                <small class="text-red-500" *ngIf="submitted && !objeto.dataFim">Data de fim é obrigatória.</small>
+            </div>
+            <div>
+                <label for="maximo_alunos" class="block font-bold mb-3">Máximo de alunos</label>
+                <input name="maximo_alunos" id="maximo_alunos" type="number" pInputText [(ngModel)]="objeto.maximoAlunos" required fluid/>
+                <small class="text-red-500" *ngIf="submitted && !objeto.maximoAlunos">Máximo de alunos é obrigatório.</small>
+            </div>
+            <div>
+                <label for="minimo_alunos" class="block font-bold mb-3">Mínimo de alunos</label>
+                <input name="minimo_alunos" id="minimo_alunos" type="number" pInputText [(ngModel)]="objeto.minimoAlunos" required fluid/>
+                <small class="text-red-500" *ngIf="submitted && !objeto.minimoAlunos">Mínimo de alunos é obrigatório.</small>
+            </div>
+            <div>
+                <label for="meta_alunos" class="block font-bold mb-3">Meta de alunos</label>
+                <input name="meta_alunos" id="meta_alunos" type="number" pInputText [(ngModel)]="objeto.metaAlunos" required fluid/>
+                <small class="text-red-500" *ngIf="submitted && !objeto.metaAlunos">Meta de alunos é obrigatório.</small>
+            </div>
+
+            <div>
+                <label for="cursos" class="block font-bold mb-3">Curso</label>
+                <p-select 
+                    name="cursos" 
+                    [(ngModel)]="objeto.curso" 
+                    inputId="curso" 
+                    [options]="cursos_select" 
+                    optionLabel="label" 
+                    optionValue="value"
+                    placeholder="Selecione um curso"
+                    fluid 
+                    [appendTo]="'body'"
+                />
+                <small class="text-red-500" *ngIf="submitted && objeto.curso == undefined">Curso é obrigatório.</small>
+            </div>
+
+            <div>
+                <label for="situacao_turmas" class="block font-bold mb-3">Situacao de turma</label>
+                <p-select 
+                    name="situacao_turmas" 
+                    [(ngModel)]="objeto.situacaoTurma" 
+                    inputId="situacao_turma" 
+                    [options]="situacao_turmas_select" 
+                    optionLabel="label" 
+                    optionValue="value"
+                    placeholder="Selecione uma situacao de turma"
+                    fluid 
+                    [appendTo]="'body'"
+                />
+                <small class="text-red-500" *ngIf="submitted && objeto.situacaoTurma == undefined">Situacao de turma é obrigatório.</small>
+            </div>
+
+            <div>
+                <label for="professores" class="block font-bold mb-3">Professor</label>
+                <p-select 
+                    name="professores" 
+                    [(ngModel)]="objeto.professor" 
+                    inputId="professor" 
+                    [options]="professores_select" 
+                    optionLabel="label" 
+                    optionValue="value"
+                    placeholder="Selecione um professor"
+                    fluid 
+                    [appendTo]="'body'"
+                />
+                <small class="text-red-500" *ngIf="submitted && objeto.professor == undefined">Professor é obrigatório.</small>
+            </div>
+
+            <div>
+                <label for="turnos" class="block font-bold mb-3">Turno</label>
+                <p-select 
+                    name="turnos" 
+                    [(ngModel)]="objeto.turno" 
+                    inputId="turno" 
+                    [options]="turnos_select" 
+                    optionLabel="label" 
+                    optionValue="value"
+                    placeholder="Selecione um turno"
+                    fluid 
+                    [appendTo]="'body'"
+                />
+                <small class="text-red-500" *ngIf="submitted && objeto.turno == undefined">Turno é obrigatório.</small>
+            </div>
+
+            <div>
+                <label for="salas" class="block font-bold mb-3">Sala</label>
+                <p-select 
+                    name="salas" 
+                    [(ngModel)]="objeto.sala" 
+                    inputId="sala" 
+                    [options]="salas_select" 
+                    optionLabel="label" 
+                    optionValue="value"
+                    placeholder="Selecione um sala"
+                    fluid 
+                    [appendTo]="'body'"
+                />
+                <small class="text-red-500" *ngIf="submitted && objeto.sala == undefined">Sala é obrigatório.</small>
+            </div>
+
+            <div>
+                <label for="status" class="block font-bold mb-3">Status</label>
+                <p-select 
+                    name="status" 
+                    [(ngModel)]="objeto.ativo" 
+                    inputId="ativo" 
+                    [options]="statuses" 
+                    optionLabel="label" 
+                    optionValue="value"
+                    placeholder="Selecione um status" 
+                    fluid 
+                    [appendTo]="'body'"
+                />
+                <small class="text-red-500" *ngIf="submitted && objeto.ativo == undefined">Status é obrigatório.</small>
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template #footer>
+        <p-button label="Cancelar" icon="pi pi-times" text (click)="hideDialog()" />
+        <p-button label="Salvar" icon="pi pi-check" (click)="save()" />
+    </ng-template>
+</p-dialog>
+
+<p-confirmdialog [style]="{ width: '450px' }" />

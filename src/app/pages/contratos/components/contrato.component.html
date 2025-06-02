@@ -1,0 +1,224 @@
+<p-toast></p-toast>
+<p-toolbar>
+    <ng-template #end>
+        <p-button label="Novo" icon="pi pi-plus" severity="secondary"(onClick)="openNew()" />
+    </ng-template>
+</p-toolbar>
+
+<p-table
+    #dt
+    [value]="lista()"
+    [rows]="10"
+    [columns]="cols"
+    [paginator]="true"
+    [globalFilterFields]="['aluno', 'ativo']"
+    [tableStyle]="{ 'min-width': '75rem' }"
+    [rowHover]="true"
+    dataKey="id"
+    currentPageReportTemplate="Mostrando de {first} até {last} de {totalRecords} contratos"
+    [showCurrentPageReport]="true"
+    [rowsPerPageOptions]="[10, 20, 30]"
+>
+    <ng-template #caption>
+        <div class="flex items-center justify-between">
+            <h5 class="m-0">Gerenciar contratos</h5>
+            <p-iconfield>
+                <p-inputicon styleClass="pi pi-search" />
+                <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Pesquisar..." />
+            </p-iconfield>
+        </div>
+    </ng-template>
+    <ng-template #header>
+        <tr>
+            <th pSortableColumn="aluno" style="min-width:16rem">
+                Aluno
+                <p-sortIcon field="aluno" />
+            </th>
+            <th style="min-width: 12rem">
+                Data início
+            </th>
+            <th style="min-width: 12rem">
+                Data fim
+            </th>
+            <th style="min-width: 12rem">
+                Vendedor
+            </th>
+            <th style="min-width: 12rem">
+                Turma
+            </th>
+            <th style="min-width: 12rem">
+                Tipo de contrato
+            </th>
+            <th style="min-width: 12rem">
+                Situação de contrato
+            </th>
+            <th style="min-width: 12rem">
+                Bolsa
+            </th>
+            <th style="min-width: 12rem">
+                Observação
+            </th>
+            <th style="min-width: 12rem"></th>
+        </tr>
+    </ng-template>
+    <ng-template #body let-objeto>
+        <tr>
+            <td style="min-width: 16rem">{{ objeto.aluno.nome }}</td>
+            <td>{{ objeto.dataInicio | date:'dd/MM/yyyy'}}</td>
+            <td>{{ objeto.dataFim | date:'dd/MM/yyyy'}}</td>
+            <td>{{ objeto.vendedor.nome }}</td>
+            <td>{{ objeto.turma.nome }}</td>
+            <td>{{ objeto.tipoContrato.nome }}</td>
+            <td>{{ objeto.situacaoContrato.nome }}</td>
+            <td>{{ objeto.bolsa.nome }}</td>
+            <td>{{ objeto.observacao }}</td>
+            <td>
+                <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="edit(objeto)" />
+                <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (click)="delete(objeto)" />
+            </td>
+        </tr>
+    </ng-template>
+</p-table>
+
+<p-dialog [(visible)]="dialogo" [style]="{ width: '450px' }" header="Detalhes da contrato" [modal]="true">
+    <ng-template #content>
+        <div class="flex flex-col gap-6">
+           <div>
+                <label for="alunos" class="block font-bold mb-3">Aluno</label>
+                <p-select 
+                    name="alunos" 
+                    [(ngModel)]="objeto.aluno" 
+                    inputId="alunos" 
+                    [options]="alunos_select" 
+                    optionLabel="label" 
+                    optionValue="value"
+                    placeholder="Selecione um aluno"
+                    fluid 
+                    [appendTo]="'body'"
+                />
+                <small class="text-red-500" *ngIf="submitted && objeto.aluno == undefined">Aluno é obrigatório.</small>
+            </div>
+            <div>
+                <label for="dataInicio" class="block font-bold mb-3">Data de início</label>
+                <p-datepicker
+                    id="dataInicio"
+                    [(ngModel)]="objeto.dataInicio"
+                    dateFormat="dd/mm/yy"
+                    inputId="dataInicio"
+                    placeholder="Selecione a data de início"
+                    [showIcon]="true"
+                    [showButtonBar]="true"
+                    fluid
+                />
+                <small class="text-red-500" *ngIf="submitted && !objeto.dataInicio">Data de início é obrigatória.</small>
+            </div>
+            <div>
+                <label for="dataFim" class="block font-bold mb-3">Data de fim</label>
+                <p-datepicker
+                    id="dataFim"
+                    [(ngModel)]="objeto.dataFim"
+                    dateFormat="dd/mm/yy"
+                    inputId="dataFim"
+                    placeholder="Selecione a data de fim"
+                    [showIcon]="true"
+                    [showButtonBar]="true"
+                    fluid
+                />
+                <small class="text-red-500" *ngIf="submitted && !objeto.dataFim">Data de fim é obrigatória.</small>
+            </div>
+
+            <div>
+
+            <div>
+                <label for="vendedores" class="block font-bold mb-3">Vendedor</label>
+                <p-select 
+                    name="vendedores" 
+                    [(ngModel)]="objeto.vendedor" 
+                    inputId="vendedor" 
+                    [options]="vendedores_select" 
+                    optionLabel="label" 
+                    optionValue="value"
+                    placeholder="Selecione um vendedor"
+                    fluid 
+                    [appendTo]="'body'"
+                />
+                <small class="text-red-500" *ngIf="submitted && objeto.vendedor == undefined">Vendedor é obrigatório.</small>
+            </div>
+
+            <div>
+                <label for="turmas" class="block font-bold mb-3">Turma</label>
+                <p-select 
+                    name="turmas" 
+                    [(ngModel)]="objeto.turma" 
+                    inputId="turma" 
+                    [options]="turmas_select" 
+                    optionLabel="label" 
+                    optionValue="value"
+                    placeholder="Selecione um turma"
+                    fluid 
+                    [appendTo]="'body'"
+                />
+                <small class="text-red-500" *ngIf="submitted && objeto.turma == undefined">Turma é obrigatório.</small>
+            </div>
+
+            <div>
+                <label for="tipoContratos" class="block font-bold mb-3">Tipo de contrato</label>
+                <p-select 
+                    name="tipoContratos" 
+                    [(ngModel)]="objeto.tipoContrato" 
+                    inputId="tipoContrato" 
+                    [options]="tipo_contratos_select" 
+                    optionLabel="label" 
+                    optionValue="value"
+                    placeholder="Selecione um tipoContrato"
+                    fluid 
+                    [appendTo]="'body'"
+                />
+                <small class="text-red-500" *ngIf="submitted && objeto.tipoContrato == undefined">Tipo de contrato é obrigatório.</small>
+            </div>
+
+            <div>
+                <label for="situacao_contratos" class="block font-bold mb-3">Situacao de contrato</label>
+                <p-select 
+                    name="situacao_contratos" 
+                    [(ngModel)]="objeto.situacaoContrato" 
+                    inputId="situacao_contrato" 
+                    [options]="situacao_contratos_select" 
+                    optionLabel="label" 
+                    optionValue="value"
+                    placeholder="Selecione uma situacao de contrato"
+                    fluid 
+                    [appendTo]="'body'"
+                />
+                <small class="text-red-500" *ngIf="submitted && objeto.situacaoContrato == undefined">Situacao de contrato é obrigatório.</small>
+            </div>
+
+            <label for="bolsas" class="block font-bold mb-3">Bolsa</label>
+                <p-select 
+                    name="bolsas" 
+                    [(ngModel)]="objeto.bolsa" 
+                    inputId="bolsa" 
+                    [options]="bolsas_select" 
+                    optionLabel="label" 
+                    optionValue="value"
+                    placeholder="Selecione um bolsa"
+                    fluid 
+                    [appendTo]="'body'"
+                />
+            </div>
+
+            <div>
+                <label for="observacao" class="block font-bold mb-3">Observação</label>
+                <input name="observacao" id="observacao" type="text" pInputText [(ngModel)]="objeto.observacao" fluid/>
+            </div>
+
+        </div>
+    </ng-template>
+
+    <ng-template #footer>
+        <p-button label="Cancelar" icon="pi pi-times" text (click)="hideDialog()" />
+        <p-button label="Salvar" icon="pi pi-check" (click)="save()" />
+    </ng-template>
+</p-dialog>
+
+<p-confirmdialog [style]="{ width: '450px' }" />

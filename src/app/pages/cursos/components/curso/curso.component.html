@@ -58,7 +58,11 @@
                 Matriz curricular
                 <p-sortIcon field="matriz_curricular" />
             </th>
-            <th pSortableColumn="bolsas" style="min-width:12rem">
+            <th pSortableColumn="matriz_curricular" style="min-width:12rem">
+                Modalidade
+                <p-sortIcon field="matriz_curricular" />
+            </th>
+            <th pSortableColumn="bolsas" style="min-width:20rem">
                 Bolsas
                 <p-sortIcon field="bolsas" />
             </th>
@@ -66,7 +70,7 @@
                 Ativo
                 <p-sortIcon field="ativo" />
             </th>
-            <th style="min-width: 12rem"></th>
+            <th style="min-width: 12rem">Ações</th>
         </tr>
     </ng-template>
     <ng-template #body let-objeto>
@@ -74,24 +78,32 @@
             <td style="min-width: 16rem">{{ objeto.nome }}</td>
             <td>
                 <span class="p-chip p-chip-text p-1 px-3 mr-2 mb-1 rounded-full bg-blue-100 text-blue-800">
-                    {{ objeto.tipoCurso }}
+                    {{ objeto.tipoCurso.nome }}
                 </span>
             </td>
-            <td>{{ objeto.coordenador }}</td>
+            <td>{{ objeto.coordenador.nome }}</td>
             <td>{{ objeto.valor }}</td>
             <td>{{ objeto.numeroAulas }}</td>
             <td>{{ objeto.cargaHoraria }}</td>
             <td>
                 <span class="p-chip p-chip-text p-1 px-3 mr-2 mb-1 rounded-full bg-blue-100 text-blue-800">
-                    {{ objeto.matrizCurricular }}
+                    {{ objeto.matrizCurricular.nome }}
+                </span>
+            </td>
+
+            <td>
+                <span class="p-chip p-chip-text p-1 px-3 mr-2 mb-1 rounded-full bg-green-100 text-white-800">
+                    {{ objeto.modalidade.nome }}
                 </span>
             </td>
             <td>
-                <ng-container *ngFor="let bolsa of objeto.bolsas; let last = last">
-                    <span class="p-chip p-chip-text p-1 px-3 mr-2 mb-1 rounded-full bg-blue-100 text-blue-800">
-                        {{ bolsa.nome }}
-                    </span>
-                </ng-container>
+                <span 
+                    class="p-chip p-chip-text p-1 px-3 mr-2 mb-2 rounded-full bg-blue-100 text-blue-800 cursor-pointer"
+                    (click)="showBolsasDialog(objeto.bolsas)"
+                    title="Clique para ver todas as bolsas"
+                >
+                    {{ objeto.bolsas.length }} bolsa(s) - clique para ver
+                </span>
             </td>
 
             <td>
@@ -105,6 +117,20 @@
         </tr>
     </ng-template>
 </p-table>
+
+<p-dialog header="Bolsas do Curso" [(visible)]="bolsasDialogVisible" [modal]="true" [style]="{width: '400px'}" [closable]="true" [dismissableMask]="true">
+  <ng-container *ngIf="selectedBolsas.length > 0; else semBolsas">
+    <ul class="list-disc pl-5">
+      <li *ngFor="let bolsa of selectedBolsas" class="mb-1">
+        {{ bolsa.nome }}
+      </li>
+    </ul>
+  </ng-container>
+  <ng-template #semBolsas>
+    <p>Nenhuma bolsa disponível.</p>
+  </ng-template>
+</p-dialog>
+
 
 <p-dialog [(visible)]="dialogo" [style]="{ width: '450px' }" header="Detalhes do curso" [modal]="true">
     <ng-template #content>
@@ -178,6 +204,22 @@
                     [appendTo]="'body'"
                 />
                 <small class="text-red-500" *ngIf="submitted && objeto.matrizCurricular == undefined">Matriz curricular é obrigatório.</small>
+            </div>
+
+            <div>
+                <label for="modalidades" class="block font-bold mb-3">Modalidade</label>
+                <p-select 
+                    name="modalidades" 
+                    [(ngModel)]="objeto.modalidade" 
+                    inputId="modalidades" 
+                    [options]="modalidades_select" 
+                    optionLabel="label" 
+                    optionValue="value"
+                    placeholder="Selecione uma modalidade"
+                    fluid 
+                    [appendTo]="'body'"
+                />
+                <small class="text-red-500" *ngIf="submitted && objeto.modalidade == undefined">Modalidade é obrigatório.</small>
             </div>
 
              <div>

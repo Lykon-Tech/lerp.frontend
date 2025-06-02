@@ -1,7 +1,6 @@
 import { ConfirmationService, MessageService } from "primeng/api";
 import { BaseComponente } from "../../bases/components/base.component";
-import { Conta } from "../models/conta.model";
-import { ContaService } from "../services/conta.service";
+import { Aluno } from "../models/aluno.model";
 import { Component, signal } from "@angular/core";
 import { ConfirmDialogModule } from "primeng/confirmdialog";
 import { CheckboxModule } from "primeng/checkbox";
@@ -22,13 +21,10 @@ import { ButtonModule } from "primeng/button";
 import { FormsModule } from "@angular/forms";
 import { TableModule } from "primeng/table";
 import { CommonModule } from "@angular/common";
-import { Banco } from "../models/banco.model";
-import { BancoService } from "../services/banco.service";
-import { ContaSaida } from "../models/conta.saida.model";
-
+import { AlunoService } from "../services/aluno.service";
 
 @Component({
-    selector: 'app-conta',
+    selector: 'app-Aluno',
     standalone: true,
     imports: [
         CommonModule,
@@ -51,64 +47,39 @@ import { ContaSaida } from "../models/conta.saida.model";
         CheckboxModule,
         ConfirmDialogModule
     ],
-    templateUrl: `./conta.component.html`,
-    providers: [MessageService, ContaService, ConfirmationService]
+    templateUrl: `./aluno.component.html`,
+    providers: [MessageService, AlunoService, ConfirmationService]
 })
-export class ContaComponent extends BaseComponente<Conta, ContaSaida> {
+export class AlunoComponent extends BaseComponente<Aluno, Aluno> {
    
     constructor(
         messageService: MessageService,
         confirmationService: ConfirmationService,
-        service: ContaService,
-        private bancoService : BancoService
+        service: AlunoService
     ) {
         super(
             messageService,
             confirmationService,
             service
         );
-        this.titulo = 'conta';
-        this.genero = 'a';
-    }
 
-    bancos = signal<Banco[]>([]);
-
-    bancos_select! : any[]
-
-    override loadDemoData(): void {
-        this.bancoService.findAll(true).then((data) => {
-            this.bancos.set(data);
-            this.bancos_select = this.bancos().map(banco => ({
-                label: banco.nome,
-                value: banco
-            }));
-        });
-
-        super.loadDemoData();
+        this.titulo = 'aluno';
     }
 
     override getValidacoes(): boolean {
-        return (this.objeto as any).agencia.trim() && (this.objeto as any).numeroConta.trim() && (this.objeto as any).ativo != undefined && (this.objeto as any).banco != undefined;
-    }
-
-    override getObjetoEdit(objeto: Conta): Conta {
-        return {
-            id : objeto.id,
-            agencia : objeto.agencia,
-            numeroConta : objeto.numeroConta,
-            banco : this.bancos().find(b => b.id === objeto.banco?.id),
-            ativo : objeto.ativo
-        }
-    }
-
-    override converterObjeto(objeto: Conta): ContaSaida {
-        return {
-            id : objeto.id,
-            agencia : objeto.agencia,
-            numeroConta : objeto.numeroConta,
-            bancoId : objeto.banco?.id,
-            ativo : objeto.ativo
-        }
+        return (this.objeto as any).nome.trim() && 
+                (this.objeto as any).cpf.trim() &&
+                (this.objeto as any).rg.trim() &&
+                (this.objeto as any).cep.trim() &&
+                (this.objeto as any).logradouro.trim() &&
+                (this.objeto as any).numero.trim() &&
+                (this.objeto as any).complemento.trim() &&
+                (this.objeto as any).bairro.trim() &&
+                (this.objeto as any).cidade.trim() &&
+                (this.objeto as any).uf.trim() &&
+                (this.objeto as any).telefone.trim() &&
+                (this.objeto as any).email.trim() &&
+                (this.objeto as any).matricula.trim();
     }
 
 }

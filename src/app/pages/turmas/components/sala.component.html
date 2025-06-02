@@ -38,7 +38,7 @@
                 Ativo
                 <p-sortIcon field="ativo" />
             </th>
-            <th style="min-width: 12rem"></th>
+            <th style="min-width: 12rem">Ações</th>
         </tr>
     </ng-template>
     <ng-template #body let-objeto>
@@ -55,7 +55,7 @@
     </ng-template>
 </p-table>
 
-<p-dialog [(visible)]="dialogo" [style]="{ width: '450px' }" header="Detalhes do sala" [modal]="true">
+<p-dialog [(visible)]="dialogo" [style]="{ width: '450px' }" header="Detalhes da sala" [modal]="true">
     <ng-template #content>
         <div class="flex flex-col gap-6">
             <div>

@@ -21,5 +21,22 @@ export class FuncionarioService extends BaseService<Funcionario, FuncionarioSaid
             return Promise.reject(this.extractErrorMessage(error));
         });
     }
+
+    findProfessores(): Promise<Funcionario[]> {
+        return firstValueFrom(
+            this.http.get<Funcionario[]>(`${this.baseUrl}/professor`)
+        ).catch(error => {
+            return Promise.reject(this.extractErrorMessage(error));
+        });
+    }
+
+    
+    findVendedores(): Promise<Funcionario[]> {
+        return firstValueFrom(
+            this.http.get<Funcionario[]>(`${this.baseUrl}/atendente`)
+        ).catch(error => {
+            return Promise.reject(this.extractErrorMessage(error));
+        });
+    }
     
 }
