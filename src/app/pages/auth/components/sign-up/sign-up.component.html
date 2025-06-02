@@ -1,0 +1,259 @@
+<p-toast />
+
+<div
+	class="bg-surface-50 dark:bg-surface-950 flex items-center justify-center min-h-screen min-w-[100vw] overflow-hidden">
+
+	<div class="flex flex-col items-center justify-center">
+		<div
+			style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)">
+
+			<div class="w-full bg-surface-0 dark:bg-surface-900 py-20 px-8 sm:px-20" style="border-radius: 53px">
+				<form [formGroup]="form" (ngSubmit)="onSubmit()">
+					<div class="flex flex-col items-center justify-center">
+						<img src="assets/logo.png" alt="logo" />
+					</div>
+					<div class="text-center mb-8">
+						<div class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-4">Crie sua conta no
+							LERP!
+						</div>
+						<span class="text-muted-color font-medium">Preencha os dados para se cadastrar</span>
+					</div>
+
+					<p-stepper [value]="step" class="basis-[50rem]" [linear]="true">
+						<p-step-list>
+							<p-step [value]="1">Empresa</p-step>
+							<p-step [value]="2">Representante</p-step>
+						</p-step-list>
+						<p-step-panels>
+							<p-step-panel [value]="1">
+								<ng-template #content let-activateCallback="activateCallback">
+									<div class="flex flex-col">
+										<p-scrollPanel [style]="{ maxHeight: '40vh' }">
+											<div formGroupName="empresaForm" class="flex flex-col gap-4">
+												<div class="mb-2 text-lg font-semibold text-primary-600">Dados da
+													Empresa
+												</div>
+												<label>Razão Social<span class="text-red-500">*</span></label>
+												<div class="flex flex-col">
+													<input pInputText formControlName="razaoSocial"
+														placeholder="Razão Social" class="w-full md:w-[30rem]" />
+													<small
+														*ngIf="form.get('empresaForm.razaoSocial')?.invalid && form.get('empresaForm.razaoSocial')?.touched"
+														class="text-red-500">Campo obrigatório</small>
+												</div>
+												<label>CNPJ<span class="text-red-500">*</span></label>
+												<div class="flex flex-col">
+													<input pInputText formControlName="cnpj" placeholder="CNPJ"
+														class="w-full md:w-[30rem]" mask="00.000.000/0000-00" />
+													<small
+														*ngIf="form.get('empresaForm.cnpj')?.invalid && form.get('empresaForm.cnpj')?.touched"
+														class="text-red-500">Campo obrigatório</small>
+												</div>
+												<label>Telefone<span class="text-red-500">*</span></label>
+												<div class="flex flex-col">
+													<input pInputText formControlName="telefone" placeholder="Telefone"
+														class="w-full md:w-[30rem]" mask="(00) 00000-0000" />
+													<small
+														*ngIf="form.get('empresaForm.telefone')?.invalid && form.get('empresaForm.telefone')?.touched"
+														class="text-red-500">Campo obrigatório</small>
+												</div>
+												<label>Email<span class="text-red-500">*</span></label>
+												<div class="flex flex-col">
+													<input pInputText formControlName="email"
+														placeholder="E-mail da Empresa" class="w-full md:w-[30rem]" />
+													<small
+														*ngIf="form.get('empresaForm.email')?.invalid && form.get('empresaForm.email')?.touched"
+														class="text-red-500">Campo obrigatório</small>
+												</div>
+												<div class="mt-4 mb-2 text-lg font-semibold text-primary-600">Endereço
+													da
+													Empresa
+												</div>
+												<label>CEP<span class="text-red-500">*</span></label>
+												<div class="flex flex-col">
+													<input pInputText formControlName="cep" placeholder="CEP"
+														class="w-full md:w-[30rem]" mask="00000-000" />
+													<small
+														*ngIf="form.get('empresaForm.cep')?.invalid && form.get('empresaForm.cep')?.touched"
+														class="text-red-500">Campo obrigatório</small>
+												</div>
+												<label>UF<span class="text-red-500">*</span></label>
+												<div class="flex flex-col">
+													<input pInputText formControlName="uf" placeholder="UF"
+														class="w-full md:w-[30rem]" mask="SS"
+														style="text-transform:uppercase" />
+													<small
+														*ngIf="form.get('empresaForm.uf')?.invalid && form.get('empresaForm.uf')?.touched"
+														class="text-red-500">Campo obrigatório</small>
+												</div>
+												<label>Cidade<span class="text-red-500">*</span></label>
+												<div class="flex flex-col">
+													<input pInputText formControlName="cidade" placeholder="Cidade"
+														class="w-full md:w-[30rem]" />
+													<small
+														*ngIf="form.get('empresaForm.cidade')?.invalid && form.get('empresaForm.cidade')?.touched"
+														class="text-red-500">Campo obrigatório</small>
+												</div>
+												<label>Logradouro<span class="text-red-500">*</span></label>
+												<div class="flex flex-col">
+													<input pInputText formControlName="logradouro"
+														placeholder="Logradouro" class="w-full md:w-[30rem]" />
+													<small
+														*ngIf="form.get('empresaForm.logradouro')?.invalid && form.get('empresaForm.logradouro')?.touched"
+														class="text-red-500">Campo obrigatório</small>
+												</div>
+												<label>Bairro<span class="text-red-500">*</span></label>
+												<div class="flex flex-col">
+													<input pInputText formControlName="bairro" placeholder="Bairro"
+														class="w-full md:w-[30rem]" />
+													<small
+														*ngIf="form.get('empresaForm.bairro')?.invalid && form.get('empresaForm.bairro')?.touched"
+														class="text-red-500">Campo obrigatório</small>
+												</div>
+												<label>Número<span class="text-red-500">*</span></label>
+												<div class="flex flex-col">
+													<input pInputText formControlName="numero" placeholder="Número"
+														class="w-full md:w-[30rem]" />
+													<small
+														*ngIf="form.get('empresaForm.numero')?.invalid && form.get('empresaForm.numero')?.touched"
+														class="text-red-500">Campo obrigatório</small>
+												</div>
+												<label>Complemento</label>
+												<input pInputText formControlName="complemento"
+													placeholder="Complemento" class="w-full md:w-[30rem]" />
+											</div>
+										</p-scrollPanel>
+										<div class="flex pt-6 justify-between">
+											<p-button label="Voltar" severity="secondary"
+												(onClick)="onRedirectToLogin()" />
+											<p-button label="Próximo" icon="pi pi-arrow-right" iconPos="right"
+												(onClick)="activateCallback(2)"
+												[disabled]="this.form.get('empresaForm')?.invalid" />
+										</div>
+									</div>
+								</ng-template>
+							</p-step-panel>
+							<p-step-panel [value]="2">
+								<ng-template #content let-activateCallback="activateCallback">
+									<div class="flex flex-col">
+										<p-scrollPanel [style]="{ maxHeight: '40vh' }">
+											<div formGroupName="representante" class="flex flex-col gap-4">
+												<div class="mb-2 text-lg font-semibold text-primary-600">Dados do
+													Representante
+												</div>
+												<label>Nome<span class="text-red-500">*</span></label>
+												<input pInputText formControlName="nome" placeholder="Nome"
+													class="w-full md:w-[30rem]" />
+												<small
+													*ngIf="form.get('representante.nome')?.invalid && (form.get('representante.nome')?.dirty || form.get('representante.nome')?.touched)"
+													class="text-red-500">Campo obrigatório</small>
+												<label>CPF<span class="text-red-500">*</span></label>
+												<input pInputText formControlName="cpf" placeholder="CPF"
+													class="w-full md:w-[30rem]" mask="000.000.000-00" />
+												<small
+													*ngIf="form.get('representante.cpf')?.invalid && (form.get('representante.cpf')?.dirty || form.get('representante.cpf')?.touched)"
+													class="text-red-500">Campo obrigatório</small>
+												<label>RG<span class="text-red-500">*</span></label>
+												<input pInputText formControlName="rg" placeholder="RG"
+													class="w-full md:w-[30rem]" mask="00.000.000-0" />
+												<small
+													*ngIf="form.get('representante.rg')?.invalid && (form.get('representante.rg')?.dirty || form.get('representante.rg')?.touched)"
+													class="text-red-500">Campo obrigatório</small>
+												<label>Telefone<span class="text-red-500">*</span></label>
+												<input pInputText formControlName="telefone" placeholder="Telefone"
+													class="w-full md:w-[30rem]" mask="(00) 00000-0000" />
+												<small
+													*ngIf="form.get('representante.telefone')?.invalid && (form.get('representante.telefone')?.dirty || form.get('representante.telefone')?.touched)"
+													class="text-red-500">Campo obrigatório</small>
+												<div class="mt-4 mb-2 text-lg font-semibold text-primary-600">Endereço
+													do
+													Representante
+												</div>
+												<label>CEP<span class="text-red-500">*</span></label>
+												<div class="flex flex-col">
+													<input pInputText formControlName="cep" placeholder="CEP"
+														class="w-full md:w-[30rem]" mask="00000-000" />
+													<small
+														*ngIf="form.get('representante.cep')?.invalid && form.get('representante.cep')?.touched"
+														class="text-red-500">Campo obrigatório</small>
+												</div>
+												<label>UF<span class="text-red-500">*</span></label>
+												<div class="flex flex-col">
+													<input pInputText formControlName="uf" placeholder="UF"
+														class="w-full md:w-[30rem]" mask="SS"
+														style="text-transform:uppercase" />
+													<small
+														*ngIf="form.get('representante.uf')?.invalid && form.get('representante.uf')?.touched"
+														class="text-red-500">Campo obrigatório</small>
+												</div>
+												<label>Cidade<span class="text-red-500">*</span></label>
+												<div class="flex flex-col">
+													<input pInputText formControlName="cidade" placeholder="Cidade"
+														class="w-full md:w-[30rem]" />
+													<small
+														*ngIf="form.get('representante.cidade')?.invalid && form.get('representante.cidade')?.touched"
+														class="text-red-500">Campo obrigatório</small>
+												</div>
+												<label>Logradouro<span class="text-red-500">*</span></label>
+												<div class="flex flex-col">
+													<input pInputText formControlName="logradouro"
+														placeholder="Logradouro" class="w-full md:w-[30rem]" />
+													<small
+														*ngIf="form.get('representante.logradouro')?.invalid && form.get('representante.logradouro')?.touched"
+														class="text-red-500">Campo obrigatório</small>
+												</div>
+												<label>Bairro<span class="text-red-500">*</span></label>
+												<div class="flex flex-col">
+													<input pInputText formControlName="bairro" placeholder="Bairro"
+														class="w-full md:w-[30rem]" />
+													<small
+														*ngIf="form.get('representante.bairro')?.invalid && form.get('representante.bairro')?.touched"
+														class="text-red-500">Campo obrigatório</small>
+												</div>
+												<label>Número<span class="text-red-500">*</span></label>
+												<div class="flex flex-col">
+													<input pInputText formControlName="numero" placeholder="Número"
+														class="w-full md:w-[30rem]" />
+													<small
+														*ngIf="form.get('representante.numero')?.invalid && form.get('representante.numero')?.touched"
+														class="text-red-500">Campo obrigatório</small>
+												</div>
+												<label>Complemento</label>
+												<div class="flex flex-col">
+													<input pInputText formControlName="complemento"
+														placeholder="Complemento" class="w-full md:w-[30rem]" />
+												</div>
+												<div class="mt-4 mb-2 text-lg font-semibold text-primary-600">Acesso do
+													Representante
+												</div>
+												<label>Email<span class="text-red-500">*</span></label>
+												<input pInputText formControlName="email" placeholder="E-mail"
+													class="w-full md:w-[30rem]" />
+												<small
+													*ngIf="form.get('representante.email')?.invalid && (form.get('representante.email')?.dirty || form.get('representante.email')?.touched)"
+													class="text-red-500">Campo obrigatório</small>
+												<label>Senha</label>
+												<p-password [toggleMask]="true" formControlName="password"
+													placeholder="Senha" [fluid]="true" [feedback]="false"
+													styleClass="w-full md:w-[30rem]"></p-password>
+												<label>Confirmar Senha</label>
+												<p-password [toggleMask]="true" formControlName="confirmPassword"
+													placeholder="Confirmar Senha" [fluid]="true" [feedback]="false"
+													styleClass="w-full md:w-[30rem]"></p-password>
+											</div>
+										</p-scrollPanel>
+										<div class="flex py-6 gap-2">
+											<p-button label="Voltar" severity="secondary"
+												(onClick)="activateCallback(1)" />
+											<p-button label="Cadastrar" type="submit" [disabled]="!form.valid" />
+										</div>
+									</div>
+								</ng-template>
+							</p-step-panel>
+						</p-step-panels>
+					</p-stepper>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>

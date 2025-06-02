@@ -1,6 +1,6 @@
 import { ConfirmationService, MessageService } from "primeng/api";
-import { BaseComponente } from "../../bases/components/base.component";
-import { TipoCurso } from "../models/tipocurso.model";
+import { BaseComponente } from "../../../bases/components/base.component";
+import { Modalidade } from "../../models/modalidade.model";
 import { Component } from "@angular/core";
 import { ConfirmDialogModule } from "primeng/confirmdialog";
 import { CheckboxModule } from "primeng/checkbox";
@@ -21,11 +21,11 @@ import { ButtonModule } from "primeng/button";
 import { FormsModule } from "@angular/forms";
 import { TableModule } from "primeng/table";
 import { CommonModule } from "@angular/common";
-import { TipoCursoService } from "../services/tipocurso.service";
+import { ModalidadeService } from "../../services/modalidade.service";
 
 
 @Component({
-    selector: 'app-TipoCurso',
+    selector: 'app-Modalidade',
     standalone: true,
     imports: [
         CommonModule,
@@ -48,15 +48,15 @@ import { TipoCursoService } from "../services/tipocurso.service";
         CheckboxModule,
         ConfirmDialogModule
     ],
-    templateUrl: `./tipocurso.component.html`,
-    providers: [MessageService, TipoCursoService, ConfirmationService]
+    templateUrl: `./modalidade.component.html`,
+    providers: [MessageService, ModalidadeService, ConfirmationService]
 })
-export class TipoCursoComponent extends BaseComponente<TipoCurso, TipoCurso> {
+export class ModalidadeComponent extends BaseComponente<Modalidade, Modalidade> {
    
     constructor(
         messageService: MessageService,
         confirmationService: ConfirmationService,
-        service: TipoCursoService
+        service: ModalidadeService
     ) {
         super(
             messageService,
@@ -64,7 +64,8 @@ export class TipoCursoComponent extends BaseComponente<TipoCurso, TipoCurso> {
             service
         );
 
-        this.titulo = 'tipo de curso';
+        this.titulo = 'Modalidade';
+        this.genero = 'a';
     }
 
     override getValidacoes(): boolean {
