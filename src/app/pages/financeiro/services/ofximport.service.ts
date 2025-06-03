@@ -30,48 +30,49 @@ export class OfxImportService {
     });
   }
 
-    private parseOfx(ofxContent: string): ImportacaoOfx[] {
-        const content = ofxContent.replace(/\r\n/g, '').replace(/>\s+</g, '><');
-        const getHeaderTagValue = (tag: string): string => {
-            const match = content.match(new RegExp(`<${tag}>(.*?)<\/${tag}>`));
-            return match ? match[1] : '';
-        };
+  private parseOfx(ofxContent: string): ImportacaoOfx[] {
+    const content = ofxContent.replace(/\r\n/g, '').replace(/\n/g, '').replace(/>\s+</g, '><');
 
-        const agencia = getHeaderTagValue('BANKID');
-        const numeroConta = getHeaderTagValue('ACCTID');
+    const getTagValue = (source: string, tag: string): string => {
+        const xmlMatch = source.match(new RegExp(`<${tag}>(.*?)<\/${tag}>`, 's'));
+        if (xmlMatch) return xmlMatch[1].trim();
 
-        const transactionMatches = content.match(/<STMTTRN>.*?<\/STMTTRN>/g) || [];
+        const sgmlMatch = source.match(new RegExp(`<${tag}>([^<\\r\\n]+)`));
+        return sgmlMatch ? sgmlMatch[1].trim() : '';
+    };
 
-        return transactionMatches.map(trn => {
-            const getTagValue = (tag: string) => {
-            const match = trn.match(new RegExp(`<${tag}>(.*?)<\/${tag}>`));
-            return match ? match[1] : '';
-            };
+    const numeroBanco = getTagValue(content, 'BANKID')
+    const agencia = getTagValue(content, 'BRANCHID');
+    const numeroConta = getTagValue(content, 'ACCTID');
 
-            const dtPosted = getTagValue('DTPOSTED');
-            let date: Date;
-            if (dtPosted.length >= 8) {
+    const transactionMatches = content.match(/<STMTTRN>.*?<\/STMTTRN>/gs) || [];
+
+    return transactionMatches.map(trn => {
+        const dtPosted = getTagValue(trn, 'DTPOSTED');
+        let date: Date;
+        if (dtPosted.length >= 8) {
             const year = parseInt(dtPosted.substring(0, 4));
             const month = parseInt(dtPosted.substring(4, 6)) - 1;
             const day = parseInt(dtPosted.substring(6, 8));
             date = new Date(year, month, day);
-            } else {
+        } else {
             date = new Date();
-            }
+        }
 
-            const amount = Math.abs(parseFloat(getTagValue('TRNAMT'))) || 0;
-            const historico = getTagValue('MEMO');
+        const amount = parseFloat(getTagValue(trn, 'TRNAMT')) || 0;
+        const historico = getTagValue(trn, 'MEMO');
 
-            return {
+        return {
             dataLancamento: date,
             valor: amount,
             historico: historico,
-            numeroDocumento: getTagValue('CHECKNUM') || getTagValue('FITID'),
+            numeroDocumento: getTagValue(trn, 'CHECKNUM') || getTagValue(trn, 'FITID'),
             tag: historico,
+            numeroBanco : numeroBanco,
             agencia: agencia,
             numeroConta: numeroConta
-            };
-        });
-    }
+        };
+    });
+  }
 
 }

@@ -10,8 +10,19 @@ import { SubcontaSaida } from '../models/subconta.saida.model';
 })
 export class SubcontaService extends BaseService<Subconta,SubcontaSaida>{
    
-    constructor(http: HttpClient) {
-        super(http, 'financeiro/subconta');
-    }
+  constructor(http: HttpClient) {
+      super(http, 'financeiro/subconta');
+  }
+
+    
+  findSubcontaPadrao(entrada : boolean): Promise<Subconta> {
+      return firstValueFrom(
+          this.http.get<Subconta>(`${this.baseUrl}/find_by_padrao`, {
+              params: {entrada}
+          })
+      ).catch(error => {
+          return Promise.reject(this.extractErrorMessage(error));
+      });
+  }
 
 }

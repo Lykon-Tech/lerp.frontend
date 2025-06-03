@@ -137,7 +137,7 @@ export class MovimentoComponent extends BaseComponente<Movimento, MovimentoSaida
         this.contaService.findAll(true).then((data)=>{
             this.contas.set(data);
             this.contas_select = this.contas().map(conta => ({
-                label: conta.numeroConta,
+                label: conta.banco?.nome + ' - ' + conta.numeroConta,
                 value: conta
             }));
         });
@@ -194,6 +194,15 @@ export class MovimentoComponent extends BaseComponente<Movimento, MovimentoSaida
                 
                 const conta = await this.contaService.findByAgenciaNumeroConta(ofxData[0].agencia, ofxData[0].numeroConta);
 
+                if(conta.banco?.numeroBanco?.toString() != ofxData[0].numeroBanco){
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Falha',
+                        detail: 'O Banco cadastrado difere da importação OFX! \n Banco cadastrado: ' + conta.banco?.numeroBanco + '\n Banco OFX:' + ofxData[0].numeroBanco ,
+                        life: 5000
+                    });
+                    return;
+                }
                 if(!conta){
                     this.messageService.add({
                         severity: 'error',
@@ -206,54 +215,66 @@ export class MovimentoComponent extends BaseComponente<Movimento, MovimentoSaida
                 
                 const tipoDocumento = await this.tipoDocumentoService.findOfx();
 
-                const { movimentosValidos, historicosSemTag } = await this.identificarTagsFaltantes(ofxData, conta, tipoDocumento);
+                const { movimentosValidos, movimentosPadrao, historicosSemTag } = await this.identificarTagsFaltantes(ofxData, conta, tipoDocumento);
+
+                 if (movimentosValidos.length > 0) {
+                    const movimentosSaida = movimentosValidos
+                        .map(mov => this.converterObjeto(mov));
+
+                    await this.movimentoService.createmovimentos(movimentosSaida);
+                    await this.loadDemoData();
+                }
+
+                if (movimentosPadrao.length > 0) {
+                    const movimentosSaida = movimentosPadrao
+                        .map(mov => this.converterObjeto(mov));
+
+                    await this.movimentoService.createmovimentos(movimentosSaida);
+                    await this.loadDemoData();
+                }
+
+                if(movimentosValidos.length > 0 || movimentosPadrao.length > 0){
+                    this.messageService.add({
+                        severity: 'success',
+                        summary: 'Sucesso',
+                        detail: `${movimentosValidos.length} movimentos importados automaticamente!`,
+                        life: 5000
+                    });
+                }
 
                 if (historicosSemTag.length > 0) {
                     this.confirmationService.confirm({
                         message: `
                             <div>
+                                <p>Estes movimentos foram importados na subconta padrão!</p>
+                                <p>Deseja editar esses ${historicosSemTag.length} movimentos manualmente?</p>
+
                                 <p>Os seguintes históricos não possuem tags correspondentes:</p>
                                 <ul style="max-height: 200px; overflow-y: auto; margin: 10px 0; padding-left: 20px;">
                                     ${historicosSemTag.map(h => `<li>${h}</li>`).join('')}
                                 </ul>
-                                <p>Deseja importar esses ${historicosSemTag.length} movimentos manualmente?</p>
-                            </div>
+                                                           </div>
                         `,
                         header: 'Tags não encontradas',
                         icon: 'pi pi-exclamation-triangle',
-                        acceptLabel: 'Sim, importar manualmente',
+                        acceptLabel: 'Sim, editar manualmente',
                         rejectLabel: 'Não, pular estes',
                         acceptButtonStyleClass: 'p-button-primary',
                         rejectButtonStyleClass: 'p-button-secondary',
                         accept: async () => {
                             await this.importarMovimentosManualmente(
-                                ofxData.filter(item => historicosSemTag.includes(item.historico)),
+                                movimentosPadrao,
                                 tipoDocumento
                             );
                         },
                         reject: () => {
                             this.messageService.add({
                                 severity: 'info',
-                                summary: 'Importação parcial',
-                                detail: `${historicosSemTag.length} movimentos sem tags foram ignorados`,
+                                summary: 'Importaçãopadrão',
+                                detail: `${historicosSemTag.length} movimentos sem tags foram importados na subconta padrão`,
                                 life: 5000
                             });
                         }
-                    });
-                }
-
-                if (movimentosValidos.length > 0) {
-                    const movimentosSaida = movimentosValidos
-                        .map(mov => this.converterObjeto(mov));
-
-                    await this.movimentoService.createmovimentos(movimentosSaida);
-                    await this.loadDemoData();
-                    
-                    this.messageService.add({
-                        severity: 'success',
-                        summary: 'Sucesso',
-                        detail: `${movimentosValidos.length} movimentos importados automaticamente!`,
-                        life: 5000
                     });
                 }
 
@@ -273,51 +294,76 @@ export class MovimentoComponent extends BaseComponente<Movimento, MovimentoSaida
 
     private async identificarTagsFaltantes(ofxData: any[], conta :Conta, tipoDocumento : TipoDocumento): Promise<{ 
         movimentosValidos: Movimento[], 
-        historicosSemTag: string[]
+        historicosSemTag: string[],
+        movimentosPadrao: Movimento[], 
     }> {
         const movimentosValidos: Movimento[] = [];
+        const movimentosPadrao: Movimento[] = [];
         const historicosSemTag = new Set<string>();
         let tag : TagModel = {};
 
+        const subcontaEntradaPadrao = await this.subcontaService.findSubcontaPadrao(true);
+        const subcontaSaidaPadrao = await this.subcontaService.findSubcontaPadrao(false);
+        let lancarPadrao = false;
         for (const item of ofxData) {
             try {
                 tag = await this.tagService.findByName(item.historico);
                 
                 if (!tag) {
                     historicosSemTag.add(item.historico);
-                    continue;
+                    lancarPadrao = true;
                 }
                 
 
             } catch (error) {
                 historicosSemTag.add(item.historico);
-                continue;
+                lancarPadrao = true;
             }
             
-            movimentosValidos.push({
-                dataLancamento: item.dataLancamento,
-                valor: item.valor,
-                historico: item.historico,
-                numeroDocumento: item.numeroDocumento,
-                subconta: tag.subconta || {},
-                conta : conta || {},
-                tipoDocumento: tipoDocumento || {},
-                importadoOfx: true
-            });
+            if(lancarPadrao){
+                lancarPadrao = false;
+                movimentosPadrao.push({
+                    dataLancamento: item.dataLancamento,
+                    valor: item.valor,
+                    historico: item.historico,
+                    numeroDocumento: item.numeroDocumento,
+                    subconta:  item.valor > 0 ? subcontaEntradaPadrao : subcontaSaidaPadrao,
+                    conta : conta || {},
+                    tipoDocumento: tipoDocumento || {},
+                    importadoOfx: true
+                });
+            }
+            else{
+                movimentosValidos.push({
+                    dataLancamento: item.dataLancamento,
+                    valor: item.valor,
+                    historico: item.historico,
+                    numeroDocumento: item.numeroDocumento,
+                    subconta: tag.subconta || {},
+                    conta : conta || {},
+                    tipoDocumento: tipoDocumento || {},
+                    importadoOfx: true
+                });
+            }
+
             
         }
 
         return { 
             movimentosValidos, 
-            historicosSemTag: Array.from(historicosSemTag) 
+            historicosSemTag: Array.from(historicosSemTag),
+            movimentosPadrao
         };
     }
 
     private async importarMovimentosManualmente(movimentos: any[], tipodocumento :TipoDocumento): Promise<void> {
         for (const mov of movimentos) {
             try {
+
+                const id = await this.movimentoService.findByNumeroDocumento(mov.numeroDocumento);
                 
                 this.objeto = {
+                    id: id,
                     dataLancamento: mov.dataLancamento,
                     valor: mov.valor,
                     historico: mov.historico,
@@ -326,7 +372,6 @@ export class MovimentoComponent extends BaseComponente<Movimento, MovimentoSaida
                     subconta: {}, 
                     tipoDocumento: tipodocumento || {}
                 };
-
 
                 this.dialogo = true;
                 

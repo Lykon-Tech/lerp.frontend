@@ -25,6 +25,7 @@ import { FuncionarioComponent } from './funcionarios/components/funcionario.comp
 import { TurmaComponent } from './turmas/components/turma.component';
 import { ContratoComponent } from './contratos/components/contrato.component';
 import { AlunoComponent } from './funcionarios/components/aluno.component';
+import { TransfAlunoComponent } from './turmas/components/transfalunos.component';
 
 export default [
     { path: 'documentation', component: Documentation },
@@ -50,6 +51,7 @@ export default [
     { path: 'funcionarios', component: FuncionarioComponent },
     { path: 'cursos', component: CursoComponent },
     { path: 'alunos', component: AlunoComponent },
+    { path: 'transferencia_alunos', component: TransfAlunoComponent },
     { path: 'turmas', component: TurmaComponent },
     { path: 'crud', component: Crud },
     { path: 'empty', component: Empty },

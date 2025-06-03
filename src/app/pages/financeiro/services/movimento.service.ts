@@ -53,15 +53,22 @@ export class MovimentoService extends BaseService<Movimento, MovimentoSaida>{
     }
 
     
-    getMovimentosFiltro(filtro : FiltroMovimento): Promise<Movimento[]> {
+    getMovimentosFiltro(filtroMovimentoDTO: FiltroMovimento): Promise<Movimento[]> {
         return firstValueFrom(
-            this.http.post<Movimento[]>(`${this.baseUrl}/find_all_by_filtro`, filtro)
+            this.http.post<Movimento[]>(`${this.baseUrl}/find_all_by_filtro`, filtroMovimentoDTO)
         ).catch(error => Promise.reject(this.extractErrorMessage(error)));
     }
+
 
     getReceitasDespesas(filtro : FiltroMovimento): Promise<ReceitasDespesasRelatorios> {
         return firstValueFrom(
             this.http.post<ReceitasDespesasRelatorios>(`${this.baseUrl}/receitas_despesas/find_all_by_filtro`, filtro)
+        ).catch(error => Promise.reject(this.extractErrorMessage(error)));
+    }
+
+    findByNumeroDocumento(numeroDocumento : string): Promise<string> {
+        return firstValueFrom(
+            this.http.post<string>(`${this.baseUrl}/find_id_by_numero_documento`, numeroDocumento)
         ).catch(error => Promise.reject(this.extractErrorMessage(error)));
     }
     

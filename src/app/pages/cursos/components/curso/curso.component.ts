@@ -35,6 +35,7 @@ import { MultiSelectModule } from "primeng/multiselect";
 import { ModalidadeService } from "../../services/modalidade.service";
 import { Modalidade } from "../../models/modalidade.model";
 import { Panel } from "primeng/panel";
+import { Popover, PopoverModule } from "primeng/popover";
 
 
 @Component({
@@ -60,7 +61,8 @@ import { Panel } from "primeng/panel";
         IconFieldModule,
         CheckboxModule,
         ConfirmDialogModule,
-        MultiSelectModule
+        MultiSelectModule,
+        PopoverModule
     ],
     templateUrl: `./curso.component.html`,
     providers: [MessageService, CursoService, ConfirmationService]
@@ -90,10 +92,10 @@ export class CursoComponent extends BaseComponente<Curso, CursoSaida> {
     selectedBolsas: any[] = [];
 
 
-    showBolsasDialog(bolsas: any[]) {
-        this.selectedBolsas = bolsas || [];
-        this.bolsasDialogVisible = true;
+    toggleDataTable(op: Popover, event: any) {
+        op.toggle(event);
     }
+    
 
     currentBolsasInOverlay: Bolsa[] = [];
 

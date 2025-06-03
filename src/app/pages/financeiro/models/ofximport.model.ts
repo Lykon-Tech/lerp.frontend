@@ -6,4 +6,5 @@ export interface ImportacaoOfx {
   tag: string;
   agencia : string;
   numeroConta : string;
+  numeroBanco: string;
 }

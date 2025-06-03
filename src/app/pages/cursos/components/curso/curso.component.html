@@ -97,13 +97,24 @@
                 </span>
             </td>
             <td>
-                <span 
-                    class="p-chip p-chip-text p-1 px-3 mr-2 mb-2 rounded-full bg-blue-100 text-blue-800 cursor-pointer"
-                    (click)="showBolsasDialog(objeto.bolsas)"
-                    title="Clique para ver todas as bolsas"
-                >
-                    {{ objeto.bolsas.length }} bolsa(s) - clique para ver
-                </span>
+ 
+                <span class="p-chip p-chip-text p-1 px-3 mr-2 mb-1 rounded-full bg-green-100 text-white-800" (click)="toggleDataTable(op2, $event)">Mostrar bolsas +</span>
+                <p-popover #op2 id="overlay_panel" fluid>
+                    <p-table [value]="objeto.bolsas" selectionMode="single" dataKey="id" [rows]="5" [paginator]="true">
+                        <ng-template #header>
+                            <tr>
+                                <th>Nome</th>
+                            </tr>
+                        </ng-template>
+                        <ng-template #body let-bolsa>
+                            <tr [pSelectableRow]="bolsa">
+                                <td>{{ bolsa.nome }}</td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </p-popover>
+                <p-toast />
+
             </td>
 
             <td>

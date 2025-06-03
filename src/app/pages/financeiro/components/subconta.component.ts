@@ -92,7 +92,7 @@ export class SubcontaComponent extends BaseComponente<Subconta, SubcontaSaida> {
     }
 
     override getValidacoes(): boolean {
-        return (this.objeto as any).agencia.trim() && (this.objeto as any).ativo != undefined && (this.objeto as any).grupoConta != undefined && (this.objeto as any).tipo != undefined;
+        return (this.objeto as any).nome.trim() && (this.objeto as any).ativo != undefined && (this.objeto as any).grupoConta != undefined && (this.objeto as any).tipo != undefined;
     }
 
     override getObjetoEdit(objeto: Subconta): Subconta {

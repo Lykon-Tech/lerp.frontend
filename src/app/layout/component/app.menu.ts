@@ -34,6 +34,7 @@ export class AppMenu {
                         label: 'Turmas',
                         items: [
                             { label: 'Turmas', icon: 'pi pi-users', routerLink: ['/pages/turmas'] },
+                            { label: 'Transferência entre turmas', icon: 'pi pi-refresh', routerLink: ['/pages/transferencia_alunos'] },
                             { label: 'Turnos', icon: 'pi pi-clock', routerLink: ['/pages/turnos'] },
                             { label: 'Situação de turma', icon: 'pi pi-info-circle', routerLink: ['/pages/situacoes_turmas'] },
                         ]
@@ -65,8 +66,8 @@ export class AppMenu {
                     { label: 'Movimentação Financeira', icon: 'pi pi-dollar', routerLink: ['/pages/movimentos'] },
                     { label: 'Bancos', icon: 'pi pi-wallet', routerLink: ['/pages/bancos'] },
                     { label: 'Contas', icon: 'pi pi-credit-card', routerLink: ['/pages/contas'] },
-                    { label: 'Subcontas', icon: 'pi pi-credit-card', routerLink: ['/pages/subcontas'] },
                     { label: 'Grupo de Contas', icon: 'pi pi-th-large', routerLink: ['/pages/grupos_contas'] },
+                    { label: 'Subcontas', icon: 'pi pi-credit-card', routerLink: ['/pages/subcontas'] },
                     { label: 'Tags', icon: 'pi pi-tags', routerLink: ['/pages/tags'] },
                     { label: 'Bolsas', icon: 'pi pi-percentage', routerLink: ['/pages/bolsas'] },
                     { label: 'Tipos de Documentos', icon: 'pi pi-file', routerLink: ['/pages/tipos_documentos'] }

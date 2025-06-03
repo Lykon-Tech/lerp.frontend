@@ -15,13 +15,13 @@
     [tableStyle]="{ 'min-width': '75rem' }"
     [rowHover]="true"
     dataKey="id"
-    currentPageReportTemplate="Mostrando de {first} até {last} de {totalRecords} objetos"
+    currentPageReportTemplate="Mostrando de {first} até {last} de {totalRecords} bancos"
     [showCurrentPageReport]="true"
     [rowsPerPageOptions]="[10, 20, 30]"
 >
     <ng-template #caption>
         <div class="flex items-center justify-between">
-            <h5 class="m-0">Gerenciar objetos</h5>
+            <h5 class="m-0">Gerenciar bancos</h5>
             <p-iconfield>
                 <p-inputicon styleClass="pi pi-search" />
                 <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Pesquisar..." />
@@ -88,7 +88,7 @@
     </ng-template>
 </p-table>
 
-<p-dialog [(visible)]="dialogo" [style]="{ width: '450px' }" header="Detalhes do objeto" [modal]="true">
+<p-dialog [(visible)]="dialogo" [style]="{ width: '450px' }" header="Detalhes do banco" [modal]="true">
     <ng-template #content>
         <div class="flex flex-col gap-6">
             <div>

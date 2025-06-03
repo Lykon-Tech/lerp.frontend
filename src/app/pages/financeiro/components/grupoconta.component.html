@@ -38,6 +38,10 @@
                 Recebimento de vendas
                 <p-sortIcon field="recebimento_vendas" />
             </th>
+            <th pSortableColumn="transf_contas" style="min-width: 12rem">
+                Transferência entre contas
+                <p-sortIcon field="transf_contas" />
+            </th>
             <th pSortableColumn="ativo" style="min-width: 12rem">
                 Ativo
                 <p-sortIcon field="ativo" />
@@ -52,8 +56,18 @@
                 <i
                     class="pi"
                     [ngClass]="{
-                    'pi-check text-green-600': objeto.recebimentoVendas,
-                    'pi-times text-red-600': !objeto.recebimentoVendas
+                    'pi-check text-green-600': objeto.tipoOperacao == 'RECEBIMENTO',
+                    'pi-times text-red-600': objeto.tipoOperacao != 'RECEBIMENTO'
+                    }"
+                    aria-label="aut_sup">
+                </i>
+            </td>
+            <td>
+                <i
+                    class="pi"
+                    [ngClass]="{
+                    'pi-check text-green-600': objeto.tipoOperacao == 'TRANSFERENCIA',
+                    'pi-times text-red-600': objeto.tipoOperacao != 'TRANSFERENCIA'
                     }"
                     aria-label="aut_sup">
                 </i>
@@ -96,13 +110,26 @@
 
             <div>
                 <span class="block font-bold mb-4">Opções</span>
-                <div class="grid grid-cols-2 gap-2">
+                <div class="grid grid-cols-12 gap-4">
                     <div class="flex items-center gap-2 col-span-6">
-                        <p-checkbox id="recebimento_vendas" name="recebimento_vendas" binary="true" [(ngModel)]="objeto.recebimentoVendas"></p-checkbox>
+                        <p-radiobutton 
+                            name="opcoes" 
+                            inputId="recebimento_vendas" 
+                            [(ngModel)]="objeto.tipoOperacao" 
+                            value="RECEBIMENTO" />
                         <label for="recebimento_vendas">Recebimento de vendas</label>
+                    </div>
+                    <div class="flex items-center gap-2 col-span-6">
+                        <p-radiobutton 
+                            name="opcoes" 
+                            inputId="transf_contas" 
+                            [(ngModel)]="objeto.tipoOperacao" 
+                            value="TRANSFERENCIA" />
+                        <label for="transf_contas">Transferência entre contas</label>
                     </div>
                 </div>
             </div>
+
         </div>
     </ng-template>
 
