@@ -1,4 +1,5 @@
 import { GrupoConta } from "./grupoconta.model";
+import { TagModel } from "./tag.model";
 
 export interface Subconta {
   id?: string;  
@@ -6,4 +7,5 @@ export interface Subconta {
   grupoConta?: GrupoConta;
   ativo?: boolean;
   tipo?: string;
+  tags?: TagModel[];
 }

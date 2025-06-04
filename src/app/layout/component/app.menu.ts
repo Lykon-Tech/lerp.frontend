@@ -68,7 +68,6 @@ export class AppMenu {
                     { label: 'Contas', icon: 'pi pi-credit-card', routerLink: ['/pages/contas'] },
                     { label: 'Grupo de Contas', icon: 'pi pi-th-large', routerLink: ['/pages/grupos_contas'] },
                     { label: 'Subcontas', icon: 'pi pi-credit-card', routerLink: ['/pages/subcontas'] },
-                    { label: 'Tags', icon: 'pi pi-tags', routerLink: ['/pages/tags'] },
                     { label: 'Bolsas', icon: 'pi pi-percentage', routerLink: ['/pages/bolsas'] },
                     { label: 'Tipos de Documentos', icon: 'pi pi-file', routerLink: ['/pages/tipos_documentos'] }
                 ]

@@ -45,8 +45,10 @@ export class MovimentoService extends BaseService<Movimento, MovimentoSaida>{
     }
 
     
-    createmovimentos(movimentos :MovimentoSaida[]){
-        return firstValueFrom(this.http.post<Movimento>(this.baseUrl+"/cadastrar_lista", movimentos))
+    createmovimentos(movimentos :MovimentoSaida[], cancelarComErro : boolean = false){
+         let params = new HttpParams()
+            .set('cancelarComErro', cancelarComErro);
+        return firstValueFrom(this.http.post<Movimento>(this.baseUrl+"/cadastrar_lista", movimentos,{params}))
             .catch(error => {
                 return Promise.reject(this.extractErrorMessage(error));
             });

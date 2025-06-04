@@ -6,8 +6,6 @@ import { Router } from '@angular/router';
 export class AuthService {
   private readonly TOKEN_KEY = 'auth-token';
   private readonly API_LOGIN = 'http://localhost:8080/auth/login';
-  private lembrar : boolean = false;
-
   constructor(private http: HttpClient, private router: Router) {}
 
   login(credentials: { email: string; senha: string }) {
@@ -15,7 +13,7 @@ export class AuthService {
   }
 
   saveToken(token: string, lembrar : boolean): void {
-    this.lembrar = lembrar;
+
     if(lembrar){
         localStorage.setItem(this.TOKEN_KEY, token);
         sessionStorage.removeItem(this.TOKEN_KEY);
@@ -28,13 +26,13 @@ export class AuthService {
   }
 
   getToken(): string | null {
-    return this.lembrar ? localStorage.getItem(this.TOKEN_KEY) : sessionStorage.getItem(this.TOKEN_KEY);
+    return localStorage.getItem(this.TOKEN_KEY) || sessionStorage.getItem(this.TOKEN_KEY);
   }
 
   logout(): void {
     localStorage.removeItem(this.TOKEN_KEY);
     sessionStorage.removeItem(this.TOKEN_KEY);
-    this.router.navigate(['/login']);
+    this.router.navigateByUrl('/');
   }
 
   isLoggedIn(): boolean {

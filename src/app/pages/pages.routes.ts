@@ -11,7 +11,6 @@ import { TipoDocumentoComponent } from './financeiro/components/tipodocumento.co
 import { TipoCursoComponent } from './cursos/components/tipocurso/tipocurso.component';
 import { ModalidadeComponent } from './cursos/components/modalidade/modalidade.component';
 import { DisciplinaComponent } from './cursos/components/disciplina/disciplina.component';
-import { TagComponent } from './financeiro/components/tag.component';
 import { MatrizCurricularComponent } from './cursos/components/matrizcurricular/matrizcurricular.component';
 import { MovimentoComponent } from './financeiro/components/movimento.component';
 import { SituacaoTurmaComponent } from './turmas/components/situacaoturma.component';
@@ -35,7 +34,6 @@ export default [
     { path: 'grupos_contas', component: GrupoContaComponent },
     { path: 'contas', component: ContaComponent },
     { path: 'subcontas', component: SubcontaComponent },
-    { path: 'tags', component: TagComponent },
     { path: 'tipos_documentos', component: TipoDocumentoComponent },
     { path: 'tipos_cursos', component: TipoCursoComponent },
     { path: 'modalidades', component: ModalidadeComponent },

@@ -42,6 +42,10 @@
                 Tipo
                 <p-sortIcon field="tipo" />
             </th>
+            <th pSortableColumn="tags" style="min-width:12rem">
+                Tags
+                <p-sortIcon field="tags" />
+            </th>
             <th pSortableColumn="ativo" style="min-width: 12rem">
                 Ativo
                 <p-sortIcon field="ativo" />
@@ -51,11 +55,12 @@
     </ng-template>
     <ng-template #body let-objeto>
         <tr>
-            <td style="min-width: 16rem">{{ objeto.nome}}</td>
-            <td>{{ objeto.grupoConta.nome}}</td>
+            <td style="min-width: 16rem">{{objeto.nome}}</td>
+            <td>{{objeto.grupoConta.nome}}</td>
             <td>
                 <p-tag [value]="objeto.tipo" [severity]="getSeverity(objeto.tipo == 'ENTRADA')" />
             </td>
+            <td>{{getTagsNome(objeto.tags) | json}}</td>
             <td>
                 <p-tag [value]="objeto.ativo ? 'ATIVO' : 'INATIVO' " [severity]="getSeverity(objeto.ativo)" />
             </td>
@@ -105,6 +110,18 @@
                     </div>
                 </div>
                 <small class="text-red-500" *ngIf="submitted && objeto.tipo == undefined">Tipo é obrigatório.</small>
+            </div>
+
+            <div>
+                <label for="tags" class="block font-bold mb-3">Tags</label>
+                <textarea
+                pInputTextarea
+                id="tags"
+                [(ngModel)]="tagInput"
+                rows="3"
+                placeholder="tags (separe por ;)"
+                fluid
+                ></textarea>
             </div>
 
             <div>

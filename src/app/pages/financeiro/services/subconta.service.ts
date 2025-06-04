@@ -14,15 +14,25 @@ export class SubcontaService extends BaseService<Subconta,SubcontaSaida>{
       super(http, 'financeiro/subconta');
   }
 
-    
-  findSubcontaPadrao(entrada : boolean): Promise<Subconta> {
-      return firstValueFrom(
-          this.http.get<Subconta>(`${this.baseUrl}/find_by_padrao`, {
-              params: {entrada}
-          })
-      ).catch(error => {
-          return Promise.reject(this.extractErrorMessage(error));
-      });
-  }
+
+    findSubcontaPadrao(entrada : boolean): Promise<Subconta> {
+        return firstValueFrom(
+            this.http.get<Subconta>(`${this.baseUrl}/find_by_padrao`, {
+                params: {entrada}
+            })
+        ).catch(error => {
+            return Promise.reject(this.extractErrorMessage(error));
+        });
+    }
+
+    findByTagName(tagNome : string): Promise<Subconta> {
+        return firstValueFrom(
+            this.http.get<Subconta>(`${this.baseUrl}/find_by_tag_name`, {
+                params: {tagNome}
+            })
+        ).catch(error => {
+            return Promise.reject(this.extractErrorMessage(error));
+        });
+    }
 
 }

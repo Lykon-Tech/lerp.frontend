@@ -4,27 +4,29 @@
 <p-toolbar>
   <ng-template #start>
     <div class="flex gap-2 flex-wrap items-center">
-      <p-button
-        label="Novo"
-        icon="pi pi-plus"
-        severity="secondary"
-        (click)="openNew()"
-      ></p-button>
+        <p-button
+            label="Novo"
+            icon="pi pi-plus"
+            severity="secondary"
+            (click)="openNew()"
+        ></p-button>
 
-      <p-button
-        label="Importar OFX"
-        icon="pi pi-file-import"
-        severity="secondary"
-        (click)="fileInput.click()"
-      ></p-button>
-      
-      <input
-        #fileInput
-        type="file"
-        accept=".ofx,.qfx"
-        (change)="importOfx($event)"
-        style="display: none"
-      />
+        <p-button severity="secondary" label="Editar" icon="pi pi-pencil" outlined (onClick)="editarMovimentos()" [disabled]="!movimentosSelecionados || !movimentosSelecionados.length" />
+
+        <p-button
+            label="Importar OFX"
+            icon="pi pi-file-import"
+            severity="secondary"
+            (click)="fileInput.click()"
+        ></p-button>
+        
+        <input
+            #fileInput
+            type="file"
+            accept=".ofx,.qfx"
+            (change)="importOfx($event)"
+            style="display: none"
+        />
     </div>
   </ng-template>
 
@@ -81,6 +83,7 @@
         [loading]="loading"
         [paginator]="true"
         [showGridlines]="true"
+        [(selection)]="movimentosSelecionados"
         [rowHover]="true"
         responsiveLayout="scroll"
         currentPageReportTemplate="Mostrando de {first} até {last} de {totalRecords} movimentos"
@@ -106,6 +109,9 @@
 
         <ng-template #header>
             <tr>
+                <th style="width: 3rem">
+                    <p-tableHeaderCheckbox />
+                </th>
                 <th style="min-width: 12rem">
                     Data
                     <p-columnFilter  dataType="date" dateFormat="dd/mm/yy" type="date" field="dataLancamento" display="menu" placeholder="dd/mm/aaaa" />
@@ -139,6 +145,9 @@
 
         <ng-template #body let-mov>
             <tr>
+                <td style="width: 3rem">
+                    <p-tableCheckbox [value]="mov" />
+                </td>
                 <td>{{ mov?.dataLancamento | date:'dd/MM/yyyy' }}</td>
                 <td>{{ mov?.conta.banco.numeroBanco + ' - ' + mov?.conta.banco.nome + ' / ' + mov?.conta.numeroConta }}</td>
                 <td>
@@ -188,6 +197,7 @@
                         inputId="dataLancamento"
                         placeholder="Selecione a data"
                         [showIcon]="true"
+                        [disabled]="objeto.importadoOfx ?? false"
                         [showButtonBar]="true"
                         fluid
                     />
@@ -200,6 +210,7 @@
                     name="valor"
                     type="number"
                     pInputText
+                    [disabled]="objeto.importadoOfx ?? false"
                     id="valor"
                     [(ngModel)]="objeto.valor"
                     required
@@ -216,6 +227,7 @@
                     [(ngModel)]="objeto.conta"
                     inputId="conta"
                     [options]="contas_select"
+                    [disabled]="objeto.importadoOfx ?? false"
                     optionLabel="label"
                     optionValue="value"
                     placeholder="Selecione uma conta"
@@ -278,19 +290,20 @@
                     [(ngModel)]="objeto.numeroDocumento"
                     maxlength="50"
                     placeholder="Número do documento"
+                    [disabled]="objeto.importadoOfx ?? false"
                     fluid
                     />
                 </div>
 
                 <div>
-                    <label for="numeroobjeto" class="block font-bold mb-3">Número do objeto</label>
+                    <label for="numero_movimento" class="block font-bold mb-3">Número do movimento</label>
                     <input
                     type="text"
                     pInputText
-                    id="numeroobjeto"
+                    id="numero_movimento"
                     [(ngModel)]="objeto.numeroMovimento"
                     maxlength="50"
-                    placeholder="Número do objeto"
+                    placeholder="Número do movimento"
                     fluid
                     />
                 </div>
@@ -314,9 +327,52 @@
             <p-button label="Cancelar" icon="pi pi-times" text (click)="hideDialog()" />
             <p-button label="Salvar" icon="pi pi-check" (click)="save()" />
         </ng-template>
-        </p-dialog>
+    </p-dialog>
 
-        <p-confirmdialog [style]="{ width: '450px' }" />
+        <p-dialog [(visible)]="dialogoEditar" [style]="{ width: '450px' }" header="Detalhes do movimento" [modal]="true">
+        <ng-template #content>
+            <div class="flex flex-col gap-6">
+            
+                <div>
+                    <label for="subcontas" class="block font-bold mb-3">Subconta</label>
+                    <p-select
+                    name="subcontas"
+                    [(ngModel)]="movimentoEditar.subconta"
+                    inputId="subconta"
+                    [options]="subcontas_select"
+                    optionLabel="label"
+                    optionValue="value"
+                    placeholder="Selecione uma subconta"
+                    appendTo="body"
+                    fluid
+                    ></p-select>
+                </div>
+
+                <div>
+                    <label for="tipo_documentos" class="block font-bold mb-3">Tipo de Documento</label>
+                    <p-select
+                    name="tipo_documentos"
+                    [(ngModel)]="movimentoEditar.tipoDocumento"
+                    inputId="tipo_documento"
+                    [options]="tipoDocumentos_select"
+                    optionLabel="label"
+                    optionValue="value"
+                    placeholder="Selecione um tipo de documento"
+                    appendTo="body"
+                    fluid
+                    ></p-select>
+                </div>
+
+            </div>
+        </ng-template>
+
+        <ng-template #footer>
+            <p-button label="Cancelar" icon="pi pi-times" text (click)="hideDialogEditar()" />
+            <p-button label="Salvar" icon="pi pi-check" (click)="saveEditar()" />
+        </ng-template>
+    </p-dialog>
+
+    <p-confirmdialog [style]="{ width: '450px' }" />
 
 
 </div>

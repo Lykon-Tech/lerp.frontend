@@ -28,8 +28,6 @@ import { Conta } from "../models/conta.model";
 import { Subconta } from "../models/subconta.model";
 import { SubcontaService } from "../services/subconta.service";
 import { TipoDocumentoService } from "../services/tipodocumento.service";
-import { TagModel } from "../models/tag.model";
-import { TagService } from "../services/tag.service";
 import { OfxImportService } from "../services/ofximport.service";
 import { TipoDocumento } from "../models/tipodocumento.model";
 import { MovimentoSaida } from "../models/movimento.saida.model";
@@ -74,7 +72,6 @@ export class MovimentoComponent extends BaseComponente<Movimento, MovimentoSaida
         private contaService : ContaService,
         private subcontaService : SubcontaService,
         private tipoDocumentoService : TipoDocumentoService,
-        private tagService : TagService,
         private ofxService : OfxImportService
     ) {
         super(
@@ -87,8 +84,15 @@ export class MovimentoComponent extends BaseComponente<Movimento, MovimentoSaida
     }
 
     filtro : FiltroMovimento = {};
+     
+    dialogoEditar: boolean = false;
+
     loading: boolean = false;
 
+    movimentosSelecionados!: Movimento[];
+
+    movimentoEditar! : Movimento;
+    
     contas = signal<Conta[]>([]);
     contas_select! : any[];
 
@@ -170,7 +174,7 @@ export class MovimentoComponent extends BaseComponente<Movimento, MovimentoSaida
             subconta: this.subcontas().find(b => b.id === objeto.subconta?.id),
             conta : this.contas().find(b => b.id === objeto.conta?.id),
             tipoDocumento : this.tipoDocumentos().find(b => b.id === objeto.tipoDocumento?.id),
-            valor: objeto.valor,
+            valor: this.getValor(objeto.valor ?? 0),
             dataLancamento : objeto.dataLancamento ? new Date(objeto.dataLancamento) : new Date(),
             historico: objeto.historico,
             observacao: objeto.observacao,
@@ -194,7 +198,7 @@ export class MovimentoComponent extends BaseComponente<Movimento, MovimentoSaida
                 
                 const conta = await this.contaService.findByAgenciaNumeroConta(ofxData[0].agencia, ofxData[0].numeroConta);
 
-                if(conta.banco?.numeroBanco?.toString() != ofxData[0].numeroBanco){
+                if(conta.banco?.numeroBanco?.toString() != ofxData[0].numeroBanco.replace(/^0+/, '')){
                     this.messageService.add({
                         severity: 'error',
                         summary: 'Falha',
@@ -243,17 +247,16 @@ export class MovimentoComponent extends BaseComponente<Movimento, MovimentoSaida
                 }
 
                 if (historicosSemTag.length > 0) {
-                    this.confirmationService.confirm({
+                   this.confirmationService.confirm({
                         message: `
-                            <div>
+                            <div style="max-height: 400px; overflow-y: auto;">
                                 <p>Estes movimentos foram importados na subconta padrão!</p>
                                 <p>Deseja editar esses ${historicosSemTag.length} movimentos manualmente?</p>
-
                                 <p>Os seguintes históricos não possuem tags correspondentes:</p>
-                                <ul style="max-height: 200px; overflow-y: auto; margin: 10px 0; padding-left: 20px;">
+                                <ul style="margin: 10px 0; padding-left: 20px;">
                                     ${historicosSemTag.map(h => `<li>${h}</li>`).join('')}
                                 </ul>
-                                                           </div>
+                            </div>
                         `,
                         header: 'Tags não encontradas',
                         icon: 'pi pi-exclamation-triangle',
@@ -262,16 +265,13 @@ export class MovimentoComponent extends BaseComponente<Movimento, MovimentoSaida
                         acceptButtonStyleClass: 'p-button-primary',
                         rejectButtonStyleClass: 'p-button-secondary',
                         accept: async () => {
-                            await this.importarMovimentosManualmente(
-                                movimentosPadrao,
-                                tipoDocumento
-                            );
+                            await this.importarMovimentosManualmente(movimentosPadrao, tipoDocumento);
                         },
                         reject: () => {
                             this.messageService.add({
                                 severity: 'info',
-                                summary: 'Importaçãopadrão',
-                                detail: `${historicosSemTag.length} movimentos sem tags foram importados na subconta padrão`,
+                                summary: 'Importação padrão',
+                                detail: `Movimentos sem tags, não editados foram importados na subconta padrão`,
                                 life: 5000
                             });
                         }
@@ -300,20 +300,20 @@ export class MovimentoComponent extends BaseComponente<Movimento, MovimentoSaida
         const movimentosValidos: Movimento[] = [];
         const movimentosPadrao: Movimento[] = [];
         const historicosSemTag = new Set<string>();
-        let tag : TagModel = {};
+        let subconta : Subconta = {};
 
         const subcontaEntradaPadrao = await this.subcontaService.findSubcontaPadrao(true);
         const subcontaSaidaPadrao = await this.subcontaService.findSubcontaPadrao(false);
         let lancarPadrao = false;
         for (const item of ofxData) {
             try {
-                tag = await this.tagService.findByName(item.historico);
+                subconta = await this.subcontaService.findByTagName(item.historico);
                 
-                if (!tag) {
+                if (!subconta) {
                     historicosSemTag.add(item.historico);
-                    lancarPadrao = true;
                 }
-                
+
+                lancarPadrao = !subconta || (item.valor > 0 && subconta?.tipo == 'SAIDA') || (item.valor < 0 && subconta?.tipo == 'ENTRADA');
 
             } catch (error) {
                 historicosSemTag.add(item.historico);
@@ -334,12 +334,13 @@ export class MovimentoComponent extends BaseComponente<Movimento, MovimentoSaida
                 });
             }
             else{
+
                 movimentosValidos.push({
                     dataLancamento: item.dataLancamento,
                     valor: item.valor,
                     historico: item.historico,
                     numeroDocumento: item.numeroDocumento,
-                    subconta: tag.subconta || {},
+                    subconta: subconta || {},
                     conta : conta || {},
                     tipoDocumento: tipoDocumento || {},
                     importadoOfx: true
@@ -369,6 +370,7 @@ export class MovimentoComponent extends BaseComponente<Movimento, MovimentoSaida
                     historico: mov.historico,
                     numeroDocumento: mov.numeroDocumento,
                     importadoOfx: true,
+                    conta : mov.conta,
                     subconta: {}, 
                     tipoDocumento: tipodocumento || {}
                 };
@@ -380,7 +382,7 @@ export class MovimentoComponent extends BaseComponente<Movimento, MovimentoSaida
                         const mensagens = Array.isArray(msg) ? msg : [msg];
 
                         for (const m of mensagens) {
-                            if ((m.summary === 'Sucesso' && m.detail?.includes('Movimento'))) {
+                            if ((m.summary === 'Sucesso' && m.detail?.includes('movimento'))) {
                                 subscription.unsubscribe();
                                 resolve();
                                 break;
@@ -422,8 +424,8 @@ export class MovimentoComponent extends BaseComponente<Movimento, MovimentoSaida
         return this.lista()
             .reduce((acc, mov) => {
                 return mov?.subconta?.tipo === 'ENTRADA'
-                    ? acc + (mov?.valor ?? 0)
-                    : acc - (mov?.valor ?? 0);
+                    ? acc + Math.abs((mov?.valor ?? 0))
+                    : acc - Math.abs((mov?.valor ?? 0));
             }, 0);
     }
 
@@ -433,7 +435,97 @@ export class MovimentoComponent extends BaseComponente<Movimento, MovimentoSaida
     }
 
     formatarValor(valor: number): string{
-        return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        return Math.abs(valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    getValor(valor: number) {
+        return Math.abs(valor)
+    }
+
+    editarMovimentos(){
+        this.dialogoEditar = true;
+        this.movimentoEditar = {};
+    }
+
+    hideDialogEditar(){
+        this.dialogoEditar = false;
+    }
+
+    async saveEditar(){
+
+        this.confirmationService.confirm({
+            message: `
+                <div style="max-height: 400px; overflow-y: auto;">
+                    <p>Deseja editar todos esses ${this.movimentosSelecionados.length} movimentos?</p>
+                </div>
+            `,
+            header: 'Editar movimentos',
+            icon: 'pi pi-exclamation-triangle',
+            acceptLabel: 'Sim, editar todos',
+            rejectLabel: 'Não',
+            acceptButtonStyleClass: 'p-button-primary',
+            rejectButtonStyleClass: 'p-button-secondary',
+            accept: async () => {
+                const movsSalvar = [];
+                for(const mov of this.movimentosSelecionados){
+                    mov.subconta = this.movimentoEditar.subconta ?? mov.subconta;
+                    mov.tipoDocumento = this.movimentoEditar.tipoDocumento ?? mov.tipoDocumento;
+                    movsSalvar.push(mov);
+                }
+
+                const movimentosSaida = movsSalvar.map(mov => this.converterObjeto(mov));
+
+                try{
+                    await this.movimentoService.createmovimentos(movimentosSaida, true);
+                    this.dialogoEditar = false;
+                    this.movimentoEditar = {};
+                    this.movimentosSelecionados = [];
+                }catch(error){
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Falha',
+                        detail: 'Falha ao editar movimentos: ' + error,
+                        life: 3000
+                    });
+                }
+             
+            }
+        });
+
+       
+    }
+
+    override async delete(objeto: Movimento) {
+        this.confirmationService.confirm({
+            message: 'Você tem certeza que deseja deletar ' + (objeto as any).historico + '?',
+            header: 'Confirmar',
+            acceptLabel: 'Sim',
+            rejectLabel: 'Não',
+            icon: 'pi pi-exclamation-triangle',
+            accept: async () => {
+                if ((objeto as any).id != null) {
+                    try {
+                        await this.movimentoService.delete((objeto as any).id);
+
+                        const novaLista = this.lista().filter(b => (b as any)?.id !== (objeto as any).id);
+                        this.lista.set([...novaLista]);
+                        this.messageService.add({
+                            severity: 'success',
+                            summary: 'Sucesso',
+                            detail: this.titulo + ' deletad' + this.genero,
+                            life: 3000
+                        });
+                    } catch (err) {
+                        this.messageService.add({
+                            severity: 'error',
+                            summary: 'Falha',
+                            detail: 'Falha ao deletar '+ this.genero + ' ' +  this.titulo + ': ' + err,
+                            life: 3000
+                        });
+                    }
+                }
+            }
+        });
     }
 
 }

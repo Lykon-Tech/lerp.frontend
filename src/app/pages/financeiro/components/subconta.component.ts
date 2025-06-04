@@ -25,6 +25,7 @@ import { CommonModule } from "@angular/common";
 import { GrupoConta } from "../models/grupoconta.model";
 import { GrupoContaService } from "../services/grupoconta.service";
 import { SubcontaSaida } from "../models/subconta.saida.model";
+import { TagModel } from "../models/tag.model";
 
 
 @Component({
@@ -75,7 +76,8 @@ export class SubcontaComponent extends BaseComponente<Subconta, SubcontaSaida> {
 
     grupoContas = signal<GrupoConta[]>([]);
 
-    grupoContas_select! : any[]
+    grupoContas_select! : any[];
+    tagInput: string = '';
 
     override loadDemoData(): void {
         this.grupoContaService.findAll(true).then((data) => {
@@ -86,8 +88,6 @@ export class SubcontaComponent extends BaseComponente<Subconta, SubcontaSaida> {
             }));
         });
 
-
-
         super.loadDemoData();
     }
 
@@ -95,14 +95,23 @@ export class SubcontaComponent extends BaseComponente<Subconta, SubcontaSaida> {
         return (this.objeto as any).nome.trim() && (this.objeto as any).ativo != undefined && (this.objeto as any).grupoConta != undefined && (this.objeto as any).tipo != undefined;
     }
 
+    override getObjectNew(): Subconta {
+        this.tagInput = '';
+        return super.getObjectNew();
+    }
+
     override getObjetoEdit(objeto: Subconta): Subconta {
+        this.tagInput = objeto.tags?.map(t => t.nome).join('; ') ?? '';
+
         return {
             id : objeto.id,
             nome : objeto.nome,
             tipo : objeto.tipo,
             grupoConta : this.grupoContas().find(b => b.id === objeto.grupoConta?.id),
+            tags : objeto.tags,
             ativo : objeto.ativo
         }
+        
     }
 
     override converterObjeto(subconta: Subconta): SubcontaSaida {
@@ -111,8 +120,30 @@ export class SubcontaComponent extends BaseComponente<Subconta, SubcontaSaida> {
             nome:subconta.nome,
             grupoContaId: subconta.grupoConta?.id, 
             ativo: subconta.ativo,
+            tags : subconta.tags,
             tipo: subconta.tipo
         };
+    }
+
+    override async save(){
+        this.submitted = true;
+
+        if (!this.getValidacoes()) return;
+
+        this.objeto.tags = this.tagInput
+            .split(';')
+            .map(tag => tag.trim())
+            .filter(tag => tag.length > 0)
+            .map(tag => {
+                const existente = this.objeto.tags?.find(t => t.nome === tag);
+                return {
+                    nome: tag,
+                    ativo: true,
+                    id: existente?.id
+                };
+        });
+        
+        super.save();
     }
 
     aoSelecionar(event: any) {
@@ -123,5 +154,11 @@ export class SubcontaComponent extends BaseComponente<Subconta, SubcontaSaida> {
             this.tipoTravado = false; 
         }
     }
+
+    getTagsNome(tags: TagModel[]): string {
+        if (!tags || tags.length === 0) return '';
+        return tags.map(t => t.nome).join('; ');
+    }
+
 
 }

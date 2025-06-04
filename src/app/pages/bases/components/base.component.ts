@@ -24,7 +24,7 @@ export abstract class BaseComponente<T extends Object, S> implements OnInit{
     genero : string = 'o';
 
     dialogo: boolean = false;
-    
+   
     lista = signal<T[]>([]);
 
     objeto: T  = {} as T;
@@ -56,8 +56,13 @@ export abstract class BaseComponente<T extends Object, S> implements OnInit{
     }
 
     onGlobalFilter(table: Table, event: Event) {
-        table.filterGlobal((event.target as HTMLInputElement).value, 'contains');
+        const target = event.target as HTMLInputElement;
+
+        if (target.tagName.toLowerCase() === 'input' && target.type === 'text') {
+            table.filterGlobal(target.value, 'contains');
+        }
     }
+
 
     openNew() {
         this.objeto = this.getObjectNew();
@@ -92,6 +97,8 @@ export abstract class BaseComponente<T extends Object, S> implements OnInit{
         this.confirmationService.confirm({
             message: 'Você tem certeza que deseja deletar ' + (objeto as any).nome + '?',
             header: 'Confirmar',
+            acceptLabel: 'Sim',
+            rejectLabel: 'Não',
             icon: 'pi pi-exclamation-triangle',
             accept: async () => {
                 if ((objeto as any).id != null) {
