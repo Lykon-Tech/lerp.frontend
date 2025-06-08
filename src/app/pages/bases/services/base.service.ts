@@ -12,7 +12,7 @@ export abstract class BaseService<E, S>{
     protected baseUrl : string;
 
     constructor(protected http: HttpClient, path : string) {
-        this.baseUrl = 'http://localhost:8080/' + path;;
+        this.baseUrl = 'https://api.lykon.com.br/' + path;
     }
 
     findAll(ativo?: boolean): Promise<E[]> {

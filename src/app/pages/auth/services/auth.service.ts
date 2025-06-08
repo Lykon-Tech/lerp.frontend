@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly TOKEN_KEY = 'auth-token';
-  private readonly API_LOGIN = 'http://localhost:8080/auth/login';
+  private readonly API_LOGIN = 'https://api.lykon.com.br/auth/login';
   constructor(private http: HttpClient, private router: Router) {}
 
   login(credentials: { email: string; senha: string }) {
@@ -42,7 +42,7 @@ export class AuthService {
   validateToken() {
     const token = this.getToken();
     return this.http.get<{ valid: boolean }>(
-      'http://localhost:8080/auth/validate',
+      'https://api.lykon.com.br/auth/validate',
       {
         headers: {
           Authorization: `Bearer ${token}`

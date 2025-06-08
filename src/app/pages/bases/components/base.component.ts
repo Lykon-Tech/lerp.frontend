@@ -27,6 +27,8 @@ export abstract class BaseComponente<T extends Object, S> implements OnInit{
    
     lista = signal<T[]>([]);
 
+    loadingSalvar : boolean = false;
+
     objeto: T  = {} as T;
 
     submitted: boolean = false;
@@ -154,42 +156,44 @@ export abstract class BaseComponente<T extends Object, S> implements OnInit{
 
         if (this.getValidacoes()) {
             try {
-            if ((this.objeto as any).id) {
-                const updateObject = await this.service.update(this.converterObjeto(this.objeto), (this.objeto as any).id);
-                const index = this.findIndexById((updateObject as any).id!);
-                const updatedObjects = [..._lista];
-                updatedObjects[index] = updateObject;
-                this.lista.set(updatedObjects);
+                this.loadingSalvar = true;
+                if ((this.objeto as any).id) {
+                    const updateObject = await this.service.update(this.converterObjeto(this.objeto), (this.objeto as any).id);
+                    const index = this.findIndexById((updateObject as any).id!);
+                    const updatedObjects = [..._lista];
+                    updatedObjects[index] = updateObject;
+                    this.lista.set(updatedObjects);
 
-                this.messageService.add({
-                severity: 'success',
-                summary: 'Sucesso',
-                detail: this.titulo + ' atualizad' + this.genero,
-                life: 3000
-                });
-            } else {
-                const createdObject = await this.service.create(this.converterObjeto(this.objeto));
-                this.lista.set([..._lista, createdObject]);
-                
-
-                this.messageService.add({
+                    this.messageService.add({
                     severity: 'success',
                     summary: 'Sucesso',
-                    detail: this.titulo + ' criad'+ this.genero,
-                life: 3000
-                });
-            }
-
-            this.dialogo = false;
-            (this.objeto as any) = {};
-            } catch (error) {
-                this.messageService.add({
-                    severity: 'error',
-                    summary: 'Falha',
-                    detail: 'Falha ao salvar ' + this.titulo + ': ' + error,
+                    detail: this.titulo + ' atualizad' + this.genero,
                     life: 3000
-                });
-            }
+                    });
+                } else {
+                    const createdObject = await this.service.create(this.converterObjeto(this.objeto));
+                    this.lista.set([..._lista, createdObject]);
+                    
+
+                    this.messageService.add({
+                        severity: 'success',
+                        summary: 'Sucesso',
+                        detail: this.titulo + ' criad'+ this.genero,
+                    life: 3000
+                    });
+                }
+                this.loadingSalvar = false;
+                this.dialogo = false;
+                (this.objeto as any) = {};
+                } catch (error) {
+                    this.loadingSalvar = false;
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Falha',
+                        detail: 'Falha ao salvar ' + this.titulo + ': ' + error,
+                        life: 3000
+                    });
+                }
         }
     }
 

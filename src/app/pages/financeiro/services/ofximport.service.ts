@@ -14,7 +14,9 @@ export class OfxImportService {
 
       reader.onload = (event) => {
         try {
-          const ofxContent = event.target?.result as string;
+          const arrayBuffer = event.target?.result as ArrayBuffer;
+          const decoder = new TextDecoder('windows-1252'); 
+          const ofxContent = decoder.decode(arrayBuffer);
           const transactions = this.parseOfx(ofxContent);
           resolve(transactions);
         } catch (error) {
@@ -26,7 +28,7 @@ export class OfxImportService {
         reject(reader.error);
       };
 
-      reader.readAsText(file);
+      reader.readAsArrayBuffer(file); 
     });
   }
 

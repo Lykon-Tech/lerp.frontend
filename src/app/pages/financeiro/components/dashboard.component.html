@@ -5,31 +5,12 @@
     </h1>
   </div>
 
-  <div class="col-span-12">
-    <p-card class="shadow-md rounded-lg w-full">
-      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-4">
-        <div class="text-lg font-semibold">
-          Grupo de conta selecionado: <span class="text-indigo-600">{{ grupoContaSelecionado || 'Nenhum' }}</span>
-        </div>
-        <button
-          pButton
-          type="button"
-          label="Limpar"
-          icon="pi pi-times"
-          class="p-button-sm p-button-outlined"
-          (click)="atualizarGraficoBarra()"
-          [disabled]="!grupoContaSelecionado"
-        ></button>
-      </div>
-    </p-card>
-  </div>
-
   <div class="col-span-12 grid grid-cols-12 gap-4 mb-4">
     <div class="col-span-12 sm:col-span-6 lg:col-span-3">
       <p-card class="shadow-md rounded-lg h-full">
         <div class="bg-green-500 text-white p-4 rounded-lg h-full flex flex-col justify-between items-center">
-          <div class="text-xl font-semibold mb-2">Receita Semana</div>
-          <div class="text-4xl font-bold">R$ {{ totalReceitaSemana | number:'1.2-2' }}</div>
+          <div class="text-sm font-semibold mb-2">Receita Semana</div>
+          <div class="text-4xl font-bold"> {{ totalReceitaSemana  }}</div>
         </div>
       </p-card>
     </div>
@@ -37,8 +18,8 @@
     <div class="col-span-12 sm:col-span-6 lg:col-span-3">
       <p-card class="shadow-md rounded-lg h-full">
         <div class="bg-green-500 text-white p-4 rounded-lg h-full flex flex-col justify-between items-center">
-          <div class="text-xl font-semibold mb-2">Receita Mês</div>
-          <div class="text-4xl font-bold">R$ {{ totalReceitaMes | number:'1.2-2' }}</div>
+          <div class="text-sm font-semibold mb-2">Receita Mês</div>
+          <div class="text-4xl font-bold"> {{ totalReceitaMes }}</div>
         </div>
       </p-card>
     </div>
@@ -46,8 +27,8 @@
     <div class="col-span-12 sm:col-span-6 lg:col-span-3">
       <p-card class="shadow-md rounded-lg h-full">
         <div class="bg-green-500 text-white p-4 rounded-lg h-full flex flex-col justify-between items-center">
-          <div class="text-xl font-semibold mb-2">Receita Semestre</div>
-          <div class="text-4xl font-bold">R$ {{ totalReceitaSemestre | number:'1.2-2' }}</div>
+          <div class="text-sm font-semibold mb-2">Receita Semestre</div>
+          <div class="text-4xl font-bold"> {{ totalReceitaSemestre }}</div>
         </div>
       </p-card>
     </div>
@@ -55,8 +36,8 @@
     <div class="col-span-12 sm:col-span-6 lg:col-span-3">
       <p-card class="shadow-md rounded-lg h-full">
         <div class="bg-green-500 text-white p-4 rounded-lg h-full flex flex-col justify-between items-center">
-          <div class="text-xl font-semibold mb-2">Receita Ano</div>
-          <div class="text-4xl font-bold">R$ {{ totalReceitaAno | number:'1.2-2' }}</div>
+          <div class="text-sm font-semibold mb-2">Receita Ano</div>
+          <div class="text-4xl font-bold"> {{ totalReceitaAno }}</div>
         </div>
       </p-card>
     </div>
@@ -66,8 +47,8 @@
     <div class="col-span-12 sm:col-span-6 lg:col-span-3">
       <p-card class="shadow-md rounded-lg h-full">
         <div class="bg-red-500 text-white p-4 rounded-lg h-full flex flex-col justify-between items-center">
-          <div class="text-xl font-semibold mb-2">Despesa Semana</div>
-          <div class="text-4xl font-bold">R$ {{ totalDespesaSemana | number:'1.2-2' }}</div>
+          <div class="text-sm font-semibold mb-2">Despesa Semana</div>
+          <div class="text-4xl font-bold"> {{ totalDespesaSemana  }}</div>
         </div>
       </p-card>
     </div>
@@ -75,8 +56,8 @@
     <div class="col-span-12 sm:col-span-6 lg:col-span-3">
       <p-card class="shadow-md rounded-lg h-full">
         <div class="bg-red-500 text-white p-4 rounded-lg h-full flex flex-col justify-between items-center">
-          <div class="text-xl font-semibold mb-2">Despesa Mês</div>
-          <div class="text-4xl font-bold">R$ {{ totalDespesaMes | number:'1.2-2' }}</div>
+          <div class="text-sm font-semibold mb-2">Despesa Mês</div>
+          <div class="text-4xl font-bold"> {{ totalDespesaMes }}</div>
         </div>
       </p-card>
     </div>
@@ -84,8 +65,8 @@
     <div class="col-span-12 sm:col-span-6 lg:col-span-3">
       <p-card class="shadow-md rounded-lg h-full">
         <div class="bg-red-500 text-white p-4 rounded-lg h-full flex flex-col justify-between items-center">
-          <div class="text-xl font-semibold mb-2">Despesa Semestre</div>
-          <div class="text-4xl font-bold">R$ {{ totalDespesaSemestre | number:'1.2-2' }}</div>
+          <div class="text-sm font-semibold mb-2">Despesa Semestre</div>
+          <div class="text-4xl font-bold"> {{ totalDespesaSemestre  }}</div>
         </div>
       </p-card>
     </div>
@@ -93,8 +74,8 @@
     <div class="col-span-12 sm:col-span-6 lg:col-span-3">
       <p-card class="shadow-md rounded-lg h-full">
         <div class="bg-red-500 text-white p-4 rounded-lg h-full flex flex-col justify-between items-center">
-          <div class="text-xl font-semibold mb-2">Despesa Ano</div>
-          <div class="text-4xl font-bold">R$ {{ totalDespesaAno | number:'1.2-2' }}</div>
+          <div class="text-sm font-semibold mb-2">Despesa Ano</div>
+          <div class="text-4xl font-bold"> {{ totalDespesaAno }}</div>
         </div>
       </p-card>
     </div>
@@ -111,24 +92,124 @@
     </p-card>
   </div>
 
-  <div class="col-span-12 xl:col-span-6">
-    <div class="card flex flex-col items-center">
-        <div class="font-semibold text-xl mb-4">Receitas por grupo de conta</div>
-        <p-chart type="pie" [data]="pieDataReceitas" [options]="pieOptions" (onDataSelect)="handlePieClick($event, 'ENTRADA')"></p-chart>
-    </div>
-  </div>
+  
+  <div class="col-span-12 xl:col-span-4">
 
-  <div class="col-span-12 xl:col-span-6">
-    <div class="card flex flex-col items-center">
-        <div class="font-semibold text-xl mb-4">Despesas por grupo de conta</div>
-        <p-chart type="pie" [data]="pieDataDespesas" [options]="pieOptions" (onDataSelect)="handlePieClick($event,  'SAIDA')"></p-chart>
-    </div>
-  </div>
-
-  <div class="col-span-12 xl:col-span-6">
     <div class="card">
-        <div class="font-semibold text-xl mb-4">Evolução do lucro</div>
-        <p-chart type="line" [data]="lineData" [options]="lineOptions"></p-chart>
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-4">
+        <div class="text-lg font-semibold">
+          Grupo de conta selecionado: <span class="text-indigo-600">{{ grupoContaSelecionado || 'Nenhum' }}</span>
+        </div>
+        <button
+          pButton
+          type="button"
+          label="Limpar"
+          icon="pi pi-times"
+          class="p-button-sm p-button-outlined"
+          (click)="atualizarGraficoBarra()"
+          [disabled]="!grupoContaSelecionado"
+        ></button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="font-semibold text-sm mb-4">Evolução do lucro</div>
+      <p-chart class="w-full" type="line" [data]="lineData" [options]="lineOptions"></p-chart>
+    </div>
+  </div>
+
+  <div class="col-span-12 xl:col-span-4">
+    <div class="card flex flex-col items-center">
+        <div class="font-semibold text-sm mb-4">Receitas por grupo de conta</div>
+        <p-chart class="w-full" type="doughnut" [data]="pieDataReceitas" [options]="pieOptions" (onDataSelect)="handlePieClick($event, 'ENTRADA')"></p-chart>
+    </div>
+  </div>
+
+  <div class="col-span-12 xl:col-span-4">
+    <div class="card flex flex-col items-center">
+        <div class="font-semibold text-sm mb-4">Despesas por grupo de conta</div>
+        <p-chart class="w-full" type="doughnut" [data]="pieDataDespesas" [options]="pieOptions" (onDataSelect)="handlePieClick($event,  'SAIDA')"></p-chart>
+    </div>
+  </div>
+
+  <div class="col-span-12">
+    <div class="card flex flex-wrap gap-4 items-center">
+      <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+        <label for="startDate" class="font-bold">Data de Início:</label>
+        <p-date-picker
+          [(ngModel)]="filtro.dataInicio"
+          inputId="startDate"
+          [showIcon]="true"
+          dateFormat="dd/mm/yy"
+          placeholder="Selecione a data de início"
+          [maxDate]="filtro.dataFim || null"
+          appendTo="body"
+          styleClass="w-full sm:w-auto"
+        ></p-date-picker>
+      </div>
+
+      <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+        <label for="endDate" class="font-bold">Data de Fim:</label>
+        <p-date-picker
+          [(ngModel)]="filtro.dataFim"
+          inputId="endDate"
+          [showIcon]="true"
+          dateFormat="dd/mm/yy"
+          placeholder="Selecione a data de fim"
+          [minDate]="filtro.dataInicio || null"
+          appendTo="body"
+          styleClass="w-full sm:w-auto"
+        ></p-date-picker>
+      </div>
+
+      <p-button
+        label="Aplicar Filtro"
+        icon="pi pi-filter"
+        (click)="loadDemoData()"
+        [disabled]="!filtro.dataInicio || !filtro.dataFim"
+        styleClass="p-button-primary ml-auto sm:ml-0"
+      ></p-button>
+    </div>
+  </div>
+
+  <div class="col-span-12 xl:col-span-8">
+    <div class="card flex flex-col items-center">
+      <h2 class="text-sm font-semibold mb-4">Fluxo de Caixa</h2>
+      <p-chart class="w-full" type="line" [data]="fluxoCaixa" [options]="lineOptions"></p-chart>
+    </div>
+  </div>
+
+  <div class="card col-span-12 xl:col-span-4">
+    <div class="flex flex-col items-center px-4 pb-4">
+      <h2 class="text-sm font-semibold my-4">Saldos</h2>
+      <div class="w-full max-h-108 overflow-y-scroll">
+        <div
+          *ngFor="let dash of dashesAgrupados"
+          class="p-3 mb-2 last:mb-0 border border-gray-300 bg-gray-100 rounded-md"
+        >
+          <div class="text-sm text-gray-700 font-semibold">
+            {{ dash.nomeBanco }}
+          </div>
+
+          <div class="text-xs text-gray-700 mb-2">
+            Agência: {{ dash.agencia }} |
+            Conta: {{ dash.numeroConta }}
+          </div>
+
+          <div class="flex flex-col text-sm space-y-1">
+            <span
+              class="font-bold"
+              [ngClass]="{
+                'text-green-700': dash.lucro > 0,
+                'text-red-700'  : dash.lucro < 0,
+                'text-gray-700' : dash.lucro === 0
+              }"
+            >
+              Saldo: {{ dash.lucro | currency:'BRL' }}
+            </span>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>

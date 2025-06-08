@@ -132,7 +132,7 @@ export class TransfAlunoComponent extends BaseComponente<Turma, TurmaSaida> {
         }
 
         return turmas.filter(turma =>
-            turma.nome?.toLowerCase().startsWith(query)
+            turma.nome?.toLowerCase().includes(query)
         );
     }
 

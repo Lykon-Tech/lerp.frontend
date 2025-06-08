@@ -19,7 +19,7 @@ import { ToastModule } from "primeng/toast";
 import { RippleModule } from "primeng/ripple";
 import { ButtonModule } from "primeng/button";
 import { FormsModule } from "@angular/forms";
-import { TableModule } from "primeng/table";
+import { Table, TableModule } from "primeng/table";
 import { CommonModule } from "@angular/common";
 import { MovimentoService } from "../services/movimento.service";
 import { FiltroMovimento } from "../models/filtromovimento.model";
@@ -32,6 +32,10 @@ import { OfxImportService } from "../services/ofximport.service";
 import { TipoDocumento } from "../models/tipodocumento.model";
 import { MovimentoSaida } from "../models/movimento.saida.model";
 import { DatePicker } from "primeng/datepicker";
+import { SubcontaSaida } from "../models/subconta.saida.model";
+import { AutoCompleteCompleteEvent, AutoCompleteModule } from "primeng/autocomplete";
+import { AgrupamentoSaida } from "../models/agrupamento.saida.model";
+import { Agrupamento } from "../models/agrupamento.model";
 
 
 @Component({
@@ -57,7 +61,8 @@ import { DatePicker } from "primeng/datepicker";
         IconFieldModule,
         CheckboxModule,
         ConfirmDialogModule,
-        DatePicker
+        DatePicker,
+        AutoCompleteModule
     ],
     templateUrl: `./Movimento.component.html`,
     providers: [MessageService, MovimentoService, ConfirmationService]
@@ -86,8 +91,11 @@ export class MovimentoComponent extends BaseComponente<Movimento, MovimentoSaida
     filtro : FiltroMovimento = {};
      
     dialogoEditar: boolean = false;
+    dialogoAgrupamento : boolean = false;
 
     loading: boolean = false;
+    loadingEditar : boolean = false;
+    loadingAgrupar : boolean = false;
 
     movimentosSelecionados!: Movimento[];
 
@@ -97,10 +105,76 @@ export class MovimentoComponent extends BaseComponente<Movimento, MovimentoSaida
     contas_select! : any[];
 
     subcontas = signal<Subconta[]>([]);
-    subcontas_select! : any[];
+    subcontasAgrupar : Subconta[] = [];
+    subcontas_select : Subconta[] = [];
 
     tipoDocumentos = signal<Subconta[]>([]);
     tipoDocumentos_select! : any[];
+
+    saldo : string = '';
+
+    novoValor: number = 0;
+    valorDistribuido: number = 0;
+    erroValor: boolean = false;
+
+    adicionarAgrupamento() {
+        if (!this.subcontas || this.novoValor <= 0) return;
+
+        const totalSimulado = this.valorDistribuido + this.novoValor;
+        if (totalSimulado > (this.movimentoEditar.valor ?? 0)) {
+            this.erroValor = true;
+            return;
+        }
+
+        this.movimentoEditar.agrupamentos?.push({ subconta: this.movimentoEditar.subconta ?? {}, valor: this.novoValor });
+        this.valorDistribuido += this.novoValor;
+        this.novoValor = 0;
+        this.erroValor = false;
+    }
+
+    removerAgrupamento(agrup: Agrupamento) {
+        const index = this.movimentoEditar.agrupamentos?.indexOf(agrup);
+        if ((index ?? 0) >= 0) {
+            this.movimentoEditar.agrupamentos?.splice(index ?? 0, 1);
+            this.valorDistribuido -= agrup.valor;
+        }
+    }
+
+    async salvarAgrupamentos() {
+        if (this.valorDistribuido !== this.movimentoEditar.valor) {
+            return;
+        }
+
+        this.submitted = true;
+        let _lista = this.lista();
+
+        try{
+            this.loadingAgrupar = true;
+            const updateObject = await this.movimentoService.update(this.converterObjeto(this.movimentoEditar), this.movimentoEditar.id ?? '');
+            const index = this.findIndexById((updateObject as any).id!);
+            const updatedObjects = [..._lista];
+            updatedObjects[index] = updateObject;
+            this.lista.set(updatedObjects);
+            this.loadingAgrupar = false;
+            this.messageService.add({
+                severity: 'success',
+                summary: 'Sucesso',
+                detail: 'Subcontas agrupadas',
+                life: 3000
+            });
+            this.dialogoAgrupamento = false;
+        }catch(error){
+            this.loadingAgrupar = false;
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Falha',
+                detail: 'Falha ao editar movimento: ' + error,
+                life: 3000
+            });
+        }
+        
+
+    }
 
     override getValidacoes(): boolean {
         return (this.objeto as any).historico.trim() && (this.objeto as any).subconta != undefined  && (this.objeto as any).dataLancamento != undefined;
@@ -110,7 +184,7 @@ export class MovimentoComponent extends BaseComponente<Movimento, MovimentoSaida
         const hoje = new Date();
 
         this.filtro = {
-            dataInicio: new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate()),
+            dataInicio: new Date(hoje.getFullYear(), hoje.getMonth(), 1),
             dataFim: new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate())     
         };
 
@@ -128,6 +202,8 @@ export class MovimentoComponent extends BaseComponente<Movimento, MovimentoSaida
             }));
             this.lista.set(movimentosComDataConvertida);
             this.loading = false;
+            this.saldo = this.totalSaldoFormatado(this.dt);
+            
         }).catch(error => {
             this.loading = false;
             this.messageService.add({
@@ -149,10 +225,7 @@ export class MovimentoComponent extends BaseComponente<Movimento, MovimentoSaida
 
         this.subcontaService.findAll(true).then((data)=>{
             this.subcontas.set(data);
-            this.subcontas_select = this.subcontas().map(subconta => ({
-                label: subconta.nome,
-                value: subconta
-            }));
+            this.subcontas_select = this.subcontas();
         });
 
         this.tipoDocumentoService.findAll(true).then((data)=>{
@@ -163,6 +236,21 @@ export class MovimentoComponent extends BaseComponente<Movimento, MovimentoSaida
             }));
         });
     }
+
+    filterSubconta(event: AutoCompleteCompleteEvent) {
+        const query = event.query?.toLowerCase() || '';
+        this.subcontas_select = this.subcontas().filter(subconta => 
+            subconta.nome?.toLowerCase().includes(query)
+        );
+    }
+
+    filterSubcontaAgrupar(event: AutoCompleteCompleteEvent) {
+        const query = event.query?.toLowerCase() || '';
+        this.subcontas_select = this.subcontasAgrupar.filter(subconta => 
+            subconta.nome?.toLowerCase().includes(query)
+        );
+    }
+    
 
     override getObjectNew(): Movimento {
         return {dataLancamento : new Date};
@@ -241,21 +329,26 @@ export class MovimentoComponent extends BaseComponente<Movimento, MovimentoSaida
                     this.messageService.add({
                         severity: 'success',
                         summary: 'Sucesso',
-                        detail: `${movimentosValidos.length} movimentos importados automaticamente!`,
+                        detail: `Movimentos importados automaticamente!`,
                         life: 5000
                     });
                 }
 
                 if (historicosSemTag.length > 0) {
-                   this.confirmationService.confirm({
+                    const maxItensExibir = 10;
+                    const itensExibidos = historicosSemTag.slice(0, maxItensExibir);
+                    const maisItens = historicosSemTag.length - maxItensExibir;
+
+                    this.confirmationService.confirm({
                         message: `
                             <div style="max-height: 400px; overflow-y: auto;">
-                                <p>Estes movimentos foram importados na subconta padrão!</p>
-                                <p>Deseja editar esses ${historicosSemTag.length} movimentos manualmente?</p>
-                                <p>Os seguintes históricos não possuem tags correspondentes:</p>
-                                <ul style="margin: 10px 0; padding-left: 20px;">
-                                    ${historicosSemTag.map(h => `<li>${h}</li>`).join('')}
-                                </ul>
+                            <p>Estes movimentos foram importados na subconta padrão!</p>
+                            <p>Deseja editar esses ${historicosSemTag.length} movimentos manualmente?</p>
+                            <p>Os seguintes históricos não possuem tags correspondentes:</p>
+                            <ul style="margin: 10px 0; padding-left: 20px;">
+                                ${itensExibidos.map(h => `<li>${h}</li>`).join('')}
+                            </ul>
+                            ${maisItens > 0 ? `<p>... e mais ${maisItens} itens não mostrados</p>` : ''}
                             </div>
                         `,
                         header: 'Tags não encontradas',
@@ -264,18 +357,19 @@ export class MovimentoComponent extends BaseComponente<Movimento, MovimentoSaida
                         rejectLabel: 'Não, pular estes',
                         acceptButtonStyleClass: 'p-button-primary',
                         rejectButtonStyleClass: 'p-button-secondary',
-                        accept: async () => {
-                            await this.importarMovimentosManualmente(movimentosPadrao, tipoDocumento);
-                        },
-                        reject: () => {
-                            this.messageService.add({
-                                severity: 'info',
-                                summary: 'Importação padrão',
-                                detail: `Movimentos sem tags, não editados foram importados na subconta padrão`,
-                                life: 5000
-                            });
-                        }
+                    accept: async () => {
+                        await this.importarMovimentosManualmente(movimentosPadrao, tipoDocumento);
+                    },
+                    reject: () => {
+                        this.messageService.add({
+                        severity: 'info',
+                        summary: 'Importação padrão',
+                        detail: `Movimentos sem tags, não editados foram importados na subconta padrão`,
+                        life: 5000
+                        });
+                    }
                     });
+
                 }
 
             } catch (error) {
@@ -305,9 +399,11 @@ export class MovimentoComponent extends BaseComponente<Movimento, MovimentoSaida
         const subcontaEntradaPadrao = await this.subcontaService.findSubcontaPadrao(true);
         const subcontaSaidaPadrao = await this.subcontaService.findSubcontaPadrao(false);
         let lancarPadrao = false;
+
+        const subcontas =  await this.subcontaService.findAllByTagName(ofxData.map(o=>o.historico));
         for (const item of ofxData) {
             try {
-                subconta = await this.subcontaService.findByTagName(item.historico);
+                subconta = subcontas.filter(s=> s.tags?.filter(t=>t.nome == item.historico))[0];
                 
                 if (!subconta) {
                     historicosSemTag.add(item.historico);
@@ -361,7 +457,7 @@ export class MovimentoComponent extends BaseComponente<Movimento, MovimentoSaida
         for (const mov of movimentos) {
             try {
 
-                const id = await this.movimentoService.findByNumeroDocumento(mov.numeroDocumento);
+                const id = await this.movimentoService.findByNumeroDocumento(this.converterObjeto(mov));
                 
                 this.objeto = {
                     id: id,
@@ -410,6 +506,7 @@ export class MovimentoComponent extends BaseComponente<Movimento, MovimentoSaida
             subcontaId: movimento.subconta?.id ?? '',
             contaId: movimento.conta?.id ?? '',
             tipoDocumentoId: movimento.tipoDocumento?.id ?? '',
+            agrupamentos: this.converterAgrupamento(movimento.agrupamentos??[]),
             valor: movimento?.valor ?? 0,
             dataLancamento: movimento?.dataLancamento ?? new Date,
             historico: movimento.historico,
@@ -420,17 +517,29 @@ export class MovimentoComponent extends BaseComponente<Movimento, MovimentoSaida
         };
     }
 
-    totalSaldo(): number {
-        return this.lista()
-            .reduce((acc, mov) => {
-                return mov?.subconta?.tipo === 'ENTRADA'
-                    ? acc + Math.abs((mov?.valor ?? 0))
-                    : acc - Math.abs((mov?.valor ?? 0));
-            }, 0);
+    converterAgrupamento(agrupamentos: Agrupamento[]): AgrupamentoSaida[] {
+        return agrupamentos.map(a => ({
+            subcontaId: a.subconta.id ?? '',
+            valor: a.valor
+        }));
     }
 
-    totalSaldoFormatado(): string {
-        const total = this.totalSaldo() ?? 0;
+    totalSaldo(table : Table): number {
+        const movimentosFiltrados = table?.filteredValue ?? this.lista();
+        if (!movimentosFiltrados) return 0;
+
+        return movimentosFiltrados.reduce((total, mov) => {
+            const valor = mov.valor || 0;
+            const tipo = mov.subconta?.tipo;
+
+            if (tipo === 'ENTRADA') return total + valor;
+            else if (tipo === 'SAIDA') return total - valor;
+            else return total;
+        }, 0);
+    }
+
+    totalSaldoFormatado(table : Table): string {
+        const total = Math.abs(this.totalSaldo(table)) ?? 0;
         return total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     }
 
@@ -451,48 +560,120 @@ export class MovimentoComponent extends BaseComponente<Movimento, MovimentoSaida
         this.dialogoEditar = false;
     }
 
-    async saveEditar(){
+    async saveEditar() {
+        const confirmEditar = await this.confirmDialog(
+            `Deseja editar todos esses ${this.movimentosSelecionados.length} movimentos?`,
+            'Editar movimentos'
+        );
 
-        this.confirmationService.confirm({
-            message: `
-                <div style="max-height: 400px; overflow-y: auto;">
-                    <p>Deseja editar todos esses ${this.movimentosSelecionados.length} movimentos?</p>
-                </div>
-            `,
-            header: 'Editar movimentos',
-            icon: 'pi pi-exclamation-triangle',
-            acceptLabel: 'Sim, editar todos',
-            rejectLabel: 'Não',
-            acceptButtonStyleClass: 'p-button-primary',
-            rejectButtonStyleClass: 'p-button-secondary',
-            accept: async () => {
-                const movsSalvar = [];
-                for(const mov of this.movimentosSelecionados){
-                    mov.subconta = this.movimentoEditar.subconta ?? mov.subconta;
-                    mov.tipoDocumento = this.movimentoEditar.tipoDocumento ?? mov.tipoDocumento;
-                    movsSalvar.push(mov);
-                }
+        if (!confirmEditar) return;
 
-                const movimentosSaida = movsSalvar.map(mov => this.converterObjeto(mov));
+        const tags = this.movimentosSelecionados.map(m => m.historico).join(', ');
+        const tagsLimitadas = tags.length > 200 ? tags.slice(0, 200) + '...' : tags;
 
-                try{
-                    await this.movimentoService.createmovimentos(movimentosSaida, true);
-                    this.dialogoEditar = false;
-                    this.movimentoEditar = {};
-                    this.movimentosSelecionados = [];
-                }catch(error){
-                    this.messageService.add({
-                        severity: 'error',
-                        summary: 'Falha',
-                        detail: 'Falha ao editar movimentos: ' + error,
-                        life: 3000
-                    });
-                }
-             
-            }
+        const confirmTags = await this.confirmDialog(
+            `Deseja adicionar as tags "${tagsLimitadas}" à subconta?`,
+            'Adicionar tags na subconta'
+        );
+
+        this.editarMovimentosSubcontas(confirmTags);
+      
+    }
+
+    confirmDialog(message: string, header: string): Promise<boolean> {
+        return new Promise((resolve) => {
+            this.confirmationService.confirm({
+                message: `<div style="max-height: 400px; overflow-y: auto;">${message}</div>`,
+                header: header,
+                icon: 'pi pi-exclamation-triangle',
+                acceptLabel: 'Sim',
+                rejectLabel: 'Não',
+                acceptButtonStyleClass: 'p-button-primary',
+                rejectButtonStyleClass: 'p-button-secondary',
+                accept: () => resolve(true),
+                reject: () => resolve(false)
+            });
         });
+    }
 
-       
+
+    async editarMovimentosSubcontas(adicionarTags : boolean = false){
+        const movsSalvar = [];
+
+        const movimentosEditar = this.movimentosSelecionados.map(
+            movimento=>({id: movimento.id,
+            subconta: movimento.subconta ? { ...movimento.subconta } : undefined,
+            conta: movimento.conta ? { ...movimento.conta } : undefined,
+            tipoDocumento: movimento.tipoDocumento ? { ...movimento.tipoDocumento } : undefined,
+            agrupamentos: movimento.agrupamentos ? movimento.agrupamentos.map(agrup => ({ ...agrup })) : [],
+            valor: movimento?.valor ?? 0,
+            dataLancamento: movimento?.dataLancamento ? new Date(movimento.dataLancamento) : new Date(),
+            historico: movimento.historico,
+            observacao: movimento.observacao,
+            numeroDocumento: movimento.numeroDocumento,
+            numeroMovimento: movimento.numeroMovimento,
+            importadoOfx: movimento?.importadoOfx ?? false})
+        );
+
+        for(const mov of movimentosEditar){
+            mov.subconta = this.movimentoEditar.subconta ?? mov.subconta;
+            mov.tipoDocumento = this.movimentoEditar.tipoDocumento ?? mov.tipoDocumento;
+            movsSalvar.push(mov);
+        }
+
+        const movimentosSaida = movsSalvar.map(mov => this.converterObjeto(mov));
+
+        try{
+            if (!this.movimentoEditar.subconta) {
+                this.movimentoEditar.subconta = {} as Subconta;
+            }
+          
+            this.loadingEditar = true;
+
+            const _lista = this.lista();
+
+            if(adicionarTags){
+                 this.movimentoEditar.subconta.tags = [
+                    ...this.movimentoEditar.subconta.tags??[],
+                    ...Array.from(new Map(this.movimentosSelecionados.filter(f=> !this.movimentoEditar.subconta?.tags?.map(t=>t.nome).includes(f.historico)).map(
+                        m => [m.historico, { ativo: true, nome: m.historico }]
+                    )).values())
+                ];
+                
+                await this.subcontaService.update(this.converterObjetoSubconta(this.movimentoEditar.subconta), this.movimentoEditar.subconta.id??'');
+            }
+
+            const updateObjects = await this.movimentoService.createmovimentos(movimentosSaida, true);
+            const updatedObjects = [..._lista];
+
+            for(const updateObject of updateObjects){
+                const index = this.findIndexById((updateObject as any).id!);
+ 
+                updatedObjects[index] = updateObject;
+            }
+
+            this.lista.set(updatedObjects);
+
+            this.loadingEditar = false;
+            this.dialogoEditar = false;
+            this.movimentoEditar = {};
+            this.movimentosSelecionados = [];
+            this.messageService.add({
+                severity: 'success',
+                summary: 'Sucesso',
+                detail: 'Movimentos editados com sucesso!',
+                life: 3000
+            });
+            
+        }catch(error){
+            this.loadingEditar = false;
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Falha',
+                detail: 'Falha ao editar movimentos: ' + error,
+                life: 3000
+            });
+        }
     }
 
     override async delete(objeto: Movimento) {
@@ -528,4 +709,53 @@ export class MovimentoComponent extends BaseComponente<Movimento, MovimentoSaida
         });
     }
 
+    converterObjetoSubconta(subconta: Subconta): SubcontaSaida {
+        return {
+            id: subconta.id,
+            nome:subconta.nome,
+            grupoContaId: subconta.grupoConta?.id, 
+            ativo: subconta.ativo,
+            tags : subconta.tags,
+            tipo: subconta.tipo
+        };
+    }
+
+    override onGlobalFilter(table: Table, event: Event): void {
+        const target = event.target as HTMLInputElement | null;
+
+        if (!(target && target.type === 'checkbox')) {
+            this.movimentosSelecionados = [];
+        }
+    
+        super.onGlobalFilter(table,event);
+    }
+
+    filtrarSaldo(table : Table): void {
+        this.movimentosSelecionados = [];
+        this.saldo= this.totalSaldoFormatado(table);
+    }
+
+    agrupar(movimento : Movimento){
+        this.movimentoEditar = { 
+            id: movimento.id,
+            subconta: movimento.subconta ? { ...movimento.subconta } : undefined,
+            conta: movimento.conta ? { ...movimento.conta } : undefined,
+            tipoDocumento: movimento.tipoDocumento ? { ...movimento.tipoDocumento } : undefined,
+            agrupamentos: movimento.agrupamentos ? movimento.agrupamentos.map(agrup => ({ ...agrup })) : [],
+            valor: movimento?.valor ?? 0,
+            dataLancamento: movimento?.dataLancamento ? new Date(movimento.dataLancamento) : new Date(),
+            historico: movimento.historico,
+            observacao: movimento.observacao,
+            numeroDocumento: movimento.numeroDocumento,
+            numeroMovimento: movimento.numeroMovimento,
+            importadoOfx: movimento?.importadoOfx ?? false
+        };
+
+        this.subcontasAgrupar = this.subcontas().filter(s=> s.tipo == this.movimentoEditar.subconta?.tipo);
+
+        this.dialogoAgrupamento = true;
+        this.novoValor = 0;
+        this.valorDistribuido = (this.movimentoEditar.agrupamentos??[]).reduce((soma, agrup) => {return soma + (agrup.valor || 0);}, 0);
+        this.erroValor = false;
+    }
 }

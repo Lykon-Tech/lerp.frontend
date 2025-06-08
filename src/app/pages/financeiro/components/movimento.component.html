@@ -1,7 +1,8 @@
 <p-toast></p-toast>
 <p-dialog [(visible)]="dialogo" [style]="{ width: '450px' }" header="Detalhes do movimento" [modal]="true">
 </p-dialog>
-<p-toolbar>
+
+<p-toolbar class="text-sm p-2">
   <ng-template #start>
     <div class="flex gap-2 flex-wrap items-center">
         <p-button
@@ -78,8 +79,10 @@
         #dt
         [value]="lista()"
         dataKey="id"
+        class="text-xs"  
         [rows]="10"
         (input)="onGlobalFilter(dt, $event)"
+        (onFilter)="filtrarSaldo(dt)"
         [loading]="loading"
         [paginator]="true"
         [showGridlines]="true"
@@ -89,7 +92,7 @@
         currentPageReportTemplate="Mostrando de {first} até {last} de {totalRecords} movimentos"
         [showCurrentPageReport]="true"
         [rowsPerPageOptions]="[10, 20, 30]"
-        [globalFilterFields]="['subconta.nome', 'dataLancamento', 'tipoDocumento.nome', 'valor', 'numeroDocumento', 'historico']"
+        [globalFilterFields]="['conta.numeroConta','subconta.nome', 'dataLancamento', 'tipoDocumento.nome', 'valor', 'numeroDocumento', 'historico']"
     >
         <ng-template #caption>
             <div class="flex justify-between items-center">
@@ -108,19 +111,19 @@
         </ng-template>
 
         <ng-template #header>
-            <tr>
+            <tr class="text-xs">
                 <th style="width: 3rem">
                     <p-tableHeaderCheckbox />
                 </th>
-                <th style="min-width: 12rem">
+                <th style="min-width: 8rem">
                     Data
                     <p-columnFilter  dataType="date" dateFormat="dd/mm/yy" type="date" field="dataLancamento" display="menu" placeholder="dd/mm/aaaa" />
                 </th>
-                <th style="min-width: 12rem">
+                <th style="min-width: 8rem">
                     Conta
-                    <p-columnFilter type="text" field="conta.agencia" display="menu" placeholder="Buscar por conta" matchMode="contains"/>
+                    <p-columnFilter type="text" field="conta.numeroConta" display="menu" placeholder="Buscar por conta" matchMode="contains"/>
                 </th>
-                <th style="min-width: 12rem">
+                <th style="min-width: 10rem">
                     Subconta
                     <p-columnFilter type="text" field="subconta.nome" display="menu" placeholder="Buscar por subconta" matchMode="contains"/>
                 </th>
@@ -132,35 +135,36 @@
                     Nº Documento
                     <p-columnFilter type="text" field="numeroDocumento" display="menu" matchMode="contains"/>
                 </th>
-                <th style="min-width: 12rem">
+                <th style="min-width: 10rem">
                     Histórico
                     <p-columnFilter type="text" field="historico" display="menu" matchMode="contains"/>
                 </th>
-                <th style="min-width: 8rem">
-                    Saldo
+                <th style="min-width: 8rem" field="valor">
+                    Valor
                 </th>
                 <th style="min-width: 12rem">Ações</th>
             </tr>
         </ng-template>
 
         <ng-template #body let-mov>
-            <tr>
-                <td style="width: 3rem">
+            <tr class="text-xs">
+                <td class="p-1" style="width: 3rem">
                     <p-tableCheckbox [value]="mov" />
                 </td>
-                <td>{{ mov?.dataLancamento | date:'dd/MM/yyyy' }}</td>
-                <td>{{ mov?.conta.banco.numeroBanco + ' - ' + mov?.conta.banco.nome + ' / ' + mov?.conta.numeroConta }}</td>
-                <td>
-                    <p-tag [value]="mov.subconta.nome" severity="info" styleClass="rounded-full" />
+                <td >{{ mov?.dataLancamento | date:'dd/MM/yyyy' }}</td>
+                <td class="p-1">{{ mov?.conta.banco.numeroBanco + ' - ' + mov?.conta.banco.nome + ' / ' + mov?.conta.numeroConta }}</td>
+                <td class="p-1">
+                    <p-tag [value]="mov.agrupamentos.length > 0 ? 'AGRUPADO' : mov.subconta.nome" severity="info" styleClass="rounded-full" />
                 </td>
-                <td>
+                <td class="p-1">
                     <p-tag [value]="mov.tipoDocumento?.nome" severity="primary" styleClass="rounded-full" />
                 </td>
-                <td>{{ mov?.numeroDocumento }}</td>
-                <td>{{ mov?.historico }}</td>
-                <td>
+                <td class="p-1">{{ mov?.numeroDocumento }}</td>
+                <td class="p-1">{{ mov?.historico }}</td>
+                <td class="p-1">
                     <p-tag [value]="formatarValor(mov?.valor)" [severity]="getSeverity(mov?.subconta.tipo == 'ENTRADA')" />
-                <td>
+                <td class="p-1">
+                    <p-button icon="pi pi-chevron-down" class="mr-2" severity="warn" [rounded]="true" [outlined]="true" (click)="agrupar(mov)" />
                     <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="edit(mov)" />
                     <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (click)="delete(mov)" />
                 </td>
@@ -170,7 +174,7 @@
             <tr>
                 <td colspan="6" class="text-right font-bold">Total do Saldo:</td>
                 <td colspan="2">
-                    <p-tag [value]="totalSaldoFormatado()" [severity]="getSeverity(this.totalSaldo() >= 0)" styleClass="rounded-full" />
+                    <p-tag [value]="saldo" [severity]="getSeverity(this.totalSaldo(dt) >= 0)" styleClass="rounded-full" />
                 </td>
             </tr>
         </ng-template>
@@ -239,16 +243,18 @@
 
                 <div>
                     <label for="subcontas" class="block font-bold mb-3">Subconta</label>
-                    <p-select
-                    name="subcontas"
-                    [(ngModel)]="objeto.subconta"
-                    inputId="subconta"
-                    [options]="subcontas_select"
-                    optionLabel="label"
-                    optionValue="value"
-                    placeholder="Selecione uma subconta"
-                    fluid
-                    ></p-select>
+                    <p-autocomplete
+                        name="subcontas"
+                        [(ngModel)]="objeto.subconta"
+                        dropdown
+                        [forceSelection]="false"
+                        [suggestions]="subcontas_select"
+                        (completeMethod)="filterSubconta($event)"
+                        optionLabel="nome"
+                        placeholder="Selecione uma subconta"
+                        fluid
+                        appendTo="body"
+                    ></p-autocomplete>
                     <small class="text-red-500" *ngIf="submitted && (objeto.subconta == undefined || objeto.subconta.nome == undefined)">Subconta é obrigatório.</small>
                 </div>
 
@@ -329,23 +335,24 @@
         </ng-template>
     </p-dialog>
 
-        <p-dialog [(visible)]="dialogoEditar" [style]="{ width: '450px' }" header="Detalhes do movimento" [modal]="true">
+    <p-dialog  [(visible)]="dialogoEditar" [style]="{ width: '450px' }" header="Detalhes do movimento" [modal]="true">
         <ng-template #content>
             <div class="flex flex-col gap-6">
             
                 <div>
                     <label for="subcontas" class="block font-bold mb-3">Subconta</label>
-                    <p-select
+                    <p-autocomplete
                     name="subcontas"
                     [(ngModel)]="movimentoEditar.subconta"
-                    inputId="subconta"
-                    [options]="subcontas_select"
-                    optionLabel="label"
-                    optionValue="value"
+                    dropdown
+                    [forceSelection]="false"
+                    [suggestions]="subcontas_select"
+                    (completeMethod)="filterSubconta($event)"
+                    optionLabel="nome"
                     placeholder="Selecione uma subconta"
-                    appendTo="body"
                     fluid
-                    ></p-select>
+                    appendTo="body"
+                    ></p-autocomplete>
                 </div>
 
                 <div>
@@ -368,11 +375,84 @@
 
         <ng-template #footer>
             <p-button label="Cancelar" icon="pi pi-times" text (click)="hideDialogEditar()" />
-            <p-button label="Salvar" icon="pi pi-check" (click)="saveEditar()" />
+            <p-button label="Salvar" icon="pi pi-check"  [loading]="loadingEditar"  (click)="saveEditar()" />
         </ng-template>
     </p-dialog>
 
     <p-confirmdialog [style]="{ width: '450px' }" />
+
+    <p-dialog [(visible)]="dialogoAgrupamento" [style]="{ width: '600px' }" header="Agrupar Subcontas" [modal]="true">
+        <ng-template #content>
+            <div class="flex flex-col gap-4">
+
+            <div class="flex flex-col gap-1">
+                <label class="font-bold">Histórico</label>
+                <span>{{ movimentoEditar.historico }}</span>
+
+                <label class="font-bold mt-3">Valor Total do Movimento</label>
+                <span>{{ movimentoEditar.valor | currency:'BRL' }}</span>
+            </div>
+
+            <div *ngIf="(movimentoEditar.agrupamentos ?? []).length > 0">
+                <p-table [value]="(movimentoEditar.agrupamentos ?? [])" [responsiveLayout]="'scroll'" class="mt-3">
+                <ng-template pTemplate="header">
+                    <tr>
+                    <th>Subconta</th>
+                    <th>Valor</th>
+                    <th>Ações</th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-agrup>
+                    <tr>
+                    <td>{{ agrup.subconta.nome }}</td>
+                    <td>{{ agrup.valor | currency:'BRL' }}</td>
+                    <td>
+                        <button pButton icon="pi pi-trash" class="p-button-rounded p-button-danger p-button-sm"
+                            (click)="removerAgrupamento(agrup)">
+                        </button>
+                    </td>
+                    </tr>
+                </ng-template>
+                </p-table>
+            </div>
+
+            <div class="flex flex-col gap-2 mt-4">
+                <label class="font-bold">Nova Subconta</label>
+                <p-autocomplete
+                [(ngModel)]="movimentoEditar.subconta"
+                [suggestions]="subcontas_select"
+                (completeMethod)="filterSubcontaAgrupar($event)"
+                optionLabel="nome"
+                dropdown
+                fluid
+                appendTo="body"
+                placeholder="Selecione a subconta">
+                </p-autocomplete>
+
+                <label class="font-bold mt-2">Valor</label>
+                <input type="number" pInputText [(ngModel)]="novoValor" placeholder="Digite o valor" />
+
+                <small class="text-red-500" *ngIf="erroValor">A soma dos valores excede o total do movimento.</small>
+
+                <button pButton label="Adicionar Subconta" class="mt-2" 
+                        (click)="adicionarAgrupamento()" 
+                        [disabled]="!subcontas || novoValor <= 0 || (valorDistribuido + novoValor) > (movimentoEditar.valor ?? 0)">
+                </button>
+            </div>
+
+            <div class="mt-4 text-right">
+                <strong>Valor distribuído: </strong>{{ valorDistribuido | currency:'BRL' }}<br />
+                <strong>Restante: </strong>{{ (movimentoEditar.valor ?? 0) - valorDistribuido | currency:'BRL' }}
+            </div>
+            </div>
+        </ng-template>
+
+        <ng-template #footer>
+            <p-button label="Cancelar" icon="pi pi-times" text (click)="dialogoAgrupamento = false" />
+            <p-button label="Salvar" icon="pi pi-check" [loading]="loadingAgrupar" (click)="salvarAgrupamentos()" 
+                    [disabled]="valorDistribuido !== movimentoEditar.valor" />
+        </ng-template>
+    </p-dialog>
 
 
 </div>

@@ -15,6 +15,10 @@ import { SelectModule } from "primeng/select";
 import { GrupoConta } from "../models/grupoconta.model";
 import { GrupoContaService } from "../services/grupoconta.service";
 import { ReceitasDespesasRelatorios } from "../models/receitasdespesasrelatorios.model";
+import { PanelModule } from "primeng/panel";
+import { Conta } from "../models/conta.model";
+import { DashConta } from "../models/dashconta.model";
+import { DatePicker } from "primeng/datepicker";
 
 @Component({
     selector: 'app-dashboard-financeiro',
@@ -29,7 +33,9 @@ import { ReceitasDespesasRelatorios } from "../models/receitasdespesasrelatorios
         CheckboxModule,
         ButtonModule,
         CardModule,
-        SelectModule
+        SelectModule,
+        PanelModule,
+        DatePicker
     ],
     templateUrl: './dashboard.component.html',
     providers: [MessageService,ConfirmationService]
@@ -49,28 +55,39 @@ export class DashboardFinanceiroComponent implements OnInit {
     despesas : number[] = [];
     pieOptions: any;
 
+    dashes : DashConta[] = [];
+    dashesAgrupados : DashConta[] = [];
+
     pieDataReceitas: any;
     pieDataDespesas: any;
 
     lineData: any;
+    fluxoCaixa: any;
     lineOptions: any;
 
     grupoContaSelecionado! : string;
 
-    totalReceitaSemana : number = 0;
-    totalReceitaMes : number = 0;
-    totalReceitaSemestre : number = 0;
-    totalReceitaAno : number = 0;
-    totalDespesaSemana : number = 0;
-    totalDespesaMes : number = 0;
-    totalDespesaSemestre : number = 0;
-    totalDespesaAno : number = 0;
+    totalReceitaSemana : string = '0';
+    totalReceitaMes : string = '0';
+    totalReceitaSemestre : string = '0';
+    totalReceitaAno : string = '0';
+    totalDespesaSemana : string = '0';
+    totalDespesaMes : string = '0';
+    totalDespesaSemestre : string = '0';
+    totalDespesaAno : string = '0';
 
     constructor(private movimentoService: MovimentoService,private messageService: MessageService, private grupoContasService : GrupoContaService) {}
 
     ngOnInit() {
     
-        this.filtro = {dataInicio:new Date(new Date().getFullYear(), 0, 1), dataFim:new Date(new Date().getFullYear(), 11, 31)}
+        const hoje = new Date();
+
+        this.filtro = {
+            dataInicio: new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate()),
+            dataFim: new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate())     
+        };
+        
+        this.loadDemoData();
         this.buscarMovimentos();
 
         this.grupoContasService.findAll(true).then((data)=>{
@@ -92,6 +109,7 @@ export class DashboardFinanceiroComponent implements OnInit {
             this.receitasDespesasRelatorio = response;
 
             this.atualizarGraficoBarra();
+            this.atualizarGraficoLinha();
             
             this.initCharts();
             this.loading = false;
@@ -109,25 +127,71 @@ export class DashboardFinanceiroComponent implements OnInit {
         const documentStyle = getComputedStyle(document.documentElement);
         const textColor = documentStyle.getPropertyValue('--text-color');
 
+        const receitasFiltradas = this.receitasDespesasRelatorio.receitasDespesasMensal.filter(f => f.tipo === 'ENTRADA');
+        const sumByGroup: { [key: string]: number } = {};
+
+        receitasFiltradas.forEach(item => {
+            if (sumByGroup[item.grupoContaNome]) {
+                sumByGroup[item.grupoContaNome] += item.valor;
+            } else {
+                sumByGroup[item.grupoContaNome] = item.valor;
+            }
+        });
+
+        const despesasFiltradas = this.receitasDespesasRelatorio.receitasDespesasMensal.filter(f => f.tipo === 'SAIDA');
+        const sumByGroupDesp: { [key: string]: number } = {};
         
+        despesasFiltradas.forEach(item => {
+            if (sumByGroupDesp[item.grupoContaNome]) {
+                sumByGroupDesp[item.grupoContaNome] += item.valor;
+            } else {
+                sumByGroupDesp[item.grupoContaNome] = item.valor;
+            }
+        });
+
+     
         this.pieDataReceitas = {
-            labels:  Array.from(new Set(this.receitasDespesasRelatorio.receitasDespesasMensal.filter(f=>f.tipo == 'ENTRADA').map(r => r.grupoContaNome))),
+            labels: Object.keys(sumByGroup), 
             datasets: [
                 {
-                    data: this.receitasDespesasRelatorio.receitasDespesasMensal.filter(f=>f.tipo == 'ENTRADA').map(r => r.valor),
-                    backgroundColor: [documentStyle.getPropertyValue('--p-indigo-500'), documentStyle.getPropertyValue('--p-purple-500'), documentStyle.getPropertyValue('--p-teal-500')],
-                    hoverBackgroundColor: [documentStyle.getPropertyValue('--p-indigo-400'), documentStyle.getPropertyValue('--p-purple-400'), documentStyle.getPropertyValue('--p-teal-400')]
+                    data: Object.values(sumByGroup),
+                    backgroundColor: [
+                        documentStyle.getPropertyValue('--p-indigo-500'),
+                        documentStyle.getPropertyValue('--p-purple-500'),
+                        documentStyle.getPropertyValue('--p-teal-500'),
+                        documentStyle.getPropertyValue('--p-orange-500'),
+                        documentStyle.getPropertyValue('--p-pink-500')
+                    ],
+                    hoverBackgroundColor: [
+                        documentStyle.getPropertyValue('--p-indigo-400'),
+                        documentStyle.getPropertyValue('--p-purple-400'),
+                        documentStyle.getPropertyValue('--p-teal-400'),
+                        documentStyle.getPropertyValue('--p-orange-400'),
+                        documentStyle.getPropertyValue('--p-pink-400')
+                    ]                
                 }
             ]
         };
 
         this.pieDataDespesas = {
-            labels:  Array.from(new Set(this.receitasDespesasRelatorio.receitasDespesasMensal.filter(f=>f.tipo == 'SAIDA').map(r => r.grupoContaNome))),
+            labels: Object.keys(sumByGroupDesp), 
             datasets: [
                 {
-                    data: this.receitasDespesasRelatorio.receitasDespesasMensal.filter(f=>f.tipo == 'SAIDA').map(r => r.valor),
-                    backgroundColor: [documentStyle.getPropertyValue('--p-indigo-500'), documentStyle.getPropertyValue('--p-purple-500'), documentStyle.getPropertyValue('--p-teal-500')],
-                    hoverBackgroundColor: [documentStyle.getPropertyValue('--p-indigo-400'), documentStyle.getPropertyValue('--p-purple-400'), documentStyle.getPropertyValue('--p-teal-400')]
+                    data: Object.values(sumByGroupDesp),
+                    backgroundColor: [
+                        documentStyle.getPropertyValue('--p-indigo-500'),
+                        documentStyle.getPropertyValue('--p-purple-500'),
+                        documentStyle.getPropertyValue('--p-teal-500'),
+                        documentStyle.getPropertyValue('--p-orange-500'),
+                        documentStyle.getPropertyValue('--p-pink-500')
+                    ],
+                    hoverBackgroundColor: [
+                        documentStyle.getPropertyValue('--p-indigo-400'),
+                        documentStyle.getPropertyValue('--p-purple-400'),
+                        documentStyle.getPropertyValue('--p-teal-400'),
+                        documentStyle.getPropertyValue('--p-orange-400'),
+                        documentStyle.getPropertyValue('--p-pink-400')
+                    ]
                 }
             ]
         };
@@ -135,10 +199,12 @@ export class DashboardFinanceiroComponent implements OnInit {
         this.pieOptions = {
             plugins: {
                 legend: {
+                    position: 'bootom',
                     labels: {
                         usePointStyle: true,
                         color: textColor
-                    }
+                    },
+                    
                 }
             }
         };
@@ -150,7 +216,7 @@ export class DashboardFinanceiroComponent implements OnInit {
         if(event && event.element) {
             const index = event.element.index;
             const label = tipo == 'ENTRADA' ? this.pieDataReceitas.labels[index] : this.pieDataDespesas.labels[index];
-
+ 
             this.atualizarGraficoBarra(label);
         }
     }
@@ -166,15 +232,15 @@ export class DashboardFinanceiroComponent implements OnInit {
         const depesas = grupoContaNome == '' ? (this.receitasDespesasRelatorio.despesa ?? []) : (this.receitasDespesasRelatorio.despesa?.filter(f=>f.grupoContaNome == grupoContaNome) ?? [])
         const receitas = grupoContaNome == '' ? (this.receitasDespesasRelatorio.receita ?? []) : (this.receitasDespesasRelatorio.receita?.filter(f=>f.grupoContaNome == grupoContaNome) ?? [])
         
-        this.totalDespesaAno = depesas.reduce((soma, r) => soma + r.valorTotalAnual, 0) ?? 0;
-        this.totalDespesaSemestre = depesas.reduce((soma, r) => soma + r.valorTotalSemestral, 0) ?? 0;
-        this.totalDespesaMes = depesas.reduce((soma, r) => soma + r.valorTotalMensal, 0) ?? 0;
-        this.totalDespesaSemana = depesas.reduce((soma, r) => soma + r.valorTotalSemanal, 0) ?? 0;
+        this.totalDespesaAno = (depesas.reduce((soma, r) => soma + r.valorTotalAnual, 0) ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        this.totalDespesaSemestre = (depesas.reduce((soma, r) => soma + r.valorTotalSemestral, 0) ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        this.totalDespesaMes = (depesas.reduce((soma, r) => soma + r.valorTotalMensal, 0) ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        this.totalDespesaSemana = (depesas.reduce((soma, r) => soma + r.valorTotalSemanal, 0) ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
-        this.totalReceitaAno = receitas.reduce((soma, r) => soma + r.valorTotalAnual, 0) ?? 0;
-        this.totalReceitaSemestre = receitas.reduce((soma, r) => soma + r.valorTotalSemestral, 0) ?? 0;
-        this.totalReceitaMes = receitas.reduce((soma, r) => soma + r.valorTotalMensal, 0) ?? 0;
-        this.totalReceitaSemana = receitas.reduce((soma, r) => soma + r.valorTotalSemanal, 0) ?? 0;
+        this.totalReceitaAno = (receitas.reduce((soma, r) => soma + r.valorTotalAnual, 0) ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        this.totalReceitaSemestre = (receitas.reduce((soma, r) => soma + r.valorTotalSemestral, 0) ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        this.totalReceitaMes = (receitas.reduce((soma, r) => soma + r.valorTotalMensal, 0) ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        this.totalReceitaSemana = (receitas.reduce((soma, r) => soma + r.valorTotalSemanal, 0) ?? 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
         this.receitas = Array(12).fill(0);
         this.despesas = Array(12).fill(0);
@@ -203,8 +269,8 @@ export class DashboardFinanceiroComponent implements OnInit {
                 },
                 {
                     label: 'Despesa',
-                    backgroundColor: documentStyle.getPropertyValue('--p-primary-200'),
-                    borderColor: documentStyle.getPropertyValue('--p-primary-200'),
+                    backgroundColor: '#f44336',
+                    borderColor: '#f44336',
                     data: this.despesas
                 }
             ]
@@ -223,8 +289,6 @@ export class DashboardFinanceiroComponent implements OnInit {
                 }
             ]
         };
-
-
 
         this.barOptions = {
             maintainAspectRatio: false,
@@ -260,5 +324,56 @@ export class DashboardFinanceiroComponent implements OnInit {
                 }
             }
         };
+    }
+
+    atualizarGraficoLinha(){
+        const documentStyle = getComputedStyle(document.documentElement);
+
+        this.fluxoCaixa = {
+            labels: this.dashes.filter(f=>(f.dataLancamento != null || f.dataLancamento != undefined)).map(d=>(new Date(d.dataLancamento).toLocaleDateString('pt-BR'))),
+            datasets: [
+                {
+                    label: 'Fluxo de caixa',
+                    data: this.dashes.map(d => d.receita),
+                    fill: false,
+                    backgroundColor: documentStyle.getPropertyValue('--p-primary-500'),
+                    borderColor: documentStyle.getPropertyValue('--p-primary-500'),
+                    tension: 0.4
+                }
+            ]
+        };
+    }
+    
+    async loadDemoData(){
+        await this.movimentoService.findDashByFiltro(this.filtro).then(data =>{
+            this.dashes = data;
+            this.atualizarGraficoLinha();
+            const agrupado = this.dashes.reduce((acc, dash) => {
+            const key = dash.contaId ?? ''; 
+
+            if (!acc[key]) {
+                acc[key] = {
+                    contaId: dash.contaId,
+                    agencia: dash.agencia,
+                    numeroConta: dash.numeroConta,
+                    nomeBanco: dash.nomeBanco,
+                    numeroBanco: dash.numeroBanco,
+                    lucro: 0,
+                    receita: 0,
+                    despesa: 0,
+                    dataLancamento: new Date()
+                };
+            }
+
+            acc[key].lucro += dash.lucro;
+            acc[key].receita += dash.receita;
+            acc[key].despesa += dash.despesa;
+
+            return acc;
+            }, {} as { [key: string]: DashConta });
+
+            
+           this.dashesAgrupados = Object.values(agrupado);
+        });
     }
 }

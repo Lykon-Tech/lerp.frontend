@@ -6,6 +6,7 @@ import { firstValueFrom } from 'rxjs';
 import { MovimentoSaida } from '../models/movimento.saida.model';
 import { FiltroMovimento } from '../models/filtromovimento.model';
 import { ReceitasDespesasRelatorios } from '../models/receitasdespesasrelatorios.model';
+import { DashConta } from '../models/dashconta.model';
 
 interface Page<T> {
   content: T[];
@@ -45,10 +46,10 @@ export class MovimentoService extends BaseService<Movimento, MovimentoSaida>{
     }
 
     
-    createmovimentos(movimentos :MovimentoSaida[], cancelarComErro : boolean = false){
+    createmovimentos(movimentos :MovimentoSaida[], cancelarComErro : boolean = false) : Promise<Movimento[]>{
          let params = new HttpParams()
             .set('cancelarComErro', cancelarComErro);
-        return firstValueFrom(this.http.post<Movimento>(this.baseUrl+"/cadastrar_lista", movimentos,{params}))
+        return firstValueFrom(this.http.post<Movimento[]>(this.baseUrl+"/cadastrar_lista", movimentos,{params}))
             .catch(error => {
                 return Promise.reject(this.extractErrorMessage(error));
             });
@@ -68,9 +69,15 @@ export class MovimentoService extends BaseService<Movimento, MovimentoSaida>{
         ).catch(error => Promise.reject(this.extractErrorMessage(error)));
     }
 
-    findByNumeroDocumento(numeroDocumento : string): Promise<string> {
+    findByNumeroDocumento(movimento : MovimentoSaida): Promise<string> {
         return firstValueFrom(
-            this.http.post<string>(`${this.baseUrl}/find_id_by_numero_documento`, numeroDocumento)
+            this.http.post<string>(`${this.baseUrl}/find_id_by_numero_documento`, movimento)
+        ).catch(error => Promise.reject(this.extractErrorMessage(error)));
+    }
+
+    findDashByFiltro(filtro : FiltroMovimento):Promise<DashConta[]>{
+        return firstValueFrom(
+            this.http.post<DashConta[]>(`${this.baseUrl}/find_dash_by_filtro`, filtro)
         ).catch(error => Promise.reject(this.extractErrorMessage(error)));
     }
     
