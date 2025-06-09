@@ -172,10 +172,11 @@
         </ng-template>
         <ng-template #footer>
             <tr>
-                <td colspan="6" class="text-right font-bold">Total do Saldo:</td>
-                <td colspan="2">
+                <td colspan="7" class="text-right font-bold">Total do Saldo:</td>
+                <td colspan="1">
                     <p-tag [value]="saldo" [severity]="getSeverity(this.totalSaldo(dt) >= 0)" styleClass="rounded-full" />
                 </td>
+                <td colspan="2"></td>
             </tr>
         </ng-template>
 
@@ -331,7 +332,7 @@
 
         <ng-template #footer>
             <p-button label="Cancelar" icon="pi pi-times" text (click)="hideDialog()" />
-            <p-button label="Salvar" icon="pi pi-check" (click)="save()" />
+            <p-button label="Salvar" [loading]="loadingSalvar" icon="pi pi-check" (click)="save()" />
         </ng-template>
     </p-dialog>
 

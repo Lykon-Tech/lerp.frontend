@@ -34,7 +34,6 @@ import { CursoSaida } from "../../models/curso.saida.model";
 import { MultiSelectModule } from "primeng/multiselect";
 import { ModalidadeService } from "../../services/modalidade.service";
 import { Modalidade } from "../../models/modalidade.model";
-import { Panel } from "primeng/panel";
 import { Popover, PopoverModule } from "primeng/popover";
 
 
@@ -111,9 +110,11 @@ export class CursoComponent extends BaseComponente<Curso, CursoSaida> {
     modalidades_select! : any[];
     bolsas_multi_select! : any[];
 
-    override loadDemoData(): void {
+    override async loadDemoData() {
 
-        this.tipoCursoService.findAll(true).then((data) => {
+        this.loading = true;
+
+        await this.tipoCursoService.findAll(true).then((data) => {
             this.tiposCursos.set(data);
             this.tiposCursos_select = data.map(tipoCurso => ({
                 label: tipoCurso.nome,
@@ -121,7 +122,7 @@ export class CursoComponent extends BaseComponente<Curso, CursoSaida> {
             }));
         });
 
-        this.funcionarioService.findCoordenadores().then((data) => {
+        await this.funcionarioService.findCoordenadores().then((data) => {
             this.coordenadores.set(data);
             this.coordenadores_select = data.map(coordenador => ({
                 label: coordenador.nome,
@@ -129,7 +130,7 @@ export class CursoComponent extends BaseComponente<Curso, CursoSaida> {
             }));
         });
 
-        this.matrizService.findAll(true).then((data) => {
+        await this.matrizService.findAll(true).then((data) => {
             this.matrizesCurriculares.set(data);
             this.matrizes_select = data.map(matriz => ({
                 label: matriz.nome,
@@ -137,7 +138,7 @@ export class CursoComponent extends BaseComponente<Curso, CursoSaida> {
             }));
         });
 
-        this.modalidadeService.findAll(true).then((data) => {
+        await this.modalidadeService.findAll(true).then((data) => {
             this.modalidades.set(data);
             this.modalidades_select = data.map(modalidade => ({
                 label: modalidade.nome,
@@ -146,7 +147,7 @@ export class CursoComponent extends BaseComponente<Curso, CursoSaida> {
         });
 
 
-        this.bolsaService.findAll(true).then((data)=>{
+        await this.bolsaService.findAll(true).then((data)=>{
             this.bolsas.set(data);
             this.bolsas_multi_select = this.bolsas().map(bolsa => ({
                 label: bolsa.nome,

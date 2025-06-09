@@ -7,6 +7,7 @@ import { MovimentoSaida } from '../models/movimento.saida.model';
 import { FiltroMovimento } from '../models/filtromovimento.model';
 import { ReceitasDespesasRelatorios } from '../models/receitasdespesasrelatorios.model';
 import { DashConta } from '../models/dashconta.model';
+import { SaldoConta } from '../models/saldoconta.model';
 
 interface Page<T> {
   content: T[];
@@ -78,6 +79,12 @@ export class MovimentoService extends BaseService<Movimento, MovimentoSaida>{
     findDashByFiltro(filtro : FiltroMovimento):Promise<DashConta[]>{
         return firstValueFrom(
             this.http.post<DashConta[]>(`${this.baseUrl}/find_dash_by_filtro`, filtro)
+        ).catch(error => Promise.reject(this.extractErrorMessage(error)));
+    }
+
+    findSaldoContas():Promise<SaldoConta[]>{
+        return firstValueFrom(
+            this.http.get<SaldoConta[]>(`${this.baseUrl}/find_saldo_contas`)
         ).catch(error => Promise.reject(this.extractErrorMessage(error)));
     }
     

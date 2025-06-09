@@ -95,9 +95,10 @@ export class TransfAlunoComponent extends BaseComponente<Turma, TurmaSaida> {
     filtroTurmaA: Turma[] = [];
     filtroTurmaB: Turma[] = [];
 
-    override loadDemoData(): void {
+    override async loadDemoData() {
+        this.loading = true;
 
-        this.cursoService.findAll().then((data) => {
+        await this.cursoService.findAll().then((data) => {
             this.cursos.set(data);
             this.cursos_select = this.cursos().map(curso => ({
                 label: curso.nome,

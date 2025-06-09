@@ -93,7 +93,6 @@ export class MovimentoComponent extends BaseComponente<Movimento, MovimentoSaida
     dialogoEditar: boolean = false;
     dialogoAgrupamento : boolean = false;
 
-    loading: boolean = false;
     loadingEditar : boolean = false;
     loadingAgrupar : boolean = false;
 
@@ -121,6 +120,7 @@ export class MovimentoComponent extends BaseComponente<Movimento, MovimentoSaida
         if (!this.subcontas || this.novoValor <= 0) return;
 
         const totalSimulado = this.valorDistribuido + this.novoValor;
+
         if (totalSimulado > (this.movimentoEditar.valor ?? 0)) {
             this.erroValor = true;
             return;
@@ -184,18 +184,18 @@ export class MovimentoComponent extends BaseComponente<Movimento, MovimentoSaida
         const hoje = new Date();
 
         this.filtro = {
-            dataInicio: new Date(hoje.getFullYear(), hoje.getMonth(), 1),
-            dataFim: new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate())     
+            dataInicio: new Date(hoje.getFullYear(), hoje.getMonth(), 1, 0 , 0 , 0),
+            dataFim: new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate(), 23,59,59)     
         };
 
         super.ngOnInit();
     }
 
-    override loadDemoData(): void {
+    override async loadDemoData() {
 
         this.loading = true;
         
-        this.movimentoService.getMovimentosFiltro(this.filtro).then(data => {
+        await this.movimentoService.getMovimentosFiltro(this.filtro).then(data => {
             const movimentosComDataConvertida = data.map(mov => ({
                 ...mov,
                 dataLancamento: mov.dataLancamento ? new Date(mov.dataLancamento) : undefined
@@ -214,7 +214,7 @@ export class MovimentoComponent extends BaseComponente<Movimento, MovimentoSaida
             });
         });
 
-        this.contaService.findAll(true).then((data)=>{
+        await this.contaService.findAll(true).then((data)=>{
             this.contas.set(data);
             this.contas_select = this.contas().map(conta => ({
                 label: conta.banco?.nome + ' - ' + conta.numeroConta,
@@ -223,12 +223,12 @@ export class MovimentoComponent extends BaseComponente<Movimento, MovimentoSaida
         });
 
 
-        this.subcontaService.findAll(true).then((data)=>{
+        await this.subcontaService.findAll(true).then((data)=>{
             this.subcontas.set(data);
             this.subcontas_select = this.subcontas();
         });
 
-        this.tipoDocumentoService.findAll(true).then((data)=>{
+        await this.tipoDocumentoService.findAll(true).then((data)=>{
             this.tipoDocumentos.set(data);
             this.tipoDocumentos_select = this.tipoDocumentos().map(tipoDocumento => ({
                 label: tipoDocumento.nome,
@@ -309,30 +309,33 @@ export class MovimentoComponent extends BaseComponente<Movimento, MovimentoSaida
 
                 const { movimentosValidos, movimentosPadrao, historicosSemTag } = await this.identificarTagsFaltantes(ofxData, conta, tipoDocumento);
 
-                 if (movimentosValidos.length > 0) {
-                    const movimentosSaida = movimentosValidos
-                        .map(mov => this.converterObjeto(mov));
+                let movimentosSaida : MovimentoSaida[]= [];
 
-                    await this.movimentoService.createmovimentos(movimentosSaida);
-                    await this.loadDemoData();
+                if (movimentosValidos.length > 0) {
+                    movimentosSaida.push(...movimentosValidos
+                        .map(mov => this.converterObjeto(mov)));
                 }
 
                 if (movimentosPadrao.length > 0) {
-                    const movimentosSaida = movimentosPadrao
-                        .map(mov => this.converterObjeto(mov));
+                    movimentosSaida.push(...movimentosPadrao
+                        .map(mov => this.converterObjeto(mov)));
+                }
 
-                    await this.movimentoService.createmovimentos(movimentosSaida);
-                    await this.loadDemoData();
+                const tamanhoChunk = 50;
+                for (let i = 0; i < movimentosSaida.length; i += tamanhoChunk) {
+                    let chunk = movimentosSaida.slice(i, i + tamanhoChunk);
+                    await this.movimentoService.createmovimentos(chunk);
                 }
 
                 if(movimentosValidos.length > 0 || movimentosPadrao.length > 0){
+                    await this.loadDemoData();
                     this.messageService.add({
                         severity: 'success',
                         summary: 'Sucesso',
                         detail: `Movimentos importados automaticamente!`,
                         life: 5000
                     });
-                }
+                }   
 
                 if (historicosSemTag.length > 0) {
                     const maxItensExibir = 10;
@@ -400,10 +403,9 @@ export class MovimentoComponent extends BaseComponente<Movimento, MovimentoSaida
         const subcontaSaidaPadrao = await this.subcontaService.findSubcontaPadrao(false);
         let lancarPadrao = false;
 
-        const subcontas =  await this.subcontaService.findAllByTagName(ofxData.map(o=>o.historico));
         for (const item of ofxData) {
             try {
-                subconta = subcontas.filter(s=> s.tags?.filter(t=>t.nome == item.historico))[0];
+                subconta = this.subcontas().filter(s=> s.tags?.filter(t=>t.nome == item.historico))[0];
                 
                 if (!subconta) {
                     historicosSemTag.add(item.historico);
@@ -568,10 +570,11 @@ export class MovimentoComponent extends BaseComponente<Movimento, MovimentoSaida
 
         if (!confirmEditar) return;
 
-        const tags = this.movimentosSelecionados.map(m => m.historico).join(', ');
+        const tagsHistoricos = this.movimentosSelecionados.map(s=> s.historico).filter(t=>!this.movimentoEditar.subconta?.tags?.map(e=>e.nome).includes(t));
+        const tags = [...new Set(tagsHistoricos)].join(",");
         const tagsLimitadas = tags.length > 200 ? tags.slice(0, 200) + '...' : tags;
 
-        const confirmTags = await this.confirmDialog(
+        const confirmTags = tagsHistoricos.length > 0 && await this.confirmDialog(
             `Deseja adicionar as tags "${tagsLimitadas}" à subconta?`,
             'Adicionar tags na subconta'
         );
@@ -632,15 +635,28 @@ export class MovimentoComponent extends BaseComponente<Movimento, MovimentoSaida
 
             const _lista = this.lista();
 
+            let subconta : Subconta = {
+                id : this.movimentoEditar.subconta.id,
+                nome : this.movimentoEditar.subconta.nome,
+                grupoConta : {...this.movimentoEditar.subconta.grupoConta},
+                tipo : this.movimentoEditar.subconta.tipo,
+                ativo : this.movimentoEditar.subconta.ativo,
+                tags : this.movimentoEditar.subconta.tags?.map(m=>({
+                    id:m.id,
+                    nome:m.nome,
+                    ativo:m.ativo
+                }))
+            }
+
             if(adicionarTags){
-                 this.movimentoEditar.subconta.tags = [
-                    ...this.movimentoEditar.subconta.tags??[],
+                subconta.tags = [
+                    ...subconta.tags??[],
                     ...Array.from(new Map(this.movimentosSelecionados.filter(f=> !this.movimentoEditar.subconta?.tags?.map(t=>t.nome).includes(f.historico)).map(
                         m => [m.historico, { ativo: true, nome: m.historico }]
                     )).values())
                 ];
                 
-                await this.subcontaService.update(this.converterObjetoSubconta(this.movimentoEditar.subconta), this.movimentoEditar.subconta.id??'');
+                await this.subcontaService.update(this.converterObjetoSubconta(subconta), subconta.id??'');
             }
 
             const updateObjects = await this.movimentoService.createmovimentos(movimentosSaida, true);

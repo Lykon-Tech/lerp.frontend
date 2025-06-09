@@ -27,6 +27,8 @@ export abstract class BaseComponente<T extends Object, S> implements OnInit{
    
     lista = signal<T[]>([]);
 
+    loading: boolean = false;
+
     loadingSalvar : boolean = false;
 
     objeto: T  = {} as T;
@@ -44,9 +46,12 @@ export abstract class BaseComponente<T extends Object, S> implements OnInit{
         this.loadDemoData();
     }
 
-    loadDemoData() {
-        this.service.findAll().then((data) => {
+    async loadDemoData() {
+        this.loading = true;
+
+        await this.service.findAll().then((data) => {
             this.lista.set(data);
+             this.loading = false;
         });
 
         this.statuses = [

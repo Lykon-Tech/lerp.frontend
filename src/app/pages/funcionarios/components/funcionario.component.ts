@@ -79,7 +79,8 @@ export class FuncionarioComponent extends BaseComponente<Funcionario, Funcionari
 
     cargos_select! : any[];
     
-    override loadDemoData(): void {
+    override async loadDemoData() {
+        this.loading = true;
         this.chavesPix_select = [
             { label: 'CPF', value: 'CPF' },
             { label: 'TELEFONE', value: 'TELEFONE' },
@@ -92,7 +93,7 @@ export class FuncionarioComponent extends BaseComponente<Funcionario, Funcionari
             { label: 'HORISTA', value: 'HORISTA' }
         ];
         
-        this.cargoService.findAll(true).then((data) => {
+        await this.cargoService.findAll(true).then((data) => {
             this.cargos.set(data);
             this.cargos_select = this.cargos().map(cargo => ({
                 label: cargo.nome,

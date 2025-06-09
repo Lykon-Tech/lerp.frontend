@@ -38,9 +38,7 @@ export class SubcontaService extends BaseService<Subconta,SubcontaSaida>{
     
     findAllByTagName(tagNomes : string[]): Promise<Subconta[]> {
         return firstValueFrom(
-            this.http.get<Subconta[]>(`${this.baseUrl}/find_all_by_tag_name`, {
-                params: {tagNomes}
-            })
+            this.http.post<Subconta[]>(`${this.baseUrl}/find_all_by_tag_name`, tagNomes)
         ).catch(error => {
             return Promise.reject(this.extractErrorMessage(error));
         });

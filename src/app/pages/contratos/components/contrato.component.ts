@@ -101,9 +101,10 @@ export class ContratoComponent extends BaseComponente<Contrato,ContratoSaida> {
     bolsas_select! : any[];
     tipo_contratos_select! : any[];
 
-    override loadDemoData(): void {
-
-        this.alunoService.findAll(true).then((data) => {
+    override async loadDemoData() {
+        this.loading = true;
+        
+        await this.alunoService.findAll(true).then((data) => {
             this.alunos.set(data);
             this.alunos_select = this.alunos().map(aluno => ({
                 label: aluno.nome,
@@ -111,7 +112,7 @@ export class ContratoComponent extends BaseComponente<Contrato,ContratoSaida> {
             }));
         });
 
-        this.turmaService.findAll(true).then((data) => {
+        await this.turmaService.findAll(true).then((data) => {
             this.turmas.set(data);
             this.turmas_select = this.turmas().map(turma => ({
                 label: turma.nome,
@@ -119,7 +120,7 @@ export class ContratoComponent extends BaseComponente<Contrato,ContratoSaida> {
             }));
         });
 
-        this.situacaoContratoService.findAll(true).then((data) => {
+        await this.situacaoContratoService.findAll(true).then((data) => {
             this.situacoesContratos.set(data);
             this.situacao_contratos_select = this.situacoesContratos().map(turma => ({
                 label: turma.nome,
@@ -127,7 +128,7 @@ export class ContratoComponent extends BaseComponente<Contrato,ContratoSaida> {
             }));
         });
 
-        this.funcionarioService.findVendedores().then((data) => {
+        await this.funcionarioService.findVendedores().then((data) => {
             this.vendedores.set(data);
             this.vendedores_select = this.vendedores().map(vendedor => ({
                 label: vendedor.nome,
@@ -135,7 +136,7 @@ export class ContratoComponent extends BaseComponente<Contrato,ContratoSaida> {
             }));
         });
 
-        this.bolsaService.findAll(true).then((data) => {
+        await this.bolsaService.findAll(true).then((data) => {
             this.bolsas.set(data);
             this.bolsas_select = this.bolsas().map(bolsa => ({
                 label: bolsa.nome,
@@ -143,7 +144,7 @@ export class ContratoComponent extends BaseComponente<Contrato,ContratoSaida> {
             }));
         });
 
-        this.tipoContratoService.findAll(true).then((data) => {
+        await this.tipoContratoService.findAll(true).then((data) => {
             this.tipoContratos.set(data);
             this.tipo_contratos_select = this.tipoContratos().map(tipoContrato => ({
                 label: tipoContrato.nome,

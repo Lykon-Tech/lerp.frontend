@@ -19,6 +19,7 @@ import { PanelModule } from "primeng/panel";
 import { Conta } from "../models/conta.model";
 import { DashConta } from "../models/dashconta.model";
 import { DatePicker } from "primeng/datepicker";
+import { SaldoConta } from "../models/saldoconta.model";
 
 @Component({
     selector: 'app-dashboard-financeiro',
@@ -50,16 +51,20 @@ export class DashboardFinanceiroComponent implements OnInit {
     grupo_contas_select!: any[];
     barData : any;
     barOptions: any;
+    barHorizontalOptions: any;
     
     receitas : number[] = [];
     despesas : number[] = [];
     pieOptions: any;
 
     dashes : DashConta[] = [];
-    dashesAgrupados : DashConta[] = [];
+    saldoContas : SaldoConta[] = [];
 
     pieDataReceitas: any;
     pieDataDespesas: any;
+
+    barDataReceitas!: any;
+    barDataDespesas!: any;
 
     lineData: any;
     fluxoCaixa: any;
@@ -110,8 +115,8 @@ export class DashboardFinanceiroComponent implements OnInit {
 
             this.atualizarGraficoBarra();
             this.atualizarGraficoLinha();
-            
-            this.initCharts();
+            this.atualizarGraficoBarraSubcontas();
+            this.inciarGraficoRosquinha();
             this.loading = false;
         }).catch(error => {
             this.loading = false;
@@ -123,11 +128,13 @@ export class DashboardFinanceiroComponent implements OnInit {
         });
     }
 
-    initCharts() {
+    inciarGraficoRosquinha() {
         const documentStyle = getComputedStyle(document.documentElement);
         const textColor = documentStyle.getPropertyValue('--text-color');
 
         const receitasFiltradas = this.receitasDespesasRelatorio.receitasDespesasMensal.filter(f => f.tipo === 'ENTRADA');
+        const despesasFiltradas = this.receitasDespesasRelatorio.receitasDespesasMensal.filter(f => f.tipo === 'SAIDA');
+
         const sumByGroup: { [key: string]: number } = {};
 
         receitasFiltradas.forEach(item => {
@@ -138,8 +145,8 @@ export class DashboardFinanceiroComponent implements OnInit {
             }
         });
 
-        const despesasFiltradas = this.receitasDespesasRelatorio.receitasDespesasMensal.filter(f => f.tipo === 'SAIDA');
         const sumByGroupDesp: { [key: string]: number } = {};
+
         
         despesasFiltradas.forEach(item => {
             if (sumByGroupDesp[item.grupoContaNome]) {
@@ -197,9 +204,12 @@ export class DashboardFinanceiroComponent implements OnInit {
         };
 
         this.pieOptions = {
+            maintainAspectRatio: false,
+            responsive: true,
+            aspectRatio: 0.8,
             plugins: {
                 legend: {
-                    position: 'bootom',
+                    position: 'right',
                     labels: {
                         usePointStyle: true,
                         color: textColor
@@ -208,7 +218,87 @@ export class DashboardFinanceiroComponent implements OnInit {
                 }
             }
         };
+
     
+    }
+
+    atualizarGraficoBarraSubcontas(grupoContaNome : string = ''){
+        const documentStyle = getComputedStyle(document.documentElement);
+
+        const receitasFiltradas = this.receitasDespesasRelatorio.receitasDespesasMensal.filter(f =>
+            f.tipo === 'ENTRADA' && (grupoContaNome === '' || f.grupoContaNome === grupoContaNome)
+        );
+
+        const despesasFiltradas = this.receitasDespesasRelatorio.receitasDespesasMensal.filter(f =>
+            f.tipo === 'SAIDA' && (grupoContaNome === '' || f.grupoContaNome === grupoContaNome)
+        );
+
+        const sumBySubcontaDesp: { [key: string]: number } = {};
+
+        const sumBySubconta: { [key: string]: number } = {};
+
+        receitasFiltradas.forEach(item => {
+            if (sumBySubconta[item.subcontaNome]) {
+                sumBySubconta[item.subcontaNome] += item.valor;
+            } else {
+                sumBySubconta[item.subcontaNome] = item.valor;
+            }
+        });
+
+        despesasFiltradas.forEach(item => {
+            if (sumBySubcontaDesp[item.subcontaNome]) {
+                sumBySubcontaDesp[item.subcontaNome] += item.valor;
+            } else {
+                sumBySubcontaDesp[item.subcontaNome] = item.valor;
+            }
+        });
+
+        const top10Subcontas = Object.entries(sumBySubconta)
+            .sort((a, b) => b[1] - a[1]) 
+            .slice(0, 10);               
+
+        const topSumBySubconta: { [key: string]: number } = {};
+
+        top10Subcontas.forEach(([key, value]) => {
+            topSumBySubconta[key] = value;
+        });
+
+        const top10SubcontasDesp = Object.entries(sumBySubcontaDesp)
+            .sort((a, b) => b[1] - a[1]) 
+            .slice(0, 10);               
+
+        const topSumBySubcontaDesp: { [key: string]: number } = {};
+
+        top10SubcontasDesp.forEach(([key, value]) => {
+            topSumBySubcontaDesp[key] = value;
+        });
+
+        this.barDataReceitas = {
+            labels: Object.keys(topSumBySubconta),
+            datasets: [
+                {
+                    label: 'Receita',
+                    backgroundColor: documentStyle.getPropertyValue('--p-primary-500'),
+                    borderColor: documentStyle.getPropertyValue('--p-primary-500'),
+                    barThickness: 20,
+                    data: Object.values(topSumBySubconta)
+                }
+            ]
+        };
+
+        
+        this.barDataDespesas = {
+            labels: Object.keys(topSumBySubcontaDesp),
+            datasets: [
+                {
+                    label: 'Despesa',
+                    backgroundColor: '#f44336',
+                    borderColor: '#f44336',
+                    barThickness: 20,
+                    data: Object.values(topSumBySubcontaDesp)
+                }
+            ]
+        };
     }
 
     handlePieClick(event: any, tipo : string) {
@@ -218,6 +308,7 @@ export class DashboardFinanceiroComponent implements OnInit {
             const label = tipo == 'ENTRADA' ? this.pieDataReceitas.labels[index] : this.pieDataDespesas.labels[index];
  
             this.atualizarGraficoBarra(label);
+            this.atualizarGraficoBarraSubcontas(label);
         }
     }
 
@@ -324,10 +415,47 @@ export class DashboardFinanceiroComponent implements OnInit {
                 }
             }
         };
+
+        this.barHorizontalOptions = {
+            indexAxis: 'y',
+            maintainAspectRatio: false,
+            aspectRatio: 0.8,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: textColor
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: {
+                        color: textColorSecondary,
+                        font: {
+                            weight: 500
+                        }
+                    },
+                    grid: {
+                        display: false,
+                        drawBorder: false
+                    }
+                },
+                y: {
+                    ticks: {
+                        color: textColorSecondary
+                    },
+                    grid: {
+                        color: surfaceBorder,
+                        drawBorder: false
+                    }
+                }
+            }
+        };
     }
 
     atualizarGraficoLinha(){
         const documentStyle = getComputedStyle(document.documentElement);
+        const textColor = documentStyle.getPropertyValue('--text-color');
 
         this.fluxoCaixa = {
             labels: this.dashes.filter(f=>(f.dataLancamento != null || f.dataLancamento != undefined)).map(d=>(new Date(d.dataLancamento).toLocaleDateString('pt-BR'))),
@@ -342,38 +470,37 @@ export class DashboardFinanceiroComponent implements OnInit {
                 }
             ]
         };
+
+        this.lineOptions = {
+            maintainAspectRatio: false,
+            aspectRatio: 0.8,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: textColor
+                    }
+                }
+            }
+        };
+
+        
     }
     
     async loadDemoData(){
         await this.movimentoService.findDashByFiltro(this.filtro).then(data =>{
             this.dashes = data;
             this.atualizarGraficoLinha();
-            const agrupado = this.dashes.reduce((acc, dash) => {
-            const key = dash.contaId ?? ''; 
-
-            if (!acc[key]) {
-                acc[key] = {
-                    contaId: dash.contaId,
-                    agencia: dash.agencia,
-                    numeroConta: dash.numeroConta,
-                    nomeBanco: dash.nomeBanco,
-                    numeroBanco: dash.numeroBanco,
-                    lucro: 0,
-                    receita: 0,
-                    despesa: 0,
-                    dataLancamento: new Date()
-                };
-            }
-
-            acc[key].lucro += dash.lucro;
-            acc[key].receita += dash.receita;
-            acc[key].despesa += dash.despesa;
-
-            return acc;
-            }, {} as { [key: string]: DashConta });
-
-            
-           this.dashesAgrupados = Object.values(agrupado);
         });
+
+        await this.movimentoService.findSaldoContas().then(data =>{
+            this.saldoContas = data;
+        });
+
     }
+
+    atualizarGraficos(){
+        this.atualizarGraficoBarra();
+        this.atualizarGraficoBarraSubcontas();
+    }
+
 }

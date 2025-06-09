@@ -93,7 +93,7 @@
   </div>
 
   
-  <div class="col-span-12 xl:col-span-4">
+  <div class="col-span-12 xl:col-span-12">
 
     <div class="card">
       <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 p-4">
@@ -105,31 +105,73 @@
           type="button"
           label="Limpar"
           icon="pi pi-times"
-          class="p-button-sm p-button-outlined"
-          (click)="atualizarGraficoBarra()"
+          class="p-button-sm p-button-primary"
+          (click)="atualizarGraficos()"
           [disabled]="!grupoContaSelecionado"
         ></button>
+
       </div>
     </div>
-
-    <div class="card">
-      <div class="font-semibold text-sm mb-4">Evolução do lucro</div>
-      <p-chart class="w-full" type="line" [data]="lineData" [options]="lineOptions"></p-chart>
-    </div>
   </div>
 
-  <div class="col-span-12 xl:col-span-4">
-    <div class="card flex flex-col items-center">
-        <div class="font-semibold text-sm mb-4">Receitas por grupo de conta</div>
-        <p-chart class="w-full" type="doughnut" [data]="pieDataReceitas" [options]="pieOptions" (onDataSelect)="handlePieClick($event, 'ENTRADA')"></p-chart>
-    </div>
+  <div class="col-span-12 xl:col-span-6">
+    <p-card header="Receitas por grupo de conta" class="h-full shadow-md rounded-lg flex flex-col">
+      <p-chart
+        class="w-full h-full"
+        type="doughnut"
+        [data]="pieDataReceitas"
+        [options]="pieOptions"
+        (onDataSelect)="handlePieClick($event, 'ENTRADA')"
+      ></p-chart>
+    </p-card>
   </div>
 
-  <div class="col-span-12 xl:col-span-4">
-    <div class="card flex flex-col items-center">
-        <div class="font-semibold text-sm mb-4">Despesas por grupo de conta</div>
-        <p-chart class="w-full" type="doughnut" [data]="pieDataDespesas" [options]="pieOptions" (onDataSelect)="handlePieClick($event,  'SAIDA')"></p-chart>
-    </div>
+  <div class="col-span-12 xl:col-span-6">
+    <p-card header="Receitas por subconta (top 10)" class="h-full shadow-md rounded-lg flex flex-col">
+      <p-chart
+        class="w-full h-full"
+        type="bar"
+        [data]="barDataReceitas"
+        [options]="barHorizontalOptions"
+      ></p-chart>
+    </p-card>
+  </div>
+
+
+
+  <div class="col-span-12 xl:col-span-6">
+    <p-card header="Despesas por grupo de conta" class="h-full shadow-md rounded-lg flex flex-col">
+      <p-chart
+        class="w-full h-full"
+        type="doughnut"
+        [data]="pieDataDespesas"
+        [options]="pieOptions"
+        (onDataSelect)="handlePieClick($event, 'SAIDA')"
+      ></p-chart>
+    </p-card>
+  </div>
+
+  <div class="col-span-6">
+    <p-card header="Despesas por subconta (top 10)" class="h-full shadow-md rounded-lg">
+      <p-chart
+        type="bar"
+        [data]="barDataDespesas"
+        [options]="barHorizontalOptions"
+        class="w-full h-full"
+      ></p-chart>
+    </p-card>
+  </div>
+
+  <div class="col-span-12">
+    <p-card header="Evolução do lucro" class="h-full shadow-md rounded-lg">
+      <p-chart 
+        class="w-full h-full" 
+        type="line" 
+        [data]="lineData" 
+        [options]="lineOptions">
+      </p-chart>
+    </p-card>
+
   </div>
 
   <div class="col-span-12">
@@ -178,38 +220,45 @@
       <p-chart class="w-full" type="line" [data]="fluxoCaixa" [options]="lineOptions"></p-chart>
     </div>
   </div>
-
+  
   <div class="card col-span-12 xl:col-span-4">
     <div class="flex flex-col items-center px-4 pb-4">
-      <h2 class="text-sm font-semibold my-4">Saldos</h2>
-      <div class="w-full max-h-108 overflow-y-scroll">
+      <h2 class="text-sm font-semibold my-4 text-gray-800 dark:text-gray-100">
+        Saldos
+      </h2>
+
+      <div class="w-full max-h-72 overflow-y-scroll">
         <div
-          *ngFor="let dash of dashesAgrupados"
-          class="p-3 mb-2 last:mb-0 border border-gray-300 bg-gray-100 rounded-md"
+          *ngFor="let saldo of saldoContas"
+          class="p-3 mb-2 last:mb-0
+                border border-gray-300 dark:border-gray-600
+                bg-gray-100   dark:bg-gray-800
+                rounded-md"
         >
-          <div class="text-sm text-gray-700 font-semibold">
-            {{ dash.nomeBanco }}
+          <div class="text-sm font-semibold text-gray-700 dark:text-gray-200">
+            {{ saldo.nomeBanco }}
           </div>
 
-          <div class="text-xs text-gray-700 mb-2">
-            Agência: {{ dash.agencia }} |
-            Conta: {{ dash.numeroConta }}
+          <div class="text-xs mb-2 text-gray-700 dark:text-gray-400">
+            Agência: {{ saldo.agencia }} |
+            Conta: {{ saldo.numeroConta }}
           </div>
 
           <div class="flex flex-col text-sm space-y-1">
             <span
               class="font-bold"
               [ngClass]="{
-                'text-green-700': dash.lucro > 0,
-                'text-red-700'  : dash.lucro < 0,
-                'text-gray-700' : dash.lucro === 0
+                'text-green-700 dark:text-green-400': saldo.saldo > 0,
+                'text-red-700   dark:text-red-400'  : saldo.saldo < 0,
+                'text-gray-700  dark:text-gray-300' : saldo.saldo === 0
               }"
             >
-              Saldo: {{ dash.lucro | currency:'BRL' }}
+              Saldo: {{ saldo.saldo | currency:'BRL' }}
             </span>
           </div>
         </div>
       </div>
     </div>
   </div>
+
 </div>

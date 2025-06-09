@@ -75,8 +75,9 @@ export class ContaComponent extends BaseComponente<Conta, ContaSaida> {
 
     bancos_select! : any[]
 
-    override loadDemoData(): void {
-        this.bancoService.findAll(true).then((data) => {
+    override async loadDemoData() {
+        this.loading = true;
+        await this.bancoService.findAll(true).then((data) => {
             this.bancos.set(data);
             this.bancos_select = this.bancos().map(banco => ({
                 label: banco.nome,

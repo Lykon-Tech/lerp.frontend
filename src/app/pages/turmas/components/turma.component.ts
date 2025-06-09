@@ -97,8 +97,9 @@ export class TurmaComponent extends BaseComponente<Turma,TurmaSaida> {
     turnos_select! : any[];
     salas_select! : any[];
 
-    override loadDemoData(): void {
-        this.cursoService.findAll(true).then((data) => {
+    override async loadDemoData() {
+        this.loading = true;
+        await this.cursoService.findAll(true).then((data) => {
             this.cursos.set(data);
             this.cursos_select = this.cursos().map(curso => ({
                 label: curso.nome,
@@ -106,7 +107,7 @@ export class TurmaComponent extends BaseComponente<Turma,TurmaSaida> {
             }));
         });
 
-        this.situacaoTurmaService.findAll(true).then((data) => {
+        await this.situacaoTurmaService.findAll(true).then((data) => {
             this.situacoesTurmas.set(data);
             this.situacao_turmas_select = this.situacoesTurmas().map(curso => ({
                 label: curso.nome,
@@ -114,7 +115,7 @@ export class TurmaComponent extends BaseComponente<Turma,TurmaSaida> {
             }));
         });
 
-        this.funcionarioService.findProfessores().then((data) => {
+        await this.funcionarioService.findProfessores().then((data) => {
             this.professores.set(data);
             this.professores_select = this.professores().map(professor => ({
                 label: professor.nome,
@@ -122,7 +123,7 @@ export class TurmaComponent extends BaseComponente<Turma,TurmaSaida> {
             }));
         });
 
-        this.turnoService.findAll(true).then((data) => {
+        await this.turnoService.findAll(true).then((data) => {
             this.turnos.set(data);
             this.turnos_select = this.turnos().map(turno => ({
                 label: turno.nome,
@@ -130,7 +131,7 @@ export class TurmaComponent extends BaseComponente<Turma,TurmaSaida> {
             }));
         });
 
-        this.salaService.findAll(true).then((data) => {
+        await this.salaService.findAll(true).then((data) => {
             this.salas.set(data);
             this.salas_select = this.salas().map(sala => ({
                 label: sala.nome,

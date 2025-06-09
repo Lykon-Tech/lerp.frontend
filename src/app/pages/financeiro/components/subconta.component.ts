@@ -79,8 +79,9 @@ export class SubcontaComponent extends BaseComponente<Subconta, SubcontaSaida> {
     grupoContas_select! : any[];
     tagInput: string = '';
 
-    override loadDemoData(): void {
-        this.grupoContaService.findAll(true).then((data) => {
+    override async loadDemoData() {
+        this.loading = true;
+        await this.grupoContaService.findAll(true).then((data) => {
             this.grupoContas.set(data);
             this.grupoContas_select = this.grupoContas().map(grupoConta => ({
                 label: grupoConta.nome,

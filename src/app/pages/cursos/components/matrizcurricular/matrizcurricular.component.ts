@@ -76,8 +76,11 @@ export class MatrizCurricularComponent extends BaseComponente<MatrizCurricular, 
         return (this.objeto as any).nome.trim() && (this.objeto as any).ativo != undefined && (this.objeto as any).disciplinas != undefined && (this.objeto as any).disciplinas.length > 0;
     }
 
-    override loadDemoData(): void {
-        this.disciplinaService.findAll(true).then((data) => {
+    override async loadDemoData() {
+        
+        this.loading = true;
+
+        await this.disciplinaService.findAll(true).then((data) => {
             this.disciplinas.set(data);
             this.disciplinas_multi_select = this.disciplinas().map((disciplina) => ({
                 label: disciplina.nome,

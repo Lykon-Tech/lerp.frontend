@@ -68,7 +68,9 @@ export class CargoComponent extends BaseComponente<Cargo, Cargo> {
 
     permissoes! : any[];
     
-    override loadDemoData(): void {
+    override async loadDemoData() {
+        this.loading = true;
+        
         this.permissoes = [
             { label: 'VENDEDOR', value: 'VENDEDOR' },
             { label: 'FINANCEIRO', value: 'FINANCEIRO' },
