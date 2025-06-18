@@ -12,9 +12,10 @@
     [rows]="10"
     [columns]="cols"
     [paginator]="true"
-    [globalFilterFields]="['nome', 'email', 'cpf', 'ativo']"
+    [globalFilterFields]="['nome', 'email', 'cargo', 'ativo']"
     [tableStyle]="{ 'min-width': '75rem' }"
     [rowHover]="true"
+    [loading]="loading"
     dataKey="id"
     currentPageReportTemplate="Mostrando de {first} até {last} de {totalRecords} funcionários"
     [showCurrentPageReport]="true"
@@ -34,7 +35,7 @@
         <tr>
             <th pSortableColumn="nome" style="min-width: 12rem">Nome <p-sortIcon field="nome" /></th>
             <th pSortableColumn="email" style="min-width: 12rem">Email <p-sortIcon field="email" /></th>
-            <th pSortableColumn="cpf" style="min-width: 12rem">CPF <p-sortIcon field="cpf" /></th>
+            <th pSortableColumn="cargo" style="min-width: 12rem">Cargo <p-sortIcon field="cargo" /></th>
             <th pSortableColumn="ativo" style="min-width: 12rem">Ativo <p-sortIcon field="ativo" /></th>
             <th style="min-width: 12rem">Ações</th>
         </tr>
@@ -44,7 +45,7 @@
         <tr>
             <td style="min-width: 16rem">{{ objeto.nome }}</td>
             <td>{{ objeto.email }}</td>
-            <td>{{ objeto.cpf }}</td>
+            <td>{{ objeto.cargo.nome }}</td>
             <td>
                 <p-tag [value]="objeto.ativo ? 'ATIVO' : 'INATIVO'" [severity]="getSeverity(objeto.ativo)" />
             </td>
@@ -110,7 +111,6 @@
             <div>
                 <label for="complemento" class="block font-bold mb-3">Complemento</label>
                 <input id="complemento" pInputText [(ngModel)]="objeto.complemento" fluid />
-                <small class="text-red-500" *ngIf="submitted && !objeto.complemento">Complemento é obrigatório.</small>
             </div>
 
             <div>
@@ -215,6 +215,20 @@
                     fluid
                 ></p-select>
                 <small class="text-red-500" *ngIf="submitted && objeto.ativo == undefined">Status é obrigatório.</small>
+            </div>
+
+            <p-button *ngIf="objeto?.id !== undefined" label="Editar senha" icon="pi pi-pencil" (click)="editSenha()" />
+
+            <div>
+                <label for="senha" class="block font-bold mb-3">Senha</label>
+                <input type="password" [disabled]="!editarSenha && objeto.id != undefined" id="senha" pInputText [(ngModel)]="senha" fluid />
+                <small class="text-red-500" *ngIf="submitted && !senha">Senha é obrigatório.</small>
+            </div>
+
+            <div>
+                <label for="repita_senha" class="block font-bold mb-3">Repita a senha</label>
+                <input type="password" [disabled]="!editarSenha && objeto.id != undefined"  id="senha" pInputText [(ngModel)]="senhaRepetida" fluid />
+                <small class="text-red-500" *ngIf="submitted && !senhaRepetida">Senha é obrigatório.</small>
             </div>
 
         </div>

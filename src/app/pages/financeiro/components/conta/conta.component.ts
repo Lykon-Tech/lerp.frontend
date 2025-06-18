@@ -1,7 +1,7 @@
 import { ConfirmationService, MessageService } from "primeng/api";
-import { BaseComponente } from "../../bases/components/base.component";
-import { Conta } from "../models/conta.model";
-import { ContaService } from "../services/conta.service";
+import { BaseComponente } from "../../../bases/components/base.component";
+import { Conta } from "../../models/conta.model";
+import { ContaService } from "../../services/conta.service";
 import { Component, signal } from "@angular/core";
 import { ConfirmDialogModule } from "primeng/confirmdialog";
 import { CheckboxModule } from "primeng/checkbox";
@@ -22,9 +22,9 @@ import { ButtonModule } from "primeng/button";
 import { FormsModule } from "@angular/forms";
 import { TableModule } from "primeng/table";
 import { CommonModule } from "@angular/common";
-import { Banco } from "../models/banco.model";
-import { BancoService } from "../services/banco.service";
-import { ContaSaida } from "../models/conta.saida.model";
+import { Banco } from "../../models/banco.model";
+import { BancoService } from "../../services/banco.service";
+import { ContaSaida } from "../../models/conta.saida.model";
 
 
 @Component({

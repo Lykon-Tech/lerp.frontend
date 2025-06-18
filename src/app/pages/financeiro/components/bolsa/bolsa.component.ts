@@ -1,7 +1,7 @@
 import { ConfirmationService, MessageService } from "primeng/api";
-import { BaseComponente } from "../../bases/components/base.component";
-import { GrupoConta } from "../models/grupoconta.model";
-import { GrupoContaService } from "../services/grupoconta.service";
+import { BaseComponente } from "../../../bases/components/base.component";
+import { Bolsa } from "../../models/bolsa.model";
+import { BolsaService } from "../../services/bolsa.service";
 import { Component } from "@angular/core";
 import { ConfirmDialogModule } from "primeng/confirmdialog";
 import { CheckboxModule } from "primeng/checkbox";
@@ -25,7 +25,7 @@ import { CommonModule } from "@angular/common";
 
 
 @Component({
-    selector: 'app-grupo-conta',
+    selector: 'app-bolsa',
     standalone: true,
     imports: [
         CommonModule,
@@ -48,26 +48,27 @@ import { CommonModule } from "@angular/common";
         CheckboxModule,
         ConfirmDialogModule
     ],
-    templateUrl: `./grupoconta.component.html`,
-    providers: [MessageService, GrupoContaService, ConfirmationService]
+    templateUrl: `./bolsa.component.html`,
+    providers: [MessageService, BolsaService, ConfirmationService]
 })
-export class GrupoContaComponent extends BaseComponente<GrupoConta, GrupoConta> {
+export class BolsaComponent extends BaseComponente<Bolsa, Bolsa> {
    
     constructor(
         messageService: MessageService,
         confirmationService: ConfirmationService,
-        service: GrupoContaService
+        service: BolsaService
     ) {
         super(
             messageService,
             confirmationService,
             service
         );
-        this.titulo = 'grupo de conta';
+        this.titulo = 'bolsa';
+        this.genero = 'a';
     }
 
     override getValidacoes(): boolean {
-        return (this.objeto as any).nome.trim() && (this.objeto as any).ativo != undefined;
+        return (this.objeto as any).nome.trim() && (this.objeto as any).ativo != undefined && (this.objeto as any).percentualDesconto != undefined;
     }
 
 }

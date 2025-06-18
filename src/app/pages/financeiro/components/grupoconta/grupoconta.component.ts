@@ -1,6 +1,7 @@
 import { ConfirmationService, MessageService } from "primeng/api";
-import { BaseComponente } from "../../bases/components/base.component";
-import { TipoDocumento } from "../models/tipodocumento.model";
+import { BaseComponente } from "../../../bases/components/base.component";
+import { GrupoConta } from "../../models/grupoconta.model";
+import { GrupoContaService } from "../../services/grupoconta.service";
 import { Component } from "@angular/core";
 import { ConfirmDialogModule } from "primeng/confirmdialog";
 import { CheckboxModule } from "primeng/checkbox";
@@ -21,11 +22,10 @@ import { ButtonModule } from "primeng/button";
 import { FormsModule } from "@angular/forms";
 import { TableModule } from "primeng/table";
 import { CommonModule } from "@angular/common";
-import { TipoDocumentoService } from "../services/tipodocumento.service";
 
 
 @Component({
-    selector: 'app-tipo-documento',
+    selector: 'app-grupo-conta',
     standalone: true,
     imports: [
         CommonModule,
@@ -48,23 +48,59 @@ import { TipoDocumentoService } from "../services/tipodocumento.service";
         CheckboxModule,
         ConfirmDialogModule
     ],
-    templateUrl: `./tipodocumento.component.html`,
-    providers: [MessageService, TipoDocumentoService, ConfirmationService]
+    templateUrl: `./grupoconta.component.html`,
+    providers: [MessageService, GrupoContaService, ConfirmationService]
 })
-export class TipoDocumentoComponent extends BaseComponente<TipoDocumento, TipoDocumento> {
+export class GrupoContaComponent extends BaseComponente<GrupoConta, GrupoConta> {
    
     constructor(
         messageService: MessageService,
         confirmationService: ConfirmationService,
-        service: TipoDocumentoService
+        service: GrupoContaService
     ) {
         super(
             messageService,
             confirmationService,
             service
         );
+        this.titulo = 'grupo de conta';
+    }
 
-        this.titulo = 'tipo documento';
+    faixaDRE! : any[];
+    travarFaixa : boolean = false;
+
+    override async loadDemoData(){
+        
+        this.faixaDRE = [
+            { label: 'RECEITA BRUTA', value: 'RECEITA BRUTA' },
+            { label: 'DEDUÇÕES DA RECEITA', value: 'DEDUÇÕES DA RECEITA' },
+            { label: 'CUSTOS VARIÁVEIS', value: 'CUSTOS VARIÁVEIS' },
+            { label: 'CUSTOS FIXOS', value: 'CUSTOS FIXOS' },
+            { label: 'RESULTADO NÃO OPERACIONAL', value: 'RESULTADO NÃO OPERACIONAL' },
+            { label: 'IR/CSSLL', value: 'IR/CSSLL' },
+            { label: 'NÃO FILTRAR', value: 'NÃO FILTRAR' }
+        ];
+
+        super.loadDemoData();
+    }
+
+    override edit(objeto: GrupoConta): void {
+        super.edit(objeto);
+        this.mudarFaixaDRE();
+    }
+
+    mudarFaixaDRE(){
+        if(this.objeto.tipoOperacao == 'TRANSFERENCIA'){
+            this.objeto.faixaDRE = 'NÃO FILTRAR';
+            this.travarFaixa = true;
+        }
+        else if(this.objeto.tipoOperacao == 'RECEBIMENTO'){
+            this.objeto.faixaDRE = 'RECEITA BRUTA';
+            this.travarFaixa = true;
+        }
+        else{
+            this.travarFaixa = false;
+        }
     }
 
     override getValidacoes(): boolean {

@@ -62,7 +62,7 @@ export class OfxImportService {
         }
 
         const amount = parseFloat(getTagValue(trn, 'TRNAMT')) || 0;
-        const historico = getTagValue(trn, 'MEMO');
+        const historico = getTagValue(trn, 'MEMO') || getTagValue(trn, 'NAME');
 
         return {
             dataLancamento: date,

@@ -8,6 +8,7 @@ import { FiltroMovimento } from '../models/filtromovimento.model';
 import { ReceitasDespesasRelatorios } from '../models/receitasdespesasrelatorios.model';
 import { DashConta } from '../models/dashconta.model';
 import { SaldoConta } from '../models/saldoconta.model';
+import { FluxoCaixa } from '../models/fluxocaixa.model';
 
 interface Page<T> {
   content: T[];
@@ -85,6 +86,22 @@ export class MovimentoService extends BaseService<Movimento, MovimentoSaida>{
     findSaldoContas():Promise<SaldoConta[]>{
         return firstValueFrom(
             this.http.get<SaldoConta[]>(`${this.baseUrl}/find_saldo_contas`)
+        ).catch(error => Promise.reject(this.extractErrorMessage(error)));
+    }
+
+    findFluxoCaixa(ano : string):Promise<FluxoCaixa[]>{
+        let params = new HttpParams().set('ano', ano);
+        
+        return firstValueFrom(
+            this.http.get<FluxoCaixa[]>(`${this.baseUrl}/find_fluxo_caixa`, {params})
+        ).catch(error => Promise.reject(this.extractErrorMessage(error)));
+    }
+
+    findFaixaDRE(ano : string):Promise<FluxoCaixa[]>{
+        let params = new HttpParams().set('ano', ano);
+        
+        return firstValueFrom(
+            this.http.get<FluxoCaixa[]>(`${this.baseUrl}/find_faixa_dre`, {params})
         ).catch(error => Promise.reject(this.extractErrorMessage(error)));
     }
     

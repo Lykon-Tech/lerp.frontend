@@ -51,7 +51,16 @@ export abstract class BaseComponente<T extends Object, S> implements OnInit{
 
         await this.service.findAll().then((data) => {
             this.lista.set(data);
-             this.loading = false;
+            this.loading = false;
+        }).catch(error=> {
+            this.loadingSalvar = false;
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Falha',
+                detail: 'Falha ao buscar ' + this.titulo + ': ' + error,
+                life : 8000
+            });
+            this.loading = false;
         });
 
         this.statuses = [
@@ -118,14 +127,14 @@ export abstract class BaseComponente<T extends Object, S> implements OnInit{
                             severity: 'success',
                             summary: 'Sucesso',
                             detail: this.titulo + ' deletad' + this.genero,
-                            life: 3000
+                            life : 8000
                         });
                     } catch (err) {
                         this.messageService.add({
                             severity: 'error',
                             summary: 'Falha',
                             detail: 'Falha ao deletar '+ this.genero + ' ' +  this.titulo + ': ' + err,
-                            life: 3000
+                            life : 8000
                         });
                     }
                 }
@@ -173,7 +182,7 @@ export abstract class BaseComponente<T extends Object, S> implements OnInit{
                     severity: 'success',
                     summary: 'Sucesso',
                     detail: this.titulo + ' atualizad' + this.genero,
-                    life: 3000
+                    life : 8000
                     });
                 } else {
                     const createdObject = await this.service.create(this.converterObjeto(this.objeto));
@@ -184,7 +193,7 @@ export abstract class BaseComponente<T extends Object, S> implements OnInit{
                         severity: 'success',
                         summary: 'Sucesso',
                         detail: this.titulo + ' criad'+ this.genero,
-                    life: 3000
+                    life : 8000
                     });
                 }
                 this.loadingSalvar = false;
@@ -196,7 +205,7 @@ export abstract class BaseComponente<T extends Object, S> implements OnInit{
                         severity: 'error',
                         summary: 'Falha',
                         detail: 'Falha ao salvar ' + this.titulo + ': ' + error,
-                        life: 3000
+                        life : 8000
                     });
                 }
         }

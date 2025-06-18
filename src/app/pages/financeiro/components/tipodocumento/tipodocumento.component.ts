@@ -1,7 +1,6 @@
 import { ConfirmationService, MessageService } from "primeng/api";
-import { BaseComponente } from "../../bases/components/base.component";
-import { Bolsa } from "../models/bolsa.model";
-import { BolsaService } from "../services/bolsa.service";
+import { BaseComponente } from "../../../bases/components/base.component";
+import { TipoDocumento } from "../../models/tipodocumento.model";
 import { Component } from "@angular/core";
 import { ConfirmDialogModule } from "primeng/confirmdialog";
 import { CheckboxModule } from "primeng/checkbox";
@@ -22,10 +21,11 @@ import { ButtonModule } from "primeng/button";
 import { FormsModule } from "@angular/forms";
 import { TableModule } from "primeng/table";
 import { CommonModule } from "@angular/common";
+import { TipoDocumentoService } from "../../services/tipodocumento.service";
 
 
 @Component({
-    selector: 'app-bolsa',
+    selector: 'app-tipo-documento',
     standalone: true,
     imports: [
         CommonModule,
@@ -48,27 +48,27 @@ import { CommonModule } from "@angular/common";
         CheckboxModule,
         ConfirmDialogModule
     ],
-    templateUrl: `./bolsa.component.html`,
-    providers: [MessageService, BolsaService, ConfirmationService]
+    templateUrl: `./tipodocumento.component.html`,
+    providers: [MessageService, TipoDocumentoService, ConfirmationService]
 })
-export class BolsaComponent extends BaseComponente<Bolsa, Bolsa> {
+export class TipoDocumentoComponent extends BaseComponente<TipoDocumento, TipoDocumento> {
    
     constructor(
         messageService: MessageService,
         confirmationService: ConfirmationService,
-        service: BolsaService
+        service: TipoDocumentoService
     ) {
         super(
             messageService,
             confirmationService,
             service
         );
-        this.titulo = 'bolsa';
-        this.genero = 'a';
+
+        this.titulo = 'tipo documento';
     }
 
     override getValidacoes(): boolean {
-        return (this.objeto as any).nome.trim() && (this.objeto as any).ativo != undefined && (this.objeto as any).percentualDesconto != undefined;
+        return (this.objeto as any).nome.trim() && (this.objeto as any).ativo != undefined;
     }
 
 }

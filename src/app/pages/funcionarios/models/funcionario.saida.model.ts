@@ -22,4 +22,5 @@ export interface FuncionarioSaida {
   tipoChavePix? : string;
   agencia?: string;
   numeroConta?: string;
+  senha?: string; 
 }

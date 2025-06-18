@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { AuthLogin } from '../../models/auth.model';
@@ -10,7 +10,7 @@ import { AppCommonModule } from '../../../../../app.common.module';
     imports: [AppCommonModule],
     templateUrl: `./login.component.html`
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit{
     email: string = '';
     senha: string = '';
     checked: boolean = false;
@@ -20,6 +20,10 @@ export class LoginComponent {
         private authService: AuthService,
         private router: Router
     ) {}
+
+    ngOnInit(): void {
+        this.authService.logout();
+    }
 
     onSubmit(): void {
         this.errorMessage = '';
@@ -31,19 +35,17 @@ export class LoginComponent {
 
         this.authService.login(credentials).subscribe({
             next: (response) => {
-                console.log('Login bem-sucedido!', response);
-
-                this.authService.saveToken(response.token, this.checked);
+                this.authService.saveDadosUsuario(response, this.checked);
                 this.router.navigate(['/']);
             },
             error: (error) => {
-                console.error(error);
-                this.errorMessage = 'E-mail ou senha inválidos.';
+                this.errorMessage = error.error.message;
             }
         });
     }
-
+/*
     toSignUp(): void {
         this.router.navigate(['/auth/signUp']);
     }
+*/
 }

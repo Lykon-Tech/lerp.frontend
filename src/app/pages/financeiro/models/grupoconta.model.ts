@@ -3,4 +3,5 @@ export interface GrupoConta {
   nome?: string;
   ativo?: boolean;
   tipoOperacao?: string;
+  faixaDRE?:string;
 }

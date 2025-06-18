@@ -9,7 +9,7 @@
     <div class="col-span-12 sm:col-span-6 lg:col-span-3">
       <p-card class="shadow-md rounded-lg h-full">
         <div class="bg-green-500 text-white p-4 rounded-lg h-full flex flex-col justify-between items-center">
-          <div class="text-sm font-semibold mb-2">Receita Semana</div>
+          <div class="text-sm font-semibold mb-2">Receita da Semana</div>
           <div class="text-4xl font-bold"> {{ totalReceitaSemana  }}</div>
         </div>
       </p-card>
@@ -18,7 +18,7 @@
     <div class="col-span-12 sm:col-span-6 lg:col-span-3">
       <p-card class="shadow-md rounded-lg h-full">
         <div class="bg-green-500 text-white p-4 rounded-lg h-full flex flex-col justify-between items-center">
-          <div class="text-sm font-semibold mb-2">Receita Mês</div>
+          <div class="text-sm font-semibold mb-2">Receita do Mês</div>
           <div class="text-4xl font-bold"> {{ totalReceitaMes }}</div>
         </div>
       </p-card>
@@ -27,7 +27,7 @@
     <div class="col-span-12 sm:col-span-6 lg:col-span-3">
       <p-card class="shadow-md rounded-lg h-full">
         <div class="bg-green-500 text-white p-4 rounded-lg h-full flex flex-col justify-between items-center">
-          <div class="text-sm font-semibold mb-2">Receita Semestre</div>
+          <div class="text-sm font-semibold mb-2">Receita do Semestre</div>
           <div class="text-4xl font-bold"> {{ totalReceitaSemestre }}</div>
         </div>
       </p-card>
@@ -36,7 +36,7 @@
     <div class="col-span-12 sm:col-span-6 lg:col-span-3">
       <p-card class="shadow-md rounded-lg h-full">
         <div class="bg-green-500 text-white p-4 rounded-lg h-full flex flex-col justify-between items-center">
-          <div class="text-sm font-semibold mb-2">Receita Ano</div>
+          <div class="text-sm font-semibold mb-2">Receita do Ano</div>
           <div class="text-4xl font-bold"> {{ totalReceitaAno }}</div>
         </div>
       </p-card>
@@ -47,7 +47,7 @@
     <div class="col-span-12 sm:col-span-6 lg:col-span-3">
       <p-card class="shadow-md rounded-lg h-full">
         <div class="bg-red-500 text-white p-4 rounded-lg h-full flex flex-col justify-between items-center">
-          <div class="text-sm font-semibold mb-2">Despesa Semana</div>
+          <div class="text-sm font-semibold mb-2">Despesa da Semana</div>
           <div class="text-4xl font-bold"> {{ totalDespesaSemana  }}</div>
         </div>
       </p-card>
@@ -56,7 +56,7 @@
     <div class="col-span-12 sm:col-span-6 lg:col-span-3">
       <p-card class="shadow-md rounded-lg h-full">
         <div class="bg-red-500 text-white p-4 rounded-lg h-full flex flex-col justify-between items-center">
-          <div class="text-sm font-semibold mb-2">Despesa Mês</div>
+          <div class="text-sm font-semibold mb-2">Despesa do Mês</div>
           <div class="text-4xl font-bold"> {{ totalDespesaMes }}</div>
         </div>
       </p-card>
@@ -65,7 +65,7 @@
     <div class="col-span-12 sm:col-span-6 lg:col-span-3">
       <p-card class="shadow-md rounded-lg h-full">
         <div class="bg-red-500 text-white p-4 rounded-lg h-full flex flex-col justify-between items-center">
-          <div class="text-sm font-semibold mb-2">Despesa Semestre</div>
+          <div class="text-sm font-semibold mb-2">Despesa do Semestre</div>
           <div class="text-4xl font-bold"> {{ totalDespesaSemestre  }}</div>
         </div>
       </p-card>
@@ -74,7 +74,7 @@
     <div class="col-span-12 sm:col-span-6 lg:col-span-3">
       <p-card class="shadow-md rounded-lg h-full">
         <div class="bg-red-500 text-white p-4 rounded-lg h-full flex flex-col justify-between items-center">
-          <div class="text-sm font-semibold mb-2">Despesa Ano</div>
+          <div class="text-sm font-semibold mb-2">Despesa do Ano</div>
           <div class="text-4xl font-bold"> {{ totalDespesaAno }}</div>
         </div>
       </p-card>
@@ -82,7 +82,7 @@
   </div>
 
   <div class="col-span-12">
-    <p-card header="Receita por Mês" class="h-full shadow-md rounded-lg">
+    <p-card header="Receitas x Despesas por Mês" class="h-full shadow-md rounded-lg">
       <p-chart
         type="bar"
         [data]="barData"
@@ -115,7 +115,7 @@
   </div>
 
   <div class="col-span-12 xl:col-span-6">
-    <p-card header="Receitas por grupo de conta" class="h-full shadow-md rounded-lg flex flex-col">
+    <p-card header="Receitas por grupo de conta - Ano atual" class="h-full shadow-md rounded-lg flex flex-col">
       <p-chart
         class="w-full h-full"
         type="doughnut"
@@ -127,7 +127,7 @@
   </div>
 
   <div class="col-span-12 xl:col-span-6">
-    <p-card header="Receitas por subconta (top 10)" class="h-full shadow-md rounded-lg flex flex-col">
+    <p-card header="Receitas por subconta (top 10) - Ano atual" class="h-full shadow-md rounded-lg flex flex-col">
       <p-chart
         class="w-full h-full"
         type="bar"
@@ -140,7 +140,7 @@
 
 
   <div class="col-span-12 xl:col-span-6">
-    <p-card header="Despesas por grupo de conta" class="h-full shadow-md rounded-lg flex flex-col">
+    <p-card header="Despesas por grupo de conta - Ano atual" class="h-full shadow-md rounded-lg flex flex-col">
       <p-chart
         class="w-full h-full"
         type="doughnut"
@@ -151,8 +151,8 @@
     </p-card>
   </div>
 
-  <div class="col-span-6">
-    <p-card header="Despesas por subconta (top 10)" class="h-full shadow-md rounded-lg">
+  <div class="col-span-12 xl:col-span-6">
+    <p-card header="Despesas por subconta (top 10) - Ano atual" class="h-full shadow-md rounded-lg">
       <p-chart
         type="bar"
         [data]="barDataDespesas"
@@ -220,7 +220,7 @@
       <p-chart class="w-full" type="line" [data]="fluxoCaixa" [options]="lineOptions"></p-chart>
     </div>
   </div>
-  
+
   <div class="card col-span-12 xl:col-span-4">
     <div class="flex flex-col items-center px-4 pb-4">
       <h2 class="text-sm font-semibold my-4 text-gray-800 dark:text-gray-100">

@@ -7,10 +7,10 @@
 			<div class="w-full bg-surface-0 dark:bg-surface-900 py-20 px-8 sm:px-20" style="border-radius: 53px">
 				<form (ngSubmit)="onSubmit()" #loginForm="ngForm">
 					<div class="flex flex-col items-center justify-center">
-						<img src="assets/logo.png" alt="logo" />
+						<img src="assets/logo128.png" alt="logo" />
 					</div>
 					<div class="text-center mb-8">
-						<div class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-4">Bem vindo ao LERP!
+						<div class="text-surface-900 dark:text-surface-0 text-3xl font-medium mb-4">Bem vindo ao LFS!
 						</div>
 						<span class="text-muted-color font-medium">Entre na sua conta para continuar</span>
 					</div>
@@ -38,9 +38,6 @@
 
 						<div class="flex flex-col gap-2">
 							<p-button label="Entrar" styleClass="w-full" type="submit"></p-button>
-
-							<p-button (onClick)="toSignUp()" label="Cadastre-se" variant="outlined" styleClass="w-full"
-								type="button"></p-button>
 
 							<div *ngIf="errorMessage" class="text-red-500 mt-4 text-center">
 								{{ errorMessage }}

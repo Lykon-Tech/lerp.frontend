@@ -4,7 +4,7 @@ import { Documentation } from './app/pages/documentation/documentation';
 import { Landing } from './app/pages/landing/landing';
 import { Notfound } from './app/pages/notfound/notfound';
 import { authGuard } from './app/pages/auth/guards/auth.guard';
-import { DashboardFinanceiroComponent } from './app/pages/financeiro/components/dashboard.component';
+import { DashboardFinanceiroComponent } from './app/pages/financeiro/components/dashboard/dashboard.component';
 
 export const appRoutes: Routes = [
     {

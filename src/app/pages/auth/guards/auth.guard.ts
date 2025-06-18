@@ -3,7 +3,7 @@ import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { map, catchError, of } from 'rxjs';
 
-export const authGuard: CanActivateFn = () => {
+export const authGuard: CanActivateFn = (route, state) => {
   const auth = inject(AuthService);
   const router = inject(Router);
 
@@ -16,6 +16,10 @@ export const authGuard: CanActivateFn = () => {
   return auth.validateToken().pipe(
     map(response => {
       if (response.valid) {
+        if (state.url === '/' && auth.getCargo()?.permissao === 'OPERADOR FINANCEIRO') {
+          router.navigate(['/pages/movimentos']);
+          return false;
+        }
         return true;
       } else {
         router.navigate(['/auth/login']);

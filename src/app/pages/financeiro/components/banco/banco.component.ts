@@ -1,6 +1,6 @@
 import { ConfirmationService, MessageService } from "primeng/api";
-import { BaseComponente } from "../../bases/components/base.component";
-import { Banco } from "../models/banco.model";
+import { BaseComponente } from "../../../bases/components/base.component";
+import { Banco } from "../../models/banco.model";
 import { Component } from "@angular/core";
 import { ConfirmDialogModule } from "primeng/confirmdialog";
 import { CheckboxModule } from "primeng/checkbox";
@@ -21,7 +21,7 @@ import { ButtonModule } from "primeng/button";
 import { FormsModule } from "@angular/forms";
 import { TableModule } from "primeng/table";
 import { CommonModule } from "@angular/common";
-import { BancoService } from "../services/banco.service";
+import { BancoService } from "../../services/banco.service";
 
 
 @Component({

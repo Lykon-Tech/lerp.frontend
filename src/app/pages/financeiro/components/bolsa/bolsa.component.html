@@ -11,17 +11,18 @@
     [rows]="10"
     [columns]="cols"
     [paginator]="true"
-    [globalFilterFields]="['nome', 'numero_banco', 'exigeOfx', 'caixa', 'ativo']"
+    [globalFilterFields]="['nome', 'percentualDesconto', 'necessitaAutSuperior', 'ativo']"
     [tableStyle]="{ 'min-width': '75rem' }"
     [rowHover]="true"
+    [loading]="loading"
     dataKey="id"
-    currentPageReportTemplate="Mostrando de {first} até {last} de {totalRecords} bancos"
+    currentPageReportTemplate="Mostrando de {first} até {last} de {totalRecords} bolsas"
     [showCurrentPageReport]="true"
     [rowsPerPageOptions]="[10, 20, 30]"
 >
     <ng-template #caption>
         <div class="flex items-center justify-between">
-            <h5 class="m-0">Gerenciar bancos</h5>
+            <h5 class="m-0">Gerenciar bolsas</h5>
             <p-iconfield>
                 <p-inputicon styleClass="pi pi-search" />
                 <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Pesquisar..." />
@@ -34,17 +35,13 @@
                 Nome
                 <p-sortIcon field="nome" />
             </th>
-            <th pSortableColumn="numero_banco" style="min-width:12rem">
-                Número
-                <p-sortIcon field="numero_banco" />
+            <th pSortableColumn="percentualDesconto" style="min-width:12rem">
+                Percentual de desconto
+                <p-sortIcon field="percentualDesconto" />
             </th>
-            <th pSortableColumn="exigeOfx" style="min-width: 12rem">
-                Exige OFX
-                <p-sortIcon field="exigeOfx" />
-            </th>
-            <th pSortableColumn="caixa" style="min-width: 12rem">
-                Caixa
-                <p-sortIcon field="caixa" />
+            <th pSortableColumn="necessitaAutSuperior" style="min-width: 12rem">
+                Necessita autorização sup.
+                <p-sortIcon field="necessitaAutSuperior" />
             </th>
             <th pSortableColumn="ativo" style="min-width: 12rem">
                 Ativo
@@ -56,25 +53,15 @@
     <ng-template #body let-objeto>
         <tr>
             <td style="min-width: 16rem">{{ objeto.nome }}</td>
-            <td>{{ objeto.numeroBanco }}</td>
+            <td>{{ objeto.percentualDesconto + '%'}}</td>
             <td>
                 <i
                     class="pi"
                     [ngClass]="{
-                    'pi-check text-green-600': objeto.exigeOfx,
-                    'pi-times text-red-600': !objeto.exigeOfx
+                    'pi-check text-green-600': objeto.necessitaAutSuperior,
+                    'pi-times text-red-600': !objeto.necessitaAutSuperior
                     }"
-                    aria-label="exige OFX">
-                </i>
-            </td>
-            <td>
-                <i
-                    class="pi"
-                    [ngClass]="{
-                    'pi-check text-green-600': objeto.caixa,
-                    'pi-times text-red-600': !objeto.caixa
-                    }"
-                    aria-label="caixa">
+                    aria-label="aut_sup">
                 </i>
             </td>
             <td>
@@ -88,7 +75,7 @@
     </ng-template>
 </p-table>
 
-<p-dialog [(visible)]="dialogo" [style]="{ width: '450px' }" header="Detalhes do banco" [modal]="true">
+<p-dialog [(visible)]="dialogo" [style]="{ width: '450px' }" header="Detalhes da bolsa" [modal]="true">
     <ng-template #content>
         <div class="flex flex-col gap-6">
             <div>
@@ -97,9 +84,9 @@
                 <small class="text-red-500" *ngIf="submitted && !objeto.nome">Nome é obrigatório.</small>
             </div>
             <div>
-                <label for="nr_banco" class="block font-bold mb-3">Número do banco</label>
-                <input name="nr_banco" id="numero_banco" type="number" pInputText [(ngModel)]="objeto.numeroBanco" required fluid/>
-                <small class="text-red-500" *ngIf="submitted && (objeto.numeroBanco == null)">Número é obrigatório.</small>
+                <label for="perc_desconto" class="block font-bold mb-3">Percentual de desconto</label>
+                <input name="perc_desconto" id="perc_desconto" type="number" pInputText [(ngModel)]="objeto.percentualDesconto" required fluid/>
+                <small class="text-red-500" *ngIf="submitted && !objeto.percentualDesconto">Percentual de desconto é obrigatório.</small>
             </div>
 
             <div>
@@ -122,12 +109,8 @@
                 <span class="block font-bold mb-4">Opções</span>
                 <div class="grid grid-cols-2 gap-2">
                     <div class="flex items-center gap-2 col-span-6">
-                        <p-checkbox id="exige_ofx" name="exige_ofx" binary="true" [(ngModel)]="objeto.exigeOfx"></p-checkbox>
-                        <label for="exige_ofx">Exige OFX</label>
-                    </div>
-                    <div class="flex items-center gap-2 col-span-6">
-                        <p-checkbox id="caixa" name="caixa" binary="true" [(ngModel)]="objeto.caixa"></p-checkbox>
-                        <label for="caixa">Caixa</label>
+                        <p-checkbox id="aut_sup" name="aut_sup" binary="true" [(ngModel)]="objeto.necessitaAutSuperior"></p-checkbox>
+                        <label for="aut_sup">Necessita autorização de superior</label>
                     </div>
                 </div>
             </div>

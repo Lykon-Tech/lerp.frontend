@@ -1,7 +1,7 @@
 import { ConfirmationService, MessageService } from "primeng/api";
-import { BaseComponente } from "../../bases/components/base.component";
-import { Subconta } from "../models/subconta.model";
-import { SubcontaService } from "../services/subconta.service";
+import { BaseComponente } from "../../../bases/components/base.component";
+import { Subconta } from "../../models/subconta.model";
+import { SubcontaService } from "../../services/subconta.service";
 import { Component, signal } from "@angular/core";
 import { ConfirmDialogModule } from "primeng/confirmdialog";
 import { CheckboxModule } from "primeng/checkbox";
@@ -22,10 +22,10 @@ import { ButtonModule } from "primeng/button";
 import { FormsModule } from "@angular/forms";
 import { TableModule } from "primeng/table";
 import { CommonModule } from "@angular/common";
-import { GrupoConta } from "../models/grupoconta.model";
-import { GrupoContaService } from "../services/grupoconta.service";
-import { SubcontaSaida } from "../models/subconta.saida.model";
-import { TagModel } from "../models/tag.model";
+import { GrupoConta } from "../../models/grupoconta.model";
+import { GrupoContaService } from "../../services/grupoconta.service";
+import { SubcontaSaida } from "../../models/subconta.saida.model";
+import { TagModel } from "../../models/tag.model";
 
 
 @Component({

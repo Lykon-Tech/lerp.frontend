@@ -11,17 +11,18 @@
     [rows]="10"
     [columns]="cols"
     [paginator]="true"
-    [globalFilterFields]="['nome', 'percentualDesconto', 'necessitaAutSuperior', 'ativo']"
+    [globalFilterFields]="['nome', 'ativo']"
     [tableStyle]="{ 'min-width': '75rem' }"
     [rowHover]="true"
+    [loading]="loading"
     dataKey="id"
-    currentPageReportTemplate="Mostrando de {first} até {last} de {totalRecords} bolsas"
+    currentPageReportTemplate="Mostrando de {first} até {last} de {totalRecords} tipos de documentos"
     [showCurrentPageReport]="true"
     [rowsPerPageOptions]="[10, 20, 30]"
 >
     <ng-template #caption>
         <div class="flex items-center justify-between">
-            <h5 class="m-0">Gerenciar bolsas</h5>
+            <h5 class="m-0">Gerenciar tipos de documentos</h5>
             <p-iconfield>
                 <p-inputicon styleClass="pi pi-search" />
                 <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Pesquisar..." />
@@ -34,33 +35,28 @@
                 Nome
                 <p-sortIcon field="nome" />
             </th>
-            <th pSortableColumn="percentualDesconto" style="min-width:12rem">
-                Percentual de desconto
-                <p-sortIcon field="percentualDesconto" />
-            </th>
-            <th pSortableColumn="necessitaAutSuperior" style="min-width: 12rem">
-                Necessita autorização sup.
-                <p-sortIcon field="necessitaAutSuperior" />
+            <th pSortableColumn="ofx" style="min-width: 12rem">
+                OFX
+                <p-sortIcon field="ofx" />
             </th>
             <th pSortableColumn="ativo" style="min-width: 12rem">
                 Ativo
                 <p-sortIcon field="ativo" />
             </th>
-            <th style="min-width: 12rem">Ações</th>
+           <th style="min-width: 12rem">Ações</th>
         </tr>
     </ng-template>
     <ng-template #body let-objeto>
         <tr>
             <td style="min-width: 16rem">{{ objeto.nome }}</td>
-            <td>{{ objeto.percentualDesconto + '%'}}</td>
             <td>
                 <i
                     class="pi"
                     [ngClass]="{
-                    'pi-check text-green-600': objeto.necessitaAutSuperior,
-                    'pi-times text-red-600': !objeto.necessitaAutSuperior
+                    'pi-check text-green-600': objeto.ofx,
+                    'pi-times text-red-600': !objeto.ofx
                     }"
-                    aria-label="aut_sup">
+                    aria-label="ofx">
                 </i>
             </td>
             <td>
@@ -74,7 +70,7 @@
     </ng-template>
 </p-table>
 
-<p-dialog [(visible)]="dialogo" [style]="{ width: '450px' }" header="Detalhes da bolsa" [modal]="true">
+<p-dialog [(visible)]="dialogo" [style]="{ width: '450px' }" header="Detalhes do tipo de documento" [modal]="true">
     <ng-template #content>
         <div class="flex flex-col gap-6">
             <div>
@@ -83,11 +79,14 @@
                 <small class="text-red-500" *ngIf="submitted && !objeto.nome">Nome é obrigatório.</small>
             </div>
             <div>
-                <label for="perc_desconto" class="block font-bold mb-3">Percentual de desconto</label>
-                <input name="perc_desconto" id="perc_desconto" type="number" pInputText [(ngModel)]="objeto.percentualDesconto" required fluid/>
-                <small class="text-red-500" *ngIf="submitted && !objeto.percentualDesconto">Percentual de desconto é obrigatório.</small>
+                <span class="block font-bold mb-4">Opções</span>
+                <div class="grid grid-cols-2 gap-2">
+                    <div class="flex items-center gap-2 col-span-6">
+                        <p-checkbox id="ofx" name="ofx" binary="true" [(ngModel)]="objeto.ofx"></p-checkbox>
+                        <label for="ofx">OFX</label>
+                    </div>
+                </div>
             </div>
-
             <div>
                 <label for="status" class="block font-bold mb-3">Status</label>
                 <p-select 
@@ -102,16 +101,6 @@
                     [appendTo]="'body'"
                 />
                 <small class="text-red-500" *ngIf="submitted && objeto.ativo == undefined">Status é obrigatório.</small>
-            </div>
-
-            <div>
-                <span class="block font-bold mb-4">Opções</span>
-                <div class="grid grid-cols-2 gap-2">
-                    <div class="flex items-center gap-2 col-span-6">
-                        <p-checkbox id="aut_sup" name="aut_sup" binary="true" [(ngModel)]="objeto.necessitaAutSuperior"></p-checkbox>
-                        <label for="aut_sup">Necessita autorização de superior</label>
-                    </div>
-                </div>
             </div>
         </div>
     </ng-template>

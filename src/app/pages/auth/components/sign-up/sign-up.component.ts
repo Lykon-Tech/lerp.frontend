@@ -56,7 +56,7 @@ export class SignUpComponent {
     ) {}
 
     onSubmit(): void {
-        this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Usuário cadastrado', life: 3000 });
+        this.messageService.add({ severity: 'success', summary: 'Sucesso', detail: 'Usuário cadastrado', life : 8000 });
     }
 
     onRedirectToLogin(): void {

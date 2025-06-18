@@ -1,5 +1,5 @@
 import { CommonModule } from "@angular/common";
-import { MovimentoService } from "../services/movimento.service";
+import { MovimentoService } from "../../services/movimento.service";
 import { ChartModule } from "primeng/chart";
 import { Component, OnInit, signal } from "@angular/core";
 import { FluidModule } from "primeng/fluid";
@@ -7,19 +7,19 @@ import { DropdownModule } from "primeng/dropdown";
 import { InputTextModule } from "primeng/inputtext";
 import { CheckboxModule } from "primeng/checkbox";
 import { ButtonModule } from "primeng/button";
-import { FiltroMovimento } from "../models/filtromovimento.model";
+import { FiltroMovimento } from "../../models/filtromovimento.model";
 import { FormsModule } from "@angular/forms";
 import { CardModule } from "primeng/card";
 import { ConfirmationService, MessageService } from "primeng/api";
 import { SelectModule } from "primeng/select";
-import { GrupoConta } from "../models/grupoconta.model";
-import { GrupoContaService } from "../services/grupoconta.service";
-import { ReceitasDespesasRelatorios } from "../models/receitasdespesasrelatorios.model";
+import { GrupoConta } from "../../models/grupoconta.model";
+import { GrupoContaService } from "../../services/grupoconta.service";
+import { ReceitasDespesasRelatorios } from "../../models/receitasdespesasrelatorios.model";
 import { PanelModule } from "primeng/panel";
-import { Conta } from "../models/conta.model";
-import { DashConta } from "../models/dashconta.model";
+import { Conta } from "../../models/conta.model";
+import { DashConta } from "../../models/dashconta.model";
 import { DatePicker } from "primeng/datepicker";
-import { SaldoConta } from "../models/saldoconta.model";
+import { SaldoConta } from "../../models/saldoconta.model";
 
 @Component({
     selector: 'app-dashboard-financeiro',

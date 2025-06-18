@@ -1,18 +1,18 @@
 import { Routes } from '@angular/router';
 import { Documentation } from './documentation/documentation';
-import { BancoComponent } from './financeiro/components/banco.component';
+import { BancoComponent } from './financeiro/components/banco/banco.component';
 import { Crud } from './crud/crud';
 import { Empty } from './empty/empty';
-import { BolsaComponent } from './financeiro/components/bolsa.component';
-import { GrupoContaComponent } from './financeiro/components/grupoconta.component';
-import { ContaComponent } from './financeiro/components/conta.component';
-import { SubcontaComponent } from './financeiro/components/subconta.component';
-import { TipoDocumentoComponent } from './financeiro/components/tipodocumento.component';
+import { BolsaComponent } from './financeiro/components/bolsa/bolsa.component';
+import { GrupoContaComponent } from './financeiro/components/grupoconta/grupoconta.component';
+import { ContaComponent } from './financeiro/components/conta/conta.component';
+import { SubcontaComponent } from './financeiro/components/subconta/subconta.component';
+import { TipoDocumentoComponent } from './financeiro/components/tipodocumento/tipodocumento.component';
 import { TipoCursoComponent } from './cursos/components/tipocurso/tipocurso.component';
 import { ModalidadeComponent } from './cursos/components/modalidade/modalidade.component';
 import { DisciplinaComponent } from './cursos/components/disciplina/disciplina.component';
 import { MatrizCurricularComponent } from './cursos/components/matrizcurricular/matrizcurricular.component';
-import { MovimentoComponent } from './financeiro/components/movimento.component';
+import { MovimentoComponent } from './financeiro/components/movimento/movimento.component';
 import { SituacaoTurmaComponent } from './turmas/components/situacaoturma.component';
 import { TurnoComponent } from './turmas/components/turnos.component';
 import { SalaComponent } from './turmas/components/sala.component';
@@ -25,6 +25,8 @@ import { TurmaComponent } from './turmas/components/turma.component';
 import { ContratoComponent } from './contratos/components/contrato.component';
 import { AlunoComponent } from './funcionarios/components/aluno.component';
 import { TransfAlunoComponent } from './turmas/components/transfalunos.component';
+import { FluxoCaixaComponent } from './financeiro/components/fluxocaixa/fluxocaixa.component';
+import { FaixaDREComponent } from './financeiro/components/faixadre/faixadre.component';
 
 export default [
     { path: 'documentation', component: Documentation },
@@ -51,6 +53,8 @@ export default [
     { path: 'alunos', component: AlunoComponent },
     { path: 'transferencia_alunos', component: TransfAlunoComponent },
     { path: 'turmas', component: TurmaComponent },
+    { path: 'fluxo_caixa', component: FluxoCaixaComponent },
+    { path: 'dre', component: FaixaDREComponent },
     { path: 'crud', component: Crud },
     { path: 'empty', component: Empty },
     { path: '**', redirectTo: '/notfound' }

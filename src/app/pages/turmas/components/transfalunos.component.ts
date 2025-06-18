@@ -158,7 +158,7 @@ export class TransfAlunoComponent extends BaseComponente<Turma, TurmaSaida> {
                     severity: 'error',
                     summary: 'Falha',
                     detail: 'Selecione uma turma de origem e destino',
-                    life: 3000
+                    life : 8000
                 });
 
                 return;
@@ -170,7 +170,7 @@ export class TransfAlunoComponent extends BaseComponente<Turma, TurmaSaida> {
                 severity: 'success',
                 summary: 'Sucesso',
                 detail: this.titulo + ' atualizad' + this.genero,
-                life: 3000
+                life : 8000
             });
         
         } catch (error) {
@@ -178,7 +178,7 @@ export class TransfAlunoComponent extends BaseComponente<Turma, TurmaSaida> {
                 severity: 'error',
                 summary: 'Falha',
                 detail: 'Falha ao salvar ' + this.titulo + ': ' + error,
-                life: 3000
+                life : 8000
             });
         }
         

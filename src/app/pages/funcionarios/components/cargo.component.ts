@@ -74,6 +74,7 @@ export class CargoComponent extends BaseComponente<Cargo, Cargo> {
         this.permissoes = [
             { label: 'VENDEDOR', value: 'VENDEDOR' },
             { label: 'FINANCEIRO', value: 'FINANCEIRO' },
+            { label: 'OPERADOR FINANCEIRO', value: 'OPERADOR FINANCEIRO' },
             { label: 'SUPERVISOR', value: 'SUPERVISOR' },
             { label: 'GESTOR', value: 'GESTOR' }
         ];

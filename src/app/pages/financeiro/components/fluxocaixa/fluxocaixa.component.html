@@ -1,0 +1,118 @@
+<div class="bg-white rounded-md shadow-md p-8">
+  <div class="flex items-center justify-between mb-8">
+    <h2 class="font-semibold text-2xl">Fluxo de Caixa</h2>
+    <div class="flex items-center space-x-4">
+      <label for="ano" class="font-bold text-gray-700">Selecione o Ano:</label>
+      <div class="relative">
+        <p-date-picker
+          id="ano"
+          [(ngModel)]="selectedYear"
+          view="year"
+          selectionMode="single"
+          dateFormat="yy"
+          (onSelect)="onYearSelect()"
+          [showIcon]="true"
+          [readonlyInput]="true"
+          inputId="yearPicker"
+          styleClass="w-48 text-sm"
+        ></p-date-picker>
+      </div>
+    </div>
+  </div>
+
+  <p-treeTable
+    [value]="treeTableValue"
+    [columns]="cols"
+    selectionMode="multiple"
+    [(selection)]="selectedNodes"
+    tableStyleClass="p-datatable-sm w-full"
+    [scrollable]="true"
+    scrollHeight="40rem"
+    responsiveLayout="scroll"
+  >
+    <ng-template pTemplate="header" let-columns>
+      <tr [style.background-color]="columns[0] ? 'darkblue': null"> <th
+          class="text-left font-semibold border-b-4 border-blue-700 px-6 py-4 w-96 text-sm"
+        >
+          {{ columns[0].header }}
+        </th>
+        <th
+          *ngFor="let col of columns.slice(1)"
+          class="text-left font-semibold border-b-4 border-blue-700 px-6 py-4 text-sm w-32"
+        >
+          {{ col.header }}
+        </th>
+      </tr>
+    </ng-template>
+
+    <ng-template
+      pTemplate="body"
+      let-rowNode
+      let-rowData="rowData"
+      let-columns="columns"
+    >
+      <tr
+        class="border-b-4 border-gray-100"
+        [style.background-color]="
+          rowData?.tipo === 'ENTRADAS' ? '#22c55e' : 
+          (rowNode.parent?.data?.tipo === 'ENTRADAS' && rowData?.isTotal) ? '#dcfce7' : 
+          (rowNode.parent?.parent?.data?.tipo === 'ENTRADAS' && !rowData?.isTotal) ? '#f0fdf4' :
+
+          rowData?.tipo === 'SAIDAS' ? '#dc2626' : 
+          (rowNode.parent?.data?.tipo === 'SAIDAS' && rowData?.isTotal) ? '#fee2e2' : 
+          (rowNode.parent?.parent?.data?.tipo === 'SAIDAS' && !rowData?.isTotal) ? '#fef2f2' : 
+
+          rowData?.tipo === 'RESULTADO FINAL' ? '#bfdbfe' :
+          rowData?.tipo === 'RESULTADO ACUMULADO' ? 'lightyellow' :
+          rowData?.tipo === 'PERCENTUAL DE LUCRATIVIDADE' ? 'lightgreen' :
+          null 
+        "
+        [style.color]="
+          rowData?.tipo === 'ENTRADAS' ? 'white' :
+          (rowNode.parent?.data?.tipo === 'ENTRADAS' && rowData?.isTotal) ? '#166534' :
+          (rowNode.parent?.parent?.data?.tipo === 'ENTRADAS' && !rowData?.isTotal) ? '#15803d' : 
+
+          rowData?.tipo === 'SAIDAS' ? 'white' :
+          (rowNode.parent?.data?.tipo === 'SAIDAS' && rowData?.isTotal) ? '#991b1b' : 
+          (rowNode.parent?.parent?.data?.tipo === 'SAIDAS' && !rowData?.isTotal) ? '#b91c1c' :
+
+          rowData?.tipo === 'RESULTADO FINAL' ? 'darkblue' : 
+          rowData?.tipo === 'RESULTADO ACUMULADO' ? 'black' :
+          rowData?.tipo === 'PERCENTUAL DE LUCRATIVIDADE' ? '#166534' :
+          null
+        "
+        [ngClass]="{
+          'font-bold': rowData?.tipo === 'ENTRADAS' || 
+          rowData?.tipo === 'SAIDAS' || 
+          rowData?.tipo === 'RESULTADO FINAL' || 
+          rowData?.tipo === 'RESULTADO ACUMULADO' || 
+          rowData?.tipo === 'PERCENTUAL DE LUCRATIVIDADE' ||
+          rowData?.grupoConta
+        }"
+      >
+        <td class="px-6 py-4 align-middle w-96">
+          <p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>
+          <span
+            [ngClass]="{
+              'ml-6': !rowNode.children && rowNode.level > 0,
+              'text-sm': rowNode.level <= 1,
+              'text-xs': rowNode.level === 2
+            }"
+          >
+            <ng-container *ngIf="rowData?.tipo">{{ rowData.tipo }}</ng-container>
+            <ng-container *ngIf="!rowData?.tipo && rowData?.grupoConta">{{ rowData.grupoConta }}</ng-container>
+            <ng-container *ngIf="!rowData?.tipo && !rowData?.grupoConta && rowData?.subconta">{{ rowData.subconta }}</ng-container>
+            <ng-container *ngIf="!rowData?.tipo && !rowData?.grupoConta && !rowData?.subconta">—</ng-container>
+          </span>
+        </td>
+
+        <td
+          *ngFor="let col of columns.slice(1)"
+          class="px-6 py-4 text-right align-middle text-sm w-32"
+        >
+          {{ rowData?.tipo === 'PERCENTUAL DE LUCRATIVIDADE' ? (getFieldData(rowData, col.field) | percent:'1.2-2') : (getFieldData(rowData, col.field) | currency:'BRL':'symbol':'1.2-2') }}
+        </td>
+      </tr>
+    </ng-template>
+  </p-treeTable>
+</div>

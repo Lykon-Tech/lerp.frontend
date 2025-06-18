@@ -11,17 +11,18 @@
     [rows]="10"
     [columns]="cols"
     [paginator]="true"
-    [globalFilterFields]="['nome', 'ativo']"
+    [globalFilterFields]="['nome', 'grupoConta.nome', 'tipo', 'tags', 'ativo']"
     [tableStyle]="{ 'min-width': '75rem' }"
     [rowHover]="true"
+    [loading]="loading"
     dataKey="id"
-    currentPageReportTemplate="Mostrando de {first} até {last} de {totalRecords} tipos de documentos"
+    currentPageReportTemplate="Mostrando de {first} até {last} de {totalRecords} subcontas"
     [showCurrentPageReport]="true"
     [rowsPerPageOptions]="[10, 20, 30]"
 >
     <ng-template #caption>
         <div class="flex items-center justify-between">
-            <h5 class="m-0">Gerenciar tipos de documentos</h5>
+            <h5 class="m-0">Gerenciar subcontas</h5>
             <p-iconfield>
                 <p-inputicon styleClass="pi pi-search" />
                 <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Pesquisar..." />
@@ -34,30 +35,33 @@
                 Nome
                 <p-sortIcon field="nome" />
             </th>
-            <th pSortableColumn="ofx" style="min-width: 12rem">
-                OFX
-                <p-sortIcon field="ofx" />
+            <th pSortableColumn="grupoConta" style="min-width:12rem">
+                Grupo de conta
+                <p-sortIcon field="grupoConta" />
+            </th>
+            <th pSortableColumn="tipo" style="min-width:12rem">
+                Tipo
+                <p-sortIcon field="tipo" />
+            </th>
+            <th pSortableColumn="tags" style="min-width:12rem">
+                Tags
+                <p-sortIcon field="tags" />
             </th>
             <th pSortableColumn="ativo" style="min-width: 12rem">
                 Ativo
                 <p-sortIcon field="ativo" />
             </th>
-           <th style="min-width: 12rem">Ações</th>
+            <th style="min-width: 12rem">Ações</th>
         </tr>
     </ng-template>
     <ng-template #body let-objeto>
         <tr>
-            <td style="min-width: 16rem">{{ objeto.nome }}</td>
+            <td style="min-width: 16rem">{{objeto.nome}}</td>
+            <td>{{objeto.grupoConta.nome}}</td>
             <td>
-                <i
-                    class="pi"
-                    [ngClass]="{
-                    'pi-check text-green-600': objeto.ofx,
-                    'pi-times text-red-600': !objeto.ofx
-                    }"
-                    aria-label="ofx">
-                </i>
+                <p-tag [value]="objeto.tipo" [severity]="getSeverity(objeto.tipo == 'ENTRADA')" />
             </td>
+            <td>{{getTagsNome(objeto.tags) | json}}</td>
             <td>
                 <p-tag [value]="objeto.ativo ? 'ATIVO' : 'INATIVO' " [severity]="getSeverity(objeto.ativo)" />
             </td>
@@ -67,9 +71,17 @@
             </td>
         </tr>
     </ng-template>
+
+    <ng-template #emptymessage>
+        <tr><td colspan="7">Nenhuma subconta encontrada.</td></tr>
+    </ng-template>
+
+    <ng-template #loadingbody>
+        <tr><td colspan="7">Carregando dados...</td></tr>
+    </ng-template>
 </p-table>
 
-<p-dialog [(visible)]="dialogo" [style]="{ width: '450px' }" header="Detalhes do tipo de documento" [modal]="true">
+<p-dialog [(visible)]="dialogo" [style]="{ width: '450px' }" header="Detalhes da subconta" [modal]="true">
     <ng-template #content>
         <div class="flex flex-col gap-6">
             <div>
@@ -78,14 +90,49 @@
                 <small class="text-red-500" *ngIf="submitted && !objeto.nome">Nome é obrigatório.</small>
             </div>
             <div>
-                <span class="block font-bold mb-4">Opções</span>
-                <div class="grid grid-cols-2 gap-2">
+                <label for="grupo_conta" class="block font-bold mb-3">Grupo de conta</label>
+                <p-select 
+                    name="grupo_conta" 
+                    [(ngModel)]="objeto.grupoConta" 
+                    inputId="grupo_conta" 
+                    [options]="grupoContas_select" 
+                    optionLabel="label" 
+                    optionValue="value"
+                    placeholder="Selecione um grupo de conta"
+                    fluid 
+                    (onChange)="aoSelecionar($event)"
+                    [appendTo]="'body'"
+                />
+                <small class="text-red-500" *ngIf="submitted && objeto.grupoConta == undefined">Grupo de conta é obrigatório.</small>
+            </div>
+
+            <div>
+                <span class="block font-bold mb-4">Tipo</span>
+                <div class="grid grid-cols-12 gap-4">
                     <div class="flex items-center gap-2 col-span-6">
-                        <p-checkbox id="ofx" name="ofx" binary="true" [(ngModel)]="objeto.ofx"></p-checkbox>
-                        <label for="ofx">OFX</label>
+                        <p-radiobutton [disabled]="tipoTravado" id="tipo1" name="tipo" value="ENTRADA" [(ngModel)]="objeto.tipo" />
+                        <label for="tipo1">Entrada</label>
+                    </div>
+                    <div class="flex items-center gap-2 col-span-6">
+                        <p-radiobutton [disabled]="tipoTravado" id="tipo2" name="tipo" value="SAIDA" [(ngModel)]="objeto.tipo" />
+                        <label for="tipo2">Saída</label>
                     </div>
                 </div>
+                <small class="text-red-500" *ngIf="submitted && objeto.tipo == undefined">Tipo é obrigatório.</small>
             </div>
+
+            <div>
+                <label for="tags" class="block font-bold mb-3">Tags</label>
+                <textarea
+                pInputTextarea
+                id="tags"
+                [(ngModel)]="tagInput"
+                rows="3"
+                placeholder="tags (separe por ;)"
+                fluid
+                ></textarea>
+            </div>
+
             <div>
                 <label for="status" class="block font-bold mb-3">Status</label>
                 <p-select 

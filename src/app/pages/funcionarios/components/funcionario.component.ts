@@ -78,6 +78,11 @@ export class FuncionarioComponent extends BaseComponente<Funcionario, Funcionari
     cargos = signal<Cargo[]>([]);
 
     cargos_select! : any[];
+
+    senha! : string;
+    senhaRepetida! : string;
+
+    editarSenha : boolean = false;
     
     override async loadDemoData() {
         this.loading = true;
@@ -104,6 +109,20 @@ export class FuncionarioComponent extends BaseComponente<Funcionario, Funcionari
         super.loadDemoData();
     }
 
+    override async save(){
+        if(this.senha !== this.senhaRepetida){
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Falha',
+                detail: 'As senhas não conferem',
+                life : 8000
+            });
+            return;
+        }
+
+        await super.save()
+    }
+
     override getValidacoes(): boolean {
         return (this.objeto as any).nome.trim() && 
                 (this.objeto as any).ativo != undefined && 
@@ -113,7 +132,6 @@ export class FuncionarioComponent extends BaseComponente<Funcionario, Funcionari
                 (this.objeto as any).cep.trim() &&
                 (this.objeto as any).logradouro.trim() &&
                 (this.objeto as any).numero.trim() &&
-                (this.objeto as any).complemento.trim() &&
                 (this.objeto as any).bairro.trim() &&
                 (this.objeto as any).cidade.trim() &&
                 (this.objeto as any).uf.trim() &&
@@ -174,12 +192,17 @@ export class FuncionarioComponent extends BaseComponente<Funcionario, Funcionari
             chavePix : objeto.chavePix,
             tipoChavePix : objeto.tipoChavePix,
             agencia : objeto.agencia,
-            numeroConta : objeto.numeroConta
+            numeroConta : objeto.numeroConta,
+            senha: this.senha
         };
     }
 
     alterarTipoPagamento(event : any){
         this.tipoPagamentoSelecionado = event.value;
+    }
+
+    editSenha(){
+        this.editarSenha = !this.editarSenha;
     }
 
 }

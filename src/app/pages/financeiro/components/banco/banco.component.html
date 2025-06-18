@@ -11,17 +11,18 @@
     [rows]="10"
     [columns]="cols"
     [paginator]="true"
-    [globalFilterFields]="['nome', 'recebimento_vendas', 'ativo']"
+    [globalFilterFields]="['nome', 'numero_banco', 'exigeOfx', 'caixa', 'ativo']"
     [tableStyle]="{ 'min-width': '75rem' }"
     [rowHover]="true"
+    [loading]="loading"
     dataKey="id"
-    currentPageReportTemplate="Mostrando de {first} até {last} de {totalRecords} grupo de contas"
+    currentPageReportTemplate="Mostrando de {first} até {last} de {totalRecords} bancos"
     [showCurrentPageReport]="true"
     [rowsPerPageOptions]="[10, 20, 30]"
 >
     <ng-template #caption>
         <div class="flex items-center justify-between">
-            <h5 class="m-0">Gerenciar grupo de contas</h5>
+            <h5 class="m-0">Gerenciar bancos</h5>
             <p-iconfield>
                 <p-inputicon styleClass="pi pi-search" />
                 <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Pesquisar..." />
@@ -34,13 +35,17 @@
                 Nome
                 <p-sortIcon field="nome" />
             </th>
-            <th pSortableColumn="recebimento_vendas" style="min-width: 12rem">
-                Recebimento de vendas
-                <p-sortIcon field="recebimento_vendas" />
+            <th pSortableColumn="numero_banco" style="min-width:12rem">
+                Número
+                <p-sortIcon field="numero_banco" />
             </th>
-            <th pSortableColumn="transf_contas" style="min-width: 12rem">
-                Transferência entre contas
-                <p-sortIcon field="transf_contas" />
+            <th pSortableColumn="exigeOfx" style="min-width: 12rem">
+                Exige OFX
+                <p-sortIcon field="exigeOfx" />
+            </th>
+            <th pSortableColumn="caixa" style="min-width: 12rem">
+                Caixa
+                <p-sortIcon field="caixa" />
             </th>
             <th pSortableColumn="ativo" style="min-width: 12rem">
                 Ativo
@@ -52,24 +57,25 @@
     <ng-template #body let-objeto>
         <tr>
             <td style="min-width: 16rem">{{ objeto.nome }}</td>
+            <td>{{ objeto.numeroBanco }}</td>
             <td>
                 <i
                     class="pi"
                     [ngClass]="{
-                    'pi-check text-green-600': objeto.tipoOperacao == 'RECEBIMENTO',
-                    'pi-times text-red-600': objeto.tipoOperacao != 'RECEBIMENTO'
+                    'pi-check text-green-600': objeto.exigeOfx,
+                    'pi-times text-red-600': !objeto.exigeOfx
                     }"
-                    aria-label="aut_sup">
+                    aria-label="exige OFX">
                 </i>
             </td>
             <td>
                 <i
                     class="pi"
                     [ngClass]="{
-                    'pi-check text-green-600': objeto.tipoOperacao == 'TRANSFERENCIA',
-                    'pi-times text-red-600': objeto.tipoOperacao != 'TRANSFERENCIA'
+                    'pi-check text-green-600': objeto.caixa,
+                    'pi-times text-red-600': !objeto.caixa
                     }"
-                    aria-label="aut_sup">
+                    aria-label="caixa">
                 </i>
             </td>
             <td>
@@ -83,13 +89,18 @@
     </ng-template>
 </p-table>
 
-<p-dialog [(visible)]="dialogo" [style]="{ width: '450px' }" header="Detalhes do grupo de conta" [modal]="true">
+<p-dialog [(visible)]="dialogo" [style]="{ width: '450px' }" header="Detalhes do banco" [modal]="true">
     <ng-template #content>
         <div class="flex flex-col gap-6">
             <div>
                 <label for="name" class="block font-bold mb-3">Nome</label>
                 <input name="name" type="text" pInputText id="nome" [(ngModel)]="objeto.nome" required autofocus fluid />
                 <small class="text-red-500" *ngIf="submitted && !objeto.nome">Nome é obrigatório.</small>
+            </div>
+            <div>
+                <label for="nr_banco" class="block font-bold mb-3">Número do banco</label>
+                <input name="nr_banco" id="numero_banco" type="number" pInputText [(ngModel)]="objeto.numeroBanco" required fluid/>
+                <small class="text-red-500" *ngIf="submitted && (objeto.numeroBanco == null)">Número é obrigatório.</small>
             </div>
 
             <div>
@@ -105,31 +116,22 @@
                     fluid 
                     [appendTo]="'body'"
                 />
-                    <small class="text-red-500" *ngIf="submitted && objeto.ativo == undefined">Status é obrigatório.</small>
+                <small class="text-red-500" *ngIf="submitted && objeto.ativo == undefined">Status é obrigatório.</small>
             </div>
 
             <div>
                 <span class="block font-bold mb-4">Opções</span>
-                <div class="grid grid-cols-12 gap-4">
+                <div class="grid grid-cols-2 gap-2">
                     <div class="flex items-center gap-2 col-span-6">
-                        <p-radiobutton 
-                            name="opcoes" 
-                            inputId="recebimento_vendas" 
-                            [(ngModel)]="objeto.tipoOperacao" 
-                            value="RECEBIMENTO" />
-                        <label for="recebimento_vendas">Recebimento de vendas</label>
+                        <p-checkbox id="exige_ofx" name="exige_ofx" binary="true" [(ngModel)]="objeto.exigeOfx"></p-checkbox>
+                        <label for="exige_ofx">Exige OFX</label>
                     </div>
                     <div class="flex items-center gap-2 col-span-6">
-                        <p-radiobutton 
-                            name="opcoes" 
-                            inputId="transf_contas" 
-                            [(ngModel)]="objeto.tipoOperacao" 
-                            value="TRANSFERENCIA" />
-                        <label for="transf_contas">Transferência entre contas</label>
+                        <p-checkbox id="caixa" name="caixa" binary="true" [(ngModel)]="objeto.caixa"></p-checkbox>
+                        <label for="caixa">Caixa</label>
                     </div>
                 </div>
             </div>
-
         </div>
     </ng-template>
 

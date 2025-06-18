@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -19,8 +19,8 @@ import { MenuModule } from 'primeng/menu';
                 <i class="pi pi-bars"></i>
             </button>
             <a class="layout-topbar-logo" routerLink="/">
-                <img src="assets/logo32.png" alt="logo32" class="logo">
-                <span>LYKON | LERP</span>
+                <img src="assets/logo.png" alt="logo" class="w-16 h-16"/>
+                <span>LYKON | LFS </span>
             </a>
         </div>
 
@@ -51,20 +51,11 @@ import { MenuModule } from 'primeng/menu';
 
             <div class="layout-topbar-menu hidden lg:block">
                 <div class="layout-topbar-menu-content">
-                    <button type="button" class="layout-topbar-action">
-                        <i class="pi pi-calendar"></i>
-                        <span>Calendar</span>
-                    </button>
-                    <button type="button" class="layout-topbar-action">
-                        <i class="pi pi-inbox"></i>
-                        <span>Messages</span>
-                    </button>
-
                     <div> 
-                        <p-menu #menu [popup]="true" [model]="overlayMenuItems"></p-menu>
+                        <p-menu #menu [popup]="true" [model]="overlayMenuItems" appendTo="body"></p-menu>
                         <button type="button" class="layout-topbar-action" (click)="menu.toggle($event)" style="width:auto" pButton icon="pi pi-chevron-down" >
                             <i class="pi pi-user"></i>
-                            <span>Profile</span>
+                            <span>Perfil</span>
                         </button>
                     </div>
                 </div>
@@ -72,10 +63,29 @@ import { MenuModule } from 'primeng/menu';
         </div>
     </div>`
 })
-export class AppTopbar {
-    items!: MenuItem[];
+export class AppTopbar implements OnInit{
 
     constructor(public layoutService: LayoutService, private authService: AuthService, private router: Router) {}
+
+    items!: MenuItem[];
+
+    overlayMenuItems: MenuItem[] = [];
+
+    ngOnInit(): void {
+        this.overlayMenuItems.push( {
+            label: this.authService.getNome() ?? ""
+        },
+        {
+            separator: true
+        },
+        {
+            label: 'Sair',
+            icon: 'pi pi-fw pi-sign-in',
+            command: () => this.logout()
+        })
+    }
+
+
     toggleDarkMode() {
         this.layoutService.layoutConfig.update((state) => ({ ...state, darkTheme: !state.darkTheme }));
     }
@@ -85,26 +95,5 @@ export class AppTopbar {
         this.router.navigate(['/auth/login']);
     }
 
-    overlayMenuItems = [
-        {
-            label: 'Save',
-            icon: 'pi pi-save'
-        },
-        {
-            label: 'Update',
-            icon: 'pi pi-refresh'
-        },
-        {
-            label: 'Delete',
-            icon: 'pi pi-trash'
-        },
-        {
-            separator: true
-        },
-        {
-            label: 'Sair',
-            icon: 'pi pi-fw pi-sign-in',
-            command: () => this.logout()
-        }
-    ];
+
 }

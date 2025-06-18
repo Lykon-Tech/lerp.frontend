@@ -92,7 +92,7 @@
         currentPageReportTemplate="Mostrando de {first} até {last} de {totalRecords} movimentos"
         [showCurrentPageReport]="true"
         [rowsPerPageOptions]="[10, 20, 30]"
-        [globalFilterFields]="['conta.numeroConta','subconta.nome', 'dataLancamento', 'tipoDocumento.nome', 'valor', 'numeroDocumento', 'historico']"
+        [globalFilterFields]="['conta.numeroConta','subcontaNomeExibido', 'dataLancamento', 'tipoDocumento.nome', 'valor', 'numeroDocumento', 'historico']"
     >
         <ng-template #caption>
             <div class="flex justify-between items-center">
@@ -120,12 +120,12 @@
                     <p-columnFilter  dataType="date" dateFormat="dd/mm/yy" type="date" field="dataLancamento" display="menu" placeholder="dd/mm/aaaa" />
                 </th>
                 <th style="min-width: 8rem">
-                    Conta
+                    Conta bancária
                     <p-columnFilter type="text" field="conta.numeroConta" display="menu" placeholder="Buscar por conta" matchMode="contains"/>
                 </th>
                 <th style="min-width: 10rem">
                     Subconta
-                    <p-columnFilter type="text" field="subconta.nome" display="menu" placeholder="Buscar por subconta" matchMode="contains"/>
+                    <p-columnFilter type="text" field="subcontaNomeExibido" display="menu" placeholder="Buscar por subconta" matchMode="contains"/>
                 </th>
                 <th style="min-width: 12rem">
                     Tipo Documento

@@ -1,0 +1,123 @@
+<div class="bg-white rounded-md shadow-md p-8">
+  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+    <h2 class="font-semibold text-xl md:text-2xl text-gray-800 text-center md:text-left">
+      Demonstrativo do Resultado do Exercício
+    </h2>
+
+    <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-4 gap-2 sm:gap-0 text-center md:text-left">
+      <label for="ano" class="font-bold text-gray-700">Selecione o Ano:</label>
+      <div class="relative">
+        <p-date-picker
+          id="ano"
+          [(ngModel)]="selectedYear"
+          view="year"
+          selectionMode="single"
+          dateFormat="yy"
+          (onSelect)="onYearSelect()"
+          [showIcon]="true"
+          [readonlyInput]="true"
+          inputId="yearPicker"
+          styleClass="w-full sm:w-48 text-sm"
+        ></p-date-picker>
+      </div>
+    </div>
+  </div>
+
+  <p-treeTable
+    [value]="treeTableValue"
+    [columns]="cols"
+    selectionMode="multiple"
+    [(selection)]="selectedNodes"
+    tableStyleClass="p-datatable-sm w-full"
+    [scrollable]="true"
+    scrollHeight="50rem"
+    responsiveLayout="scroll"
+  >
+    <ng-template pTemplate="header" let-columns>
+      <tr>
+        <th *ngFor="let col of columns"
+            [ngClass]="{'text-left font-semibold border-b-2 border-gray-300 text-gray-700 bg-gray-100 px-6 py-4 text-sm': true, 'w-96': col.field === 'name', 'w-32': col.field !== 'name'}">
+          {{ col.header }}
+        </th>
+      </tr>
+    </ng-template>
+
+    <ng-template
+      pTemplate="body"
+      let-rowNode
+      let-rowData="rowData"
+      let-columns="columns"
+    >
+      <tr
+        class="border-b border-gray-200"
+        [style.background-color]="
+          rowData?.faixaDRE === 'RECEITA BRUTA' ? '#e6f7ed' : 
+          rowData?.faixaDRE === 'DEDUÇÕES DA RECEITA' || rowData?.faixaDRE === 'CUSTOS VARIÁVEIS' || rowData?.faixaDRE === 'CUSTOS FIXOS' || rowData?.faixaDRE === 'IR/CSLL' ? '#fdf2f2' : 
+          rowData?.tipo === 'RESULTADO FINAL' ? '#e0f2fe' : 
+          rowData?.tipo === 'RECEITA LÍQUIDA' ? '#e0f2fe' : 
+          rowData?.tipo === 'RESULTADO OPERACIONAL' ? '#e0f2fe' :
+          rowData?.tipo === 'LUCRO ANTES DO IR/CSLL' ? '#e0f2fe' :
+          rowData?.tipo === 'MARGEM DE CONTRIBUIÇÃO' ? '#e0f2fe' : 
+          rowData?.tipo === 'MARGEM DE CONTRIBUIÇÃO PERCENTUAL' ? '#e0f2fe' : 
+          rowData?.tipo === 'MARGEM LÍQUIDA' ? '#f0fdf4' : 
+          null
+        "
+        [style.color]="
+          rowData?.faixaDRE === 'RECEITA BRUTA' ? '#1e7b4a' :
+          rowData?.faixaDRE === 'DEDUÇÕES DA RECEITA' || rowData?.faixaDRE === 'CUSTOS VARIÁVEIS' || rowData?.faixaDRE === 'CUSTOS FIXOS' || rowData?.faixaDRE === 'IR/CSLL' ? '#b91c1c' :
+          rowData?.tipo === 'RESULTADO FINAL' ? '#2563eb' :
+          rowData?.tipo === 'RECEITA LÍQUIDA' ? '#2563eb' : 
+          rowData?.tipo === 'RESULTADO OPERACIONAL' ? '#2563eb' :
+          rowData?.tipo === 'LUCRO ANTES DO IR/CSLL' ? '#2563eb' :
+          rowData?.tipo === 'MARGEM DE CONTRIBUIÇÃO' ? '#2563eb' : 
+          rowData?.tipo === 'MARGEM DE CONTRIBUIÇÃO PERCENTUAL' ? '#2563eb' : 
+          rowData?.tipo === 'MARGEM LÍQUIDA' ? '#2563eb' :  
+          rowData?.isHeader ? '#4b5563' : 
+          rowData?.isTotal ? '#374151' : 
+          '#6b7280'
+        "
+        [ngClass]="{
+          'font-bold': rowData?.isTotal || rowData?.isHeader,
+          'text-lg': rowData?.isHeader, 
+          'text-base': rowData?.isTotal && !rowData?.isHeader 
+        }"
+      >
+        <td *ngFor="let col of columns; let i = index"
+            [ngClass]="{'px-6 py-4 align-middle text-sm': true, 'w-96': col.field === 'name', 'w-32 text-right': col.field !== 'name'}">
+
+          <ng-container *ngIf="i === 0">
+            <p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>
+            <span
+              [ngClass]="{
+                'ml-6': !rowNode.children && rowNode.level > 0,
+                'text-sm': rowNode.level <= 1,
+                'text-xs': rowNode.level === 2
+              }"
+            >
+              {{ rowData.name }}
+            </span>
+          </ng-container>
+
+          <ng-container *ngIf="col.field !== 'name'">
+            <span [ngClass]="{
+                  'font-bold': rowData.isTotal || rowData.tipo === 'RESULTADO FINAL' || rowData.tipo === 'RESULTADO LÍQUIDO OPERACIONAL' || rowData.tipo === 'MARGEM DE CONTRIBUIÇÃO' || rowData.tipo === 'RESULTADO OPERACIONAL ANTES DO IR/CSLL' || rowData.tipo === 'RESULTADO ANTES DO IR/CSLL'
+                }">
+              <ng-container *ngIf="rowData.tipo === 'MARGEM LÍQUIDA' || rowData.tipo === 'MARGEM DE CONTRIBUIÇÃO PERCENTUAL'; else currencyFormat">
+                {{ getFieldData(rowData, col.field) | percent:'1.2-2' }}
+              </ng-container>
+              <ng-template #currencyFormat>
+                {{ getFieldData(rowData, col.field) | currency:'BRL':'symbol':'1.2-2' }}
+              </ng-template>
+            </span>
+          </ng-container>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td [attr.colspan]="cols.length">Nenhum dado encontrado para o ano selecionado.</td>
+      </tr>
+    </ng-template>
+  </p-treeTable>
+</div>
